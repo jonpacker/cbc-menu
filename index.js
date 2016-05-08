@@ -10,7 +10,7 @@ function compile(str, path) {
     .use(nib());
 }
 
-app.use('public/css', stylus.middleware({ src: __dirname , compile: compile }));
+app.use('/css', stylus.middleware({ src: __dirname + '/public/css' , compile: compile }));
 
 app.set('view engine', 'jade');
 app.set('views', __dirname + '/views');
@@ -19,4 +19,5 @@ app.get('/', function(req, res) {
   res.render('index');
 });
 
+app.use(express.static(__dirname + '/public'));
 app.listen(8090);

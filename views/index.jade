@@ -3,16 +3,20 @@ html
   head
     title CBC 2016
     script(type="text/javascript", src="/js/cbc.js")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+
+    link(href='https://fonts.googleapis.com/css?family=Oswald:400,700', rel='stylesheet', type='text/css')
+    link(href="/css/cbc.css", type="text/css", rel="stylesheet")
   body
     #main-menu
       h1 Sessions
-        .sessions
-          a(href="#", data-target-type="session", data-target="yellow", class="session yellow") Yellow
-          a(href="#", data-target-type="session", data-target="blue", class="session blue") Blue
-          a(href="#", data-target-type="session", data-target="red", class="session red") Red
-          a(href="#", data-target-type="session", data-target="green", class="session green") Green
+      .sessions
+        a(href="#", data-target-type="session", data-target="yellow", class="session yellow") Yellow
+        a(href="#", data-target-type="session", data-target="blue", class="session blue") Blue
+        a(href="#", data-target-type="session", data-target="red", class="session red") Red
+        a(href="#", data-target-type="session", data-target="green", class="session green") Green
       h1 All Beers
-        .by
-          a(href="#", data-target="brewers", class="all-beers-sel") By Brewer
-          a(href="#", data-target="styles", class="all-beers-sel") By Style
-          a(href="#", data-target="ranking", class="all-beers-sel") By Ranking
+      .beer-lists
+        a(href="#", data-target="brewers", class="all-beers-sel") By Brewer
+        a(href="#", data-target="styles", class="all-beers-sel") By Style
+        a(href="#", data-target="ranking", class="all-beers-sel") By Ranking

@@ -1,0 +1,38 @@
+@require 'clrs.styl'
+html
+body
+  width: 100%
+  padding: 0
+  margin: 0
+
+body
+  font-family: Oswald
+
+h1
+  text-align: center
+
+#main-menu
+  .sessions
+    width: 100%
+    display: flex
+    flex-wrap: wrap
+    box-sizing: border-box
+    justify-content: center
+    padding: 5% 0
+    .session
+      width: 45%
+      box-sizing: border-box
+      color: black
+      font-size: 5vw
+      padding: 8vw
+      text-align: center
+      display: block
+      
+.session.yellow
+  background-color: yellow
+.session.blue
+  background-color: blue
+.session.red
+  background-color: red
+.session.green
+  background-color: green
