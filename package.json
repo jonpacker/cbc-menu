@@ -10,6 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.13.4",
-    "seraph": "^0.14.2"
+    "jade": "^1.11.0",
+    "nib": "^1.1.0",
+    "seraph": "^0.14.2",
+    "stylus": "^0.54.5"
   }
 }
