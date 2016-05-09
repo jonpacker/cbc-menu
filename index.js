@@ -67,4 +67,4 @@ app.get('/', function(req, res) {
 });
 
 app.use(express.static(__dirname + '/public'));
-app.listen(8090);
+app.listen(8090,'0.0.0.0');

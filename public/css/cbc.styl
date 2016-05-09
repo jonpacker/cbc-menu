@@ -71,6 +71,21 @@ h1
    text-transform: capitalize
    font-size: 8vw
 
+   sub
+     font-size: 3vw
+     display: block
+
+  .key
+    text-align: center
+    margin-top: 2vw
+  .key .style-border
+    display: inline-block
+    padding: 1vw
+    font-size: 2.5vw
+    margin-right: 2vw
+    margin-bottom: 1vw
+    background: #CCC
+
   .brewery
     width: 90%
     background-color: #EEE
@@ -89,8 +104,11 @@ h1
     &:last-child
       margin-bottom: 0
 
+
+
     .headline
       padding: 2vw 5vw
+
       font-size: 4vw
       background-color: #CCC
       display: flex
@@ -158,6 +176,38 @@ h1
           font-size: 2.5vw
           box-sizing: border-box
           padding: 1px
+
+.style-border
+  &.Dark
+    border-left: 2vw solid maroon
+
+  &.Classic
+    border-left: 2vw solid silver
+
+  &.Hoppy
+    border-left: 2vw solid green
+
+  &.Extreme
+    border-left: 2vw solid black
+
+  &.Brett-fermented
+    border-left: 2vw solid blue
+
+  &.Sour
+    border-left: 2vw solid navy
+
+  &.Belgian
+    border-left: 2vw solid fuchsia
+
+  &.Experimental
+    border-left: 2vw solid red
+
+  &.Cider
+  &.Mead
+    border-left: 2vw solid teal
+
+  &.Pumpkin
+    border-left: 2vw solid orange
 
 
 .session.yellow

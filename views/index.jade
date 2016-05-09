@@ -39,22 +39,27 @@ html
   script(type="text/html", class="template", data-template-id="session")
     #session
       h1(class="session {{colour}}") {{colour}} session
+        sub {{beer_count}} beers, {{breweries.length}} brewers listed
       | {{#breweries}}
+      .key 
+        | {{#metastyles}}
+        .style-border(class="{{.}}") {{.}}
+        | {{/metastyles}}
       .brewery
         h2 {{name}}
         .beers
           | {{#beers}}
-          .beer
+          .beer.style-border(class="{{metastyle}}")
             .headline
               .name {{name}}
               .abv {{percent}}%
               .style {{superstyle}}
               .ratings
-                .score.avg {{avg_score_fixed}}
-                .score.hype {{hype_score_fixed}}
-                a.score.untappd(href="{{untappd_url}}", target="_blank") {{untappd}}
-                a.score.ratebeer(href="{{ratebeer_url}}", target="_blank") {{ratebeer}}
-                .score.beeradvocate(href="{{beeradvocate_url}}", target="_blank") {{beeradvocate}}
+                .score.avg {{avg_score_fixed}}{{score_rank_br}}
+                .score.hype {{hype_score_fixed}}{{hype_rank_br}}
+                a.score.untappd(href="{{untappd_url}}", target="_blank") {{untappd}}{{untappd_rank_br}}
+                a.score.ratebeer(href="{{ratebeer_url}}", target="_blank") {{ratebeer}}{{ratebeer_rank_br}}
+                .score.beeradvocate(href="{{beeradvocate_url}}", target="_blank") {{beeradvocate}}{{beeradvocate_rank_br}}
               .expanded
                 .style Brewer's description: <strong>{{style}}</strong>
                 .desc {{trunc_desc}}
@@ -68,4 +73,5 @@ html
   script(type="text/javascript", src="/js/jquery-2.2.3.min.js")
   script(type="text/javascript", src="/js/underscore-min.js")
   script(type="text/javascript", src="/js/mustache.min.js")
+  script(type="text/javascript", src="/js/rate.js")
   script(type="text/javascript", src="/js/cbc.js")

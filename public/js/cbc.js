@@ -33,8 +33,8 @@ function render(renderer, opts) {
 var renderers = {
   session: function(opts) {
     if (!opts.colour) return;
-    var breweries = window.beers.reduce(function(breweries, beer) {
-      if (beer.session != opts.colour) return breweries;
+    var beers = beerSubsetWithRankings(function(beer) { return beer.session == opts.colour });
+    var breweries = beers.reduce(function(breweries, beer) {
       if (!breweries[beer.brewery]) breweries[beer.brewery] = [];
       
       beer.avg_score_fixed = beer.avg_score ? beer.avg_score.toFixed(2) : '';
@@ -51,7 +51,8 @@ var renderers = {
       }
     });
     opts.breweries = _.sortBy(opts.breweries, 'name');
-    console.log(opts.breweries);
+    opts.beer_count = beers.length;
+    opts.metastyles = window.metastyles;
     return Mustache.render(templates.session, opts);
   },
   index: function(opts) {
