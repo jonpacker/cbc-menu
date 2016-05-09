@@ -2,25 +2,27 @@ doctype html
 html
   head
     title CBC 2016
-    script(type="text/javascript", src="/js/cbc.js")
     meta(name="viewport", content="width=device-width, initial-scale=1")
 
     link(href='https://fonts.googleapis.com/css?family=Oswald:400,700', rel='stylesheet', type='text/css')
     link(href="/css/cbc.css", type="text/css", rel="stylesheet")
   body
+    #window
+
+  script(type="text/html", class="template", data-template-id="index")
     #main-menu
       h1 Sessions
       .sessions
-        a(href="#", data-target-type="session", data-target="yellow", class="session yellow") 
+        a(href='#session[{"colour":"yellow"}]', class="session yellow") 
           h2 Yellow
           .sub Friday 10-14
-        a(href="#", data-target-type="session", data-target="blue", class="session blue") 
+        a(href='#session[{"colour":"blue"}]', class="session blue") 
           h2 Blue
           .sub Friday 16-20
-        a(href="#", data-target-type="session", data-target="red", class="session red") 
+        a(href='#session[{"colour":"red"}]', class="session red") 
           h2 Red
           .sub Saturday 10-14
-        a(href="#", data-target-type="session", data-target="green", class="session green") 
+        a(href='#session[{"colour":"green"}]', class="session green") 
           h2 Green
           .sub Saturday 16-20
       h1 All Beers
@@ -28,3 +30,10 @@ html
         a(href="#", data-target="brewers", class="all-beers-sel") By Brewer
         a(href="#", data-target="styles", class="all-beers-sel") By Style
         a(href="#", data-target="ranking", class="all-beers-sel") By Ranking
+
+  script(type="text/html", class="template", data-template-id="session")
+    #session(class="session-{{colour}}")
+
+  script(type="text/javascript", src="/js/jquery-2.2.3.min.js")
+  script(type="text/javascript", src="/js/underscore-min.js")
+  script(type="text/javascript", src="/js/cbc.js")

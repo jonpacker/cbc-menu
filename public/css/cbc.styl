@@ -34,7 +34,29 @@ h1
       .sub
         font-size: 2vm
         font-style: italic
-      
+
+  .beer-lists
+    display: flex
+    box-sizing:border-box
+    flex-wrap: wrap
+    flex-direction: vertical
+    justify-content: center
+    padding: 5% 0
+
+    .all-beers-sel
+      width: 90%
+      background-color: orange
+      margin-bottom: 3vw
+
+      font-size: 5vw
+      padding: 2vw 8vw
+      box-sizing: border-box
+      color: black
+      text-decoration: none
+      &:after
+        content: '➜'
+        float: right
+
 .session.yellow
   background-color: yellow
 .session.blue
