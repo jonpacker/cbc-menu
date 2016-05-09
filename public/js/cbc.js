@@ -20,24 +20,35 @@ _.templateSettings = {
 };
 var templates = {};
 $(".template").each(function() {
-  templates[this.dataset.templateId] = _.template(this.innerHTML);
+  templates[this.dataset.templateId] = this.innerHTML;
 });
 
 
 var view = $('#window');
 function render(renderer, opts) {
   if (!renderers[renderer]) return;
-  view.html(renderers[renderer](opts))
+  view.empty().html(renderers[renderer](opts))
 };
 
 var renderers = {
   session: function(opts) {
     if (!opts.colour) return;
+    opts.breweries = {
+      name: "3 Floyds Brewing",
+      beers: [
+        {name: "Zombie Dust", style: "American Pale Ale"}
+      ]
+    }
+    return Mustache.render(templates.session, opts);
   },
   index: function(opts) {
-    return templates.index();
+    return Mustache.render(templates.index, {});
   }
 };
 
 if (location.hash) route(location.hash);
 else route('#index');
+
+$(window).on('hashchange', function() {
+  route(location.hash);
+});

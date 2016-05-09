@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.0.0-rc.4",
     "express": "^4.13.4",
     "jade": "^1.11.0",
     "nib": "^1.1.0",

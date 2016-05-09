@@ -6,6 +6,11 @@ html
 
     link(href='https://fonts.googleapis.com/css?family=Oswald:400,700', rel='stylesheet', type='text/css')
     link(href="/css/cbc.css", type="text/css", rel="stylesheet")
+    script(type="text/javascript").
+      window.beers = !{JSON.stringify(beers)};
+      window.breweries = !{JSON.stringify(breweries)};
+      window.superstyles = !{JSON.stringify(superstyles)};
+      window.metastyles = !{JSON.stringify(metastyles)};
   body
     #window
 
@@ -33,7 +38,19 @@ html
 
   script(type="text/html", class="template", data-template-id="session")
     #session(class="session-{{colour}}")
+      h1 {{colour}} session
+      | {{#breweries}}
+      #brewery
+        h2 {{name}}
+        | {{#beers}}
+        #beer
+          strong {{name}}
+          | {{style}}
+        | {{/beers}}
+      | {{/breweries}}
+
 
   script(type="text/javascript", src="/js/jquery-2.2.3.min.js")
   script(type="text/javascript", src="/js/underscore-min.js")
+  script(type="text/javascript", src="/js/mustache.min.js")
   script(type="text/javascript", src="/js/cbc.js")
