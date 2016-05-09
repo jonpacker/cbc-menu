@@ -37,16 +37,31 @@ html
         a(href="#", data-target="ranking", class="all-beers-sel") By Ranking
 
   script(type="text/html", class="template", data-template-id="session")
-    #session(class="session-{{colour}}")
-      h1 {{colour}} session
+    #session
+      h1(class="session {{colour}}") {{colour}} session
       | {{#breweries}}
-      #brewery
+      .brewery
         h2 {{name}}
-        | {{#beers}}
-        #beer
-          strong {{name}}
-          | {{style}}
-        | {{/beers}}
+        .beers
+          | {{#beers}}
+          .beer
+            .headline
+              .name {{name}}
+              .abv {{percent}}%
+              .style {{superstyle}}
+              .ratings
+                .score.avg {{avg_score_fixed}}
+                .score.hype {{hype_score_fixed}}
+                a.score.untappd(href="{{untappd_url}}", target="_blank") {{untappd}}
+                a.score.ratebeer(href="{{ratebeer_url}}", target="_blank") {{ratebeer}}
+                .score.beeradvocate(href="{{beeradvocate_url}}", target="_blank") {{beeradvocate}}
+              .expanded
+                .style Brewer's description: <strong>{{style}}</strong>
+                .desc {{trunc_desc}}
+
+
+          | {{/beers}}
+
       | {{/breweries}}
 
 

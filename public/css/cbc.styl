@@ -57,6 +57,109 @@ h1
         content: '➜'
         float: right
 
+#session
+  width: 100%
+  display: flex
+  justify-content: center
+  align-items: center
+  flex-direction: column
+
+  h1 
+   margin: 0
+   padding: 1vw 0
+   width: 100%
+   text-transform: capitalize
+   font-size: 8vw
+
+  .brewery
+    width: 90%
+    background-color: #EEE
+    box-sizing: border-box
+    margin-top: 2vw
+
+    h2
+      font-size: 5vw
+      margin: 0
+      padding: 3vw 5vw
+      background-color: #333
+      color: white
+
+  .beer
+    margin-bottom: 1vw
+    &:last-child
+      margin-bottom: 0
+
+    .headline
+      padding: 2vw 5vw
+      font-size: 4vw
+      background-color: #CCC
+      display: flex
+      align-items: center
+      flex-wrap: wrap
+
+      .name
+        font-weight: bold
+        width: 55%
+
+      .abv
+        width: 15%
+        font-size: 3.5vw
+
+      .style
+        width: 30%
+        font-size: 3vw
+
+      .ratings
+        width: 100%
+        display: flex
+        margin-top: 1vw
+        font-size: 3vw
+
+        .score
+          width: 20%
+          text-align: center
+          box-sizing: border-box
+          padding: 1vw
+
+          &[href=""]
+            text-decoration: none
+
+          &:empty:after
+            content: '—'
+
+        .hype
+          background-color:pink
+          color: white
+
+        .untappd
+          background-color: #ffcc00
+          color: black
+
+        .ratebeer
+          background-color: #2b93cd
+          color: #fbd500
+
+        .beeradvocate
+          background-color: black
+          color: #e4aa00
+
+      .expanded
+        width: 100%
+        display: flex
+        flex-direction: column
+        margin-top: 1vw
+
+        div.style
+          font-size: 2.8vw
+          margin-bottom: 0.5vw
+
+        div
+          width: 100%
+          font-size: 2.5vw
+          box-sizing: border-box
+          padding: 1px
+
+
 .session.yellow
   background-color: yellow
 .session.blue

@@ -30,6 +30,8 @@ function getBeerData(cb) {
           beer.avg_score = row.avg_score;
           beer.hype_score = row.hype_score;
           beer.brewery = row.brewery;
+          beer.session = row.session;
+          beer.style = row.style;
           beer.superstyle = row.superstyle;
           beer.metastyle = row.metastyle;
           return beer;
