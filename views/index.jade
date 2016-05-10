@@ -37,6 +37,8 @@ html(manifest="app.cache")
           .sub Saturday 16-20
       .beer-lists
         a(href="#beerlist", class="all-beers-sel") All Beers
+      .info
+        p Made by <a href="http://github.com/jonpacker">Jon Packer</a>. Please note that there's probably a few mistakes/poorly linked ratings, there were a lot of beers to enter...
 
   script(type="text/html", class="template", data-template-id="beerlist")
     #beerlist(class="{{typeclass}} {{saved}} {{tasted}} order-{{order}} ms-{{metastyle}} mini-{{mini}}")
