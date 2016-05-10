@@ -1,3 +1,6 @@
+var sessions = {yellow: 1, blue: 2, red: 3, green: 4};
+window.beers = _.sortBy(window.beers, function(beer) { return sessions[beer.session] });
+
 var indexedBeers = {};
 window.beers.forEach(function(beer) {
   indexedBeers[beer.id] = beer;

@@ -112,14 +112,14 @@ html
       padding: 0 3vw
       & > div
         max-width: 45.5vw
+      & > div.bar
+        max-width: 100vw
+
 
     @media (min-width: 1080px)
       padding: 0 2.5vw
       & > div
         max-width: 30vw
-      & > div.key
-      & > div.order
-        max-width: 45vw
 
     @media (min-width: 1440px)
       padding: 0 2vw
@@ -130,9 +130,6 @@ html
       padding: 0 1.666667vw
       & > div
         max-width: 18.0vw
-      & > div.key
-      & > div.order
-        width: 49vw
 
     @media (min-width: 2160px)
       padding: 0 1.428571vw
@@ -143,6 +140,7 @@ html
   .key
     text-align: center
     margin-top: 1rem
+    width: 100%
   .key .style-border
     display: inline-block
     padding: 1rem
@@ -151,6 +149,28 @@ html
     margin-bottom: 0.5rem
     background: #CCC
     color: inherit
+
+  &.ms-Dark .key .Dark
+  &.ms-Classic .key .Classic
+  &.ms-Hoppy .key .Hoppy
+  &.ms-Extreme .key .Extreme
+  &.ms-Brett-fermented .key .Brett-fermented
+  &.ms-Sour .key .Sour
+  &.ms-Belgian .key .Belgian
+  &.ms-Experimental .key .Experimental
+  &.ms-Cider .key .Cider
+  &.ms-Mead .key .Mead
+  &.ms-Pumpkin .key .Pumpkin
+  &.order-score .order .avg
+  &.order-hype .order .hype
+  &.order-untappd .order .untappd
+  &.order-ratebeer .order .ratebeer
+  &.order-beeradvocate .order .beeradvocate
+  &.saved .filter .saved
+  &.not-saved .filter .not-saved
+  &.tasted .filter .tasted
+  &.not-tasted .filter .not-tasted
+    outline: 0.5rem solid fuchsia
 
   .order
     padding: 1rem 5%
@@ -161,6 +181,7 @@ html
     a
       display: block
       width: 16%
+      max-width: 60px
       padding: 0.5rem
       text-align: center
       font-size: 1.5rem
@@ -170,6 +191,23 @@ html
       &:last-child
         content: ''
 
+
+  .filter
+    width: 100%
+    padding: 1rem 5%
+    box-sizing: border-box
+    text-align: center
+
+    a
+      display: inline-block
+      background-color: silver
+      padding: 0.5rem
+      color: inherit
+      width: 10%
+      margin: 0 0.5rem
+      font-size: 1.5rem
+      max-width: 60px
+    
 
   .brewery
     width: 90%
@@ -189,6 +227,25 @@ html
     &:last-child
       margin-bottom: 0
 
+    &.saved
+      outline: 0.5rem solid fuchsia
+
+    &.tasted
+      opacity: 0.4
+
+    .star
+    .tick
+      text-shadow: 1px 1px 0px black
+      color: lighten(silver, 50%)
+      vertical-align: top
+      margin-top: -0.2em
+      margin: 0 0.1em
+      cursor: pointer
+      font-size: 1.2em
+    &.saved .star
+    &.tasted .tick
+      color: yellow
+      text-shadow: 0px 0px 5px black
 
 
     .headline
@@ -202,15 +259,18 @@ html
 
       .name
         font-weight: bold
-        width: 55%
+        width: 50%
 
       .abv
         width: 15%
         font-size: 1.75rem
 
       .style
-        width: 30%
+        width: 25%
         font-size: 1.5rem
+
+      .marks
+        width: 10%
 
       .ratings
         width: 100%
@@ -245,6 +305,26 @@ html
           width: 100%
           font-size: 1.25rem
           box-sizing: border-box
+
+  &.beer-list
+    .beer .name:before
+      display: inline-block
+      height: 2rem
+      width: 2rem
+      border-radius: 1rem
+      content: ''
+      vertical-align: middle
+      box-shadow: 0px 0px 0px 1px #333
+      margin-right: 0.8rem
+    .beer.yellow .name:before
+      background-color: yellow
+    .beer.blue .name:before
+      background-color: blue
+    .beer.red .name:before
+      background-color: red
+    .beer.green .name:before
+      background-color: green
+
 
 .style-border
   &.Dark
@@ -306,3 +386,14 @@ html
   background-color: red
 .session.green
   background-color: green
+
+#beerlist.session
+  background-color: white
+  &.yellow h1
+    background-color: yellow
+  &.blue h1
+    background-color: blue
+  &.red h1
+    background-color: red
+  &.green h1
+    background-color: green

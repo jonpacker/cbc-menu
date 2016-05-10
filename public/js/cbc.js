@@ -27,19 +27,26 @@ $(".template").each(function() {
 var view = $('#window');
 function render(renderer, opts) {
   if (!renderers[renderer]) return;
+  opts.page = renderer;
   view.empty().html(renderers[renderer](opts))
 };
 
 function calcBeerList(opts) {
   var beers = beerSubsetWithRankings(function(beer) { 
-    if (opts.metastyle) {
-      return beer.session == opts.colour && beer.metastyle == opts.metastyle;
-    }
-    return beer.session == opts.colour 
+    var match = true;
+    if (opts.metastyle) match = match && beer.metastyle == opts.metastyle;
+    if (opts.colour) match = match && beer.session == opts.colour;
+    if (opts.tasted) match = match && (opts.tasted == 'not-tasted' ? !beer.tasted : beer.tasted === opts.tasted);
+    if (opts.saved) match = match && (opts.saved == 'not-saved' ? !beer.saved : beer.saved === opts.saved);
+    return match;
   });
   var breweries = beers.reduce(function(breweries, beer) {
     var brewery = beer.brewery;
-    if (opts.order && beer[opts.order + '_rank']) brewery = beer[opts.order + '_rank'] + '. ' + brewery;
+    if (opts.order) {
+      if (beer[opts.order + '_rank']) brewery = beer[opts.order + '_rank'] + '. ' + brewery;
+      else brewery = 'UNRANKED - ' + brewery;
+    }
+
     if (!breweries[brewery]) breweries[brewery] = [];
     
     beer.beeradvocate_clamped = beer.beeradvocate > 0 ? beer.beeradvocate : '';
@@ -51,6 +58,7 @@ function calcBeerList(opts) {
     return breweries;
   }, {});
   opts.breweries = Object.keys(breweries).map(function(brewery) {
+
     return {
       name: brewery,
       beers: breweries[brewery]
@@ -64,6 +72,30 @@ function calcBeerList(opts) {
   }
   opts.beer_count = beers.length;
   opts.metastyles = window.metastyles;
+
+  opts.tset = function() {
+    return function(val, render) {
+      val = render(val);
+      var updates = val.split(',');
+      var settings = {
+        colour: opts.colour,
+        metastyle: opts.metastyle,
+        order: opts.order,
+        tasted: opts.tasted,
+        saved: opts.saved
+      };
+      updates = updates.reduce(function(u, update) {
+        var kv = update.split('=');
+        if (kv[1].trim() == '!') {
+          delete settings[kv[0].trim()];
+          return u;
+        }
+        u[kv[0].trim()] = kv[1].trim();
+        return u;
+      }, {});
+      return '#' + opts.page + '[' + JSON.stringify(_.extend(settings,updates)).replace(/"/g, "&quot;") + ']';
+    }
+  };
 }
 
 var renderers = {
@@ -73,10 +105,59 @@ var renderers = {
     opts.typeclass = opts.title = opts.colour + ' session'
     return Mustache.render(templates.beerlist, opts);
   },
+  beerlist: function(opts) {
+    calcBeerList(opts);
+    opts.typeclass = 'beer-list';
+    opts.title = 'All Beers';
+    return Mustache.render(templates.beerlist, opts);
+  },
   index: function(opts) {
     return Mustache.render(templates.index, {});
   }
 };
+
+var savedBeers = JSON.parse(localStorage.getItem('savedBeers') || '[]');
+var tastedBeers = JSON.parse(localStorage.getItem('tastedBeers') || '[]');
+window.beers.forEach(function(beer) {
+  if (savedBeers.indexOf(beer.id) != -1) beer.saved = 'saved';
+  if (tastedBeers.indexOf(beer.id) != -1) beer.tasted = 'tasted';
+});
+$('body').on('click', '.beer .star', function(e) {
+  var beer = $(e.target).parents('.beer');
+  var beerId = beer.data().id;
+  var willSave = savedBeers.indexOf(beer.data().id) == -1;
+  toggleBeerSaved(beerId, willSave);
+  beer.toggleClass('saved', willSave);
+  window.beers.forEach(function(beer) {
+    if (beer.id == beerId) beer.saved = willSave ? 'saved' : undefined;
+  });
+});
+$('body').on('click', '.beer .tick', function(e) {
+  var beer = $(e.target).parents('.beer');
+  var beerId = beer.data().id;
+  var willSave = tastedBeers.indexOf(beer.data().id) == -1;
+  toggleBeerTasted(beerId, willSave);
+  beer.toggleClass('tasted', willSave);
+  window.beers.forEach(function(beer) {
+    if (beer.id == beerId) beer.tasted = willSave ? 'tasted' : undefined;
+  });
+});
+function toggleBeerSaved(id, saved) {
+  if (!saved) {
+    savedBeers = _.without(savedBeers, id);
+  } else {
+    savedBeers.push(id);
+  }
+  localStorage.setItem('savedBeers', JSON.stringify(savedBeers));
+}
+function toggleBeerTasted(id, tasted) {
+  if (!tasted) {
+    tastedBeers = _.without(tastedBeers, id);
+  } else {
+    tastedBeers.push(id);
+  }
+  localStorage.setItem('tastedBeers', JSON.stringify(tastedBeers));
+}
 
 if (location.hash) route(location.hash);
 else route('#index');
