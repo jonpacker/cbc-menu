@@ -38,7 +38,7 @@ window.beerSubsetWithRankings = function(filter) {
         var index = groupSubsets[group].indexOf(beer.id);
         if (index == -1) return;
         beer[group + '_rank'] = index + 1;
-        beer[group + '_rank_br'] = ' (' + (index + 1) + ')';
+        beer[group + '_rank_br'] = ' (#' + (index + 1) + ')';
       });
       return beer;
     })

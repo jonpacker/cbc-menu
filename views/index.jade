@@ -36,38 +36,51 @@ html
         a(href="#", data-target="styles", class="all-beers-sel") By Style
         a(href="#", data-target="ranking", class="all-beers-sel") By Ranking
 
-  script(type="text/html", class="template", data-template-id="session")
-    #session
-      h1(class="session {{colour}}") {{colour}} session
+  script(type="text/html", class="template", data-template-id="beerlist")
+    #beerlist
+      h1(class="{{typeclass}}") {{title}}
         sub {{beer_count}} beers, {{breweries.length}} brewers listed
-      | {{#breweries}}
-      .key 
-        | {{#metastyles}}
-        .style-border(class="{{.}}") {{.}}
-        | {{/metastyles}}
-      .brewery
-        h2 {{name}}
-        .beers
-          | {{#beers}}
-          .beer.style-border(class="{{metastyle}}")
-            .headline
-              .name {{name}}
-              .abv {{percent}}%
-              .style {{superstyle}}
-              .ratings
-                .score.avg {{avg_score_fixed}}{{score_rank_br}}
-                .score.hype {{hype_score_fixed}}{{hype_rank_br}}
-                a.score.untappd(href="{{untappd_url}}", target="_blank") {{untappd}}{{untappd_rank_br}}
-                a.score.ratebeer(href="{{ratebeer_url}}", target="_blank") {{ratebeer}}{{ratebeer_rank_br}}
-                .score.beeradvocate(href="{{beeradvocate_url}}", target="_blank") {{beeradvocate}}{{beeradvocate_rank_br}}
-              .expanded
-                .style Brewer's description: <strong>{{style}}</strong>
-                .desc {{trunc_desc}}
+      .container
+        .order
+          a.site-bg-style.avg(href='#session[{"colour":"{{colour}}","metastyle":"{{metastyle}}","order":"score"}]') Avg
+          a.site-bg-style.hype(href='#session[{"colour":"{{colour}}","metastyle":"{{metastyle}}","order":"hype"}]') Hype
+          a.site-bg-style.untappd(href='#session[{"colour":"{{colour}}","metastyle":"{{metastyle}}","order":"untappd"}]') UT
+          a.site-bg-style.ratebeer(href='#session[{"colour":"{{colour}}","metastyle":"{{metastyle}}","order":"ratebeer"}]') RB
+          a.site-bg-style.beeradvocate(href='#session[{"colour":"{{colour}}","metastyle":"{{metastyle}}","order":"beeradvocate"}]') BA
+          | {{#order}}
+          a(href='#session[{"colour":"{{colour}}","metastyle":"{{metastyle}}"}]') ✘ Reset
+          | {{/order}}
+        .key 
+          | {{#metastyles}}
+          a.style-border(class="{{.}}", href='#session[{"colour":"{{colour}}","order":"{{order}}","metastyle":"{{.}}"}]') {{.}}
+          | {{/metastyles}}
+          | {{#metastyle}}
+          a(href='#session[{"colour":"{{colour}}","order":"{{order}}"}]') ✘ Reset
+          | {{/metastyle}}
+        | {{#breweries}}
+        .brewery
+          h2 {{name}}
+          .beers
+            | {{#beers}}
+            .beer.style-border(class="{{metastyle}}")
+              .headline
+                .name {{name}}
+                .abv {{percent}}%
+                .style {{superstyle}}
+                .ratings
+                  .site-bg-style.score.avg {{avg_score_fixed}}{{score_rank_br}}
+                  .site-bg-style.score.hype {{hype_score_fixed}}{{hype_rank_br}}
+                  a.site-bg-style.score.untappd(href="{{untappd_url}}", target="_blank") {{untappd}}{{untappd_rank_br}}
+                  a.site-bg-style.score.ratebeer(href="{{ratebeer_url}}", target="_blank") {{ratebeer}}{{ratebeer_rank_br}}
+                  .site-bg-style.score.beeradvocate(href="{{beeradvocate_url}}", target="_blank") {{beeradvocate_clamped}}{{beeradvocate_rank_br}}
+                .expanded
+                  .style Brewer's description: <strong>{{style}}</strong>
+                  .desc {{trunc_desc}}
 
 
-          | {{/beers}}
+            | {{/beers}}
 
-      | {{/breweries}}
+        | {{/breweries}}
 
 
   script(type="text/javascript", src="/js/jquery-2.2.3.min.js")

@@ -10,6 +10,7 @@ body
 
 h1
   text-align: center
+  font-size: 4rem
 
 #main-menu
   .sessions
@@ -23,16 +24,16 @@ h1
       width: 45%
       box-sizing: border-box
       color: black
-      padding: 8vw
+      padding: 4rem
       text-align: center
       display: block
       text-decoration: none
 
       h2
-        font-size: 7vw
+        font-size: 3.5rem
         margin: 0
       .sub
-        font-size: 2vm
+        font-size: 1.5rem
         font-style: italic
 
   .beer-lists
@@ -46,10 +47,10 @@ h1
     .all-beers-sel
       width: 90%
       background-color: orange
-      margin-bottom: 3vw
+      margin-bottom: 1.5rem
 
-      font-size: 5vw
-      padding: 2vw 8vw
+      font-size: 2.5rem
+      padding: 1rem 4rem
       box-sizing: border-box
       color: black
       text-decoration: none
@@ -57,7 +58,28 @@ h1
         content: '➜'
         float: right
 
-#session
+html
+  font-size: 9px
+
+  @media (min-width: 2160px) and (max-width: 2700px)
+    font-size: 0.3vw
+
+  @media (min-width: 1800px) and (max-width: 2160px)
+    font-size: 0.4vw
+
+  @media (min-width: 1440px) and (max-width: 1800px)
+    font-size: 0.5vw
+
+  @media (min-width: 1080px) and (max-width: 1350px)
+    font-size: 0.666667vw
+  
+  @media (min-width: 720px) and (max-width: 900px)
+    font-size: 1vw
+
+  @media (max-width: 500px)
+    font-size: 2vw
+
+#beerlist
   width: 100%
   display: flex
   justify-content: center
@@ -66,50 +88,113 @@ h1
 
   h1 
    margin: 0
-   padding: 1vw 0
+   padding: 0.5rem 0
    width: 100%
    text-transform: capitalize
-   font-size: 8vw
+   font-size: 4rem
 
    sub
-     font-size: 3vw
+     font-size: 1.5rem
      display: block
+
+  .container
+    display: flex
+    width: 100%
+    flex-direction: column
+    align-items: center
+    flex-wrap: wrap
+
+    @media (min-width: 720px)
+      flex-direction: row
+      justify-content: space-between
+      box-sizing: border-box
+      align-items: flex-start
+      padding: 0 3vw
+      & > div
+        max-width: 45.5vw
+
+    @media (min-width: 1080px)
+      padding: 0 2.5vw
+      & > div
+        max-width: 30vw
+      & > div.key
+      & > div.order
+        max-width: 45vw
+
+    @media (min-width: 1440px)
+      padding: 0 2vw
+      & > div
+        max-width: 22.5vw
+
+    @media (min-width: 1800px)
+      padding: 0 1.666667vw
+      & > div
+        max-width: 18.0vw
+      & > div.key
+      & > div.order
+        width: 49vw
+
+    @media (min-width: 2160px)
+      padding: 0 1.428571vw
+      & > div
+        max-width: 15.0vw
+
 
   .key
     text-align: center
-    margin-top: 2vw
+    margin-top: 1rem
   .key .style-border
     display: inline-block
-    padding: 1vw
-    font-size: 2.5vw
-    margin-right: 2vw
-    margin-bottom: 1vw
+    padding: 1rem
+    font-size: 1.25rem
+    margin-right: 1rem
+    margin-bottom: 0.5rem
     background: #CCC
+    color: inherit
+
+  .order
+    padding: 1rem 5%
+    width: 100%
+    box-sizing: border-box
+    display: flex
+    justify-content: center
+    a
+      display: block
+      width: 16%
+      padding: 0.5rem
+      text-align: center
+      font-size: 1.5rem
+      &:before
+        content: '⇳ '
+
+      &:last-child
+        content: ''
+
 
   .brewery
     width: 90%
     background-color: #EEE
     box-sizing: border-box
-    margin-top: 2vw
+    margin-top: 1rem
 
     h2
-      font-size: 5vw
+      font-size: 2.5rem
       margin: 0
-      padding: 3vw 5vw
+      padding: 1.5rem 2.5rem
       background-color: #333
       color: white
 
   .beer
-    margin-bottom: 1vw
+    margin-bottom: 0.5rem
     &:last-child
       margin-bottom: 0
 
 
 
     .headline
-      padding: 2vw 5vw
+      padding: 1rem 2.5rem
 
-      font-size: 4vw
+      font-size: 2rem
       background-color: #CCC
       display: flex
       align-items: center
@@ -121,23 +206,23 @@ h1
 
       .abv
         width: 15%
-        font-size: 3.5vw
+        font-size: 1.75rem
 
       .style
         width: 30%
-        font-size: 3vw
+        font-size: 1.5rem
 
       .ratings
         width: 100%
         display: flex
-        margin-top: 1vw
-        font-size: 3vw
+        margin-top: 0.5rem
+        font-size: 1.5rem
 
         .score
           width: 20%
           text-align: center
           box-sizing: border-box
-          padding: 1vw
+          padding: 0.5rem
 
           &[href=""]
             text-decoration: none
@@ -145,69 +230,72 @@ h1
           &:empty:after
             content: '—'
 
-        .hype
-          background-color:pink
-          color: white
-
-        .untappd
-          background-color: #ffcc00
-          color: black
-
-        .ratebeer
-          background-color: #2b93cd
-          color: #fbd500
-
-        .beeradvocate
-          background-color: black
-          color: #e4aa00
 
       .expanded
         width: 100%
         display: flex
         flex-direction: column
-        margin-top: 1vw
+        margin-top: 0.5rem
 
         div.style
-          font-size: 2.8vw
-          margin-bottom: 0.5vw
+          font-size: 1.4rem
+          margin-bottom: 0.25rem
 
         div
           width: 100%
-          font-size: 2.5vw
+          font-size: 1.25rem
           box-sizing: border-box
-          padding: 1px
 
 .style-border
   &.Dark
-    border-left: 2vw solid maroon
+    border-left: 1rem solid maroon
 
   &.Classic
-    border-left: 2vw solid silver
+    border-left: 1rem solid silver
 
   &.Hoppy
-    border-left: 2vw solid green
+    border-left: 1rem solid green
 
   &.Extreme
-    border-left: 2vw solid black
+    border-left: 1rem solid black
 
   &.Brett-fermented
-    border-left: 2vw solid blue
+    border-left: 1rem solid blue
 
   &.Sour
-    border-left: 2vw solid navy
+    border-left: 1rem solid navy
 
   &.Belgian
-    border-left: 2vw solid fuchsia
+    border-left: 1rem solid fuchsia
 
   &.Experimental
-    border-left: 2vw solid red
+    border-left: 1rem solid red
 
   &.Cider
   &.Mead
-    border-left: 2vw solid teal
+    border-left: 1rem solid teal
 
   &.Pumpkin
-    border-left: 2vw solid orange
+    border-left: 1rem solid orange
+
+.site-bg-style
+  &.avg
+    background-color: orange
+  &.hype
+    background-color:pink
+    color: white
+
+  &.untappd
+    background-color: #ffcc00
+    color: black
+
+  &.ratebeer
+    background-color: #2b93cd
+    color: #fbd500
+
+  &.beeradvocate
+    background-color: black
+    color: #e4aa00
 
 
 .session.yellow

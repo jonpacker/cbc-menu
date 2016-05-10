@@ -30,30 +30,48 @@ function render(renderer, opts) {
   view.empty().html(renderers[renderer](opts))
 };
 
+function calcBeerList(opts) {
+  var beers = beerSubsetWithRankings(function(beer) { 
+    if (opts.metastyle) {
+      return beer.session == opts.colour && beer.metastyle == opts.metastyle;
+    }
+    return beer.session == opts.colour 
+  });
+  var breweries = beers.reduce(function(breweries, beer) {
+    var brewery = beer.brewery;
+    if (opts.order && beer[opts.order + '_rank']) brewery = beer[opts.order + '_rank'] + '. ' + brewery;
+    if (!breweries[brewery]) breweries[brewery] = [];
+    
+    beer.beeradvocate_clamped = beer.beeradvocate > 0 ? beer.beeradvocate : '';
+    beer.avg_score_fixed = beer.avg_score ? beer.avg_score.toFixed(2) : '';
+    beer.hype_score_fixed = beer.hype_score ? beer.hype_score.toFixed(2) : '';
+    beer.trunc_desc = beer.desc ? beer.desc.length > 250 ? beer.desc.slice(0, 200) + '...' : beer.desc : '';
+
+    breweries[brewery].push(beer);
+    return breweries;
+  }, {});
+  opts.breweries = Object.keys(breweries).map(function(brewery) {
+    return {
+      name: brewery,
+      beers: breweries[brewery]
+    }
+  });
+  opts.breweries = _.sortBy(opts.breweries, 'name');
+  if (opts.order) {
+    opts.breweries = _.sortBy(opts.breweries, function(brewery) {
+      return brewery.beers[0][opts.order + '_rank'];
+    });
+  }
+  opts.beer_count = beers.length;
+  opts.metastyles = window.metastyles;
+}
+
 var renderers = {
   session: function(opts) {
     if (!opts.colour) return;
-    var beers = beerSubsetWithRankings(function(beer) { return beer.session == opts.colour });
-    var breweries = beers.reduce(function(breweries, beer) {
-      if (!breweries[beer.brewery]) breweries[beer.brewery] = [];
-      
-      beer.avg_score_fixed = beer.avg_score ? beer.avg_score.toFixed(2) : '';
-      beer.hype_score_fixed = beer.hype_score ? beer.hype_score.toFixed(2) : '';
-      beer.trunc_desc = beer.desc ? beer.desc.length > 250 ? beer.desc.slice(0, 200) + '...' : beer.desc : '';
-
-      breweries[beer.brewery].push(beer);
-      return breweries;
-    }, {});
-    opts.breweries = Object.keys(breweries).map(function(brewery) {
-      return {
-        name: brewery,
-        beers: breweries[brewery]
-      }
-    });
-    opts.breweries = _.sortBy(opts.breweries, 'name');
-    opts.beer_count = beers.length;
-    opts.metastyles = window.metastyles;
-    return Mustache.render(templates.session, opts);
+    calcBeerList(opts);
+    opts.typeclass = opts.title = opts.colour + ' session'
+    return Mustache.render(templates.beerlist, opts);
   },
   index: function(opts) {
     return Mustache.render(templates.index, {});
