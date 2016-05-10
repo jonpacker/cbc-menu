@@ -13,9 +13,15 @@ html
       window.metastyles = !{JSON.stringify(metastyles)};
   body
     #window
+    #exportfield
+      label(for="export") Copy this link to another device to transfer your saved/tasted beers.
+      input#export
 
   script(type="text/html", class="template", data-template-id="index")
     #main-menu
+      | {{#msg}}
+      .msg {{.}}
+      | {{/msg}}
       h1 Sessions
       .sessions
         a(href='#session[{"colour":"yellow"}]', class="session yellow") 

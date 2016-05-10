@@ -23,6 +23,8 @@ $(".template").each(function() {
   templates[this.dataset.templateId] = this.innerHTML;
 });
 
+var savedBeers = JSON.parse(localStorage.getItem('savedBeers') || '[]');
+var tastedBeers = JSON.parse(localStorage.getItem('tastedBeers') || '[]');
 
 var view = $('#window');
 function render(renderer, opts) {
@@ -112,16 +114,33 @@ var renderers = {
     return Mustache.render(templates.beerlist, opts);
   },
   index: function(opts) {
-    return Mustache.render(templates.index, {});
+    if (localStorage.getItem('msg')) {
+      opts.msg = localStorage.getItem('msg');
+      localStorage.removeItem('msg');
+    }
+    return Mustache.render(templates.index, opts);
+  },
+  load: function(opts) {
+    if (!opts.data) return renderers.index(opts);
+    var savedBeers = _.compact(opts.data.saved.split(','));
+    var tastedBeers = _.compact(opts.data.tasted.split(','));
+    localStorage.setItem('savedBeers', JSON.stringify(savedBeers));
+    localStorage.setItem('tastedBeers', JSON.stringify(tastedBeers));
+    updateBeersMarked();
+    localStorage.setItem('msg',  savedBeers.length + " saved, " + tastedBeers.length + " tasted beers loaded");
+    location.hash = '#index'
+    return '';
   }
 };
 
-var savedBeers = JSON.parse(localStorage.getItem('savedBeers') || '[]');
-var tastedBeers = JSON.parse(localStorage.getItem('tastedBeers') || '[]');
-window.beers.forEach(function(beer) {
-  if (savedBeers.indexOf(beer.id) != -1) beer.saved = 'saved';
-  if (tastedBeers.indexOf(beer.id) != -1) beer.tasted = 'tasted';
-});
+updateExportLink();
+function updateBeersMarked() {
+  window.beers.forEach(function(beer) {
+    if (savedBeers.indexOf(beer.id) != -1) beer.saved = 'saved';
+    if (tastedBeers.indexOf(beer.id) != -1) beer.tasted = 'tasted';
+  });
+}
+updateBeersMarked();
 $('body').on('click', '.beer .star', function(e) {
   var beer = $(e.target).parents('.beer');
   var beerId = beer.data().id;
@@ -149,6 +168,7 @@ function toggleBeerSaved(id, saved) {
     savedBeers.push(id);
   }
   localStorage.setItem('savedBeers', JSON.stringify(savedBeers));
+  updateExportLink();
 }
 function toggleBeerTasted(id, tasted) {
   if (!tasted) {
@@ -157,6 +177,12 @@ function toggleBeerTasted(id, tasted) {
     tastedBeers.push(id);
   }
   localStorage.setItem('tastedBeers', JSON.stringify(tastedBeers));
+  updateExportLink();
+}
+
+function updateExportLink() {
+  $('#export').val('http://' + window.location.hostname + window.location.pathname + '#load[' +
+      JSON.stringify({data:{saved:savedBeers.join(','),tasted:tastedBeers.join(',')}}) + ']');
 }
 
 if (location.hash) route(location.hash);
