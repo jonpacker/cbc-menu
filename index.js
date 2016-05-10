@@ -3,6 +3,7 @@ var db = require('seraph')();
 var nib = require('nib');
 var stylus = require('stylus');
 var fs = require('fs');
+var argv = require('optimist').argv;
 var async = require('async');
 var app = express();
 
@@ -19,6 +20,25 @@ app.set('view engine', 'jade');
 app.set('views', __dirname + '/views');
 
 var beerQuery = fs.readFileSync(__dirname + '/beer.cypher', 'utf8');
+
+var beers;
+if (argv.disk) {
+  beers = JSON.parse(fs.readFileSync(__dirname + '/beers.json', 'utf8'));
+} else {
+  getBeerData(function(err, data) {
+    if (err) {
+      console.error("Couldn't get beer data:");
+      console.error(err);
+      process.exit(1);
+    }
+    beers = data;
+    if (argv.persist) {
+      fs.writeFileSync(__dirname + '/beers.json', JSON.stringify(data));
+      console.log('wrote ' + data.beers.length + ' to disk');
+    }
+  });
+} 
+
 
 function getBeerData(cb) {
   async.parallel({
@@ -60,10 +80,7 @@ function getBeerData(cb) {
 };
 
 app.get('/', function(req, res) {
-  getBeerData(function(err, data) {
-    if (err) return res.send(500, err);
-    res.render('index', data);
-  });
+  res.render('index', beers);
 });
 
 app.use(express.static(__dirname + '/public'));

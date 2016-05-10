@@ -43,6 +43,7 @@ html
     #beerlist(class="{{typeclass}} {{saved}} {{tasted}} order-{{order}} ms-{{metastyle}}")
       h1 {{title}}
         sub {{beer_count}} beers, {{breweries.length}} brewers listed
+        a.back(href="#index") ↫
       .container
         .order.bar
           a.site-bg-style.avg(href='{{#tset}}order=score{{/tset}}') Avg

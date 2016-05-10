@@ -112,11 +112,26 @@ html
   flex-direction: column
 
   h1 
-   margin: 0
-   padding: 0.5rem 0
-   width: 100%
-   text-transform: capitalize
-   font-size: 4rem
+    margin: 0
+    padding: 0.5rem 0
+    width: 100%
+    text-transform: capitalize
+    font-size: 4rem
+    position: relative
+    overflow: hidden
+
+    .back
+      height: 150%
+      width: 20%
+      left: 0
+      top: -25%
+      text-decoration: none
+      font-size: 8rem
+      color: white
+      position: absolute
+      display: block
+      &:hover
+        background-color: rgba(white, 25%)
 
    sub
      font-size: 1.5rem
