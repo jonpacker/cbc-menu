@@ -5,6 +5,7 @@ var stylus = require('stylus');
 var fs = require('fs');
 var argv = require('optimist').argv;
 var async = require('async');
+var cache = require('appcache-node');
 var app = express();
 
 function compile(str, path) {
@@ -81,6 +82,23 @@ function getBeerData(cb) {
 
 app.get('/', function(req, res) {
   res.render('index', beers);
+});
+
+var cf = cache.newCache([
+    'js/jquery-2.2.3.min.js',
+    'js/mustache.min.js',
+    'js/underscore-min.js',
+    'js/rate.js',
+    'js/cbc.js',
+    'css/cbc.css',
+    'fonts/oswald-v10-latin-700.woff',
+    'fonts/oswald-v10-latin-700.woff2',
+    'fonts/oswald-v10-latin-regular.woff',
+    'fonts/oswald-v10-latin-regular.woff2'
+]);
+app.get('/app.cache', function(req, res) {
+  res.writeHead(200, {'Content-Type': 'text/cache-manifest'});
+  res.end(cf);
 });
 
 app.use(express.static(__dirname + '/public'));

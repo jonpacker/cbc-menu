@@ -84,15 +84,21 @@ function calcBeerList(opts) {
         metastyle: opts.metastyle,
         order: opts.order,
         tasted: opts.tasted,
-        saved: opts.saved
+        saved: opts.saved,
+        mini: opts.mini
       };
       updates = updates.reduce(function(u, update) {
         var kv = update.split('=');
-        if (kv[1].trim() == '!') {
-          delete settings[kv[0].trim()];
+        var key = kv[0].trim();
+        var val = kv[1].trim();
+        if (val == '!') {
+          delete settings[key];
+          return u;
+        } else if (val.match(/!\w+/)) {
+          settings[key] = !settings[key];
           return u;
         }
-        u[kv[0].trim()] = kv[1].trim();
+        u[key] = val;
         return u;
       }, {});
       return '#' + opts.page + '[' + JSON.stringify(_.extend(settings,updates)).replace(/"/g, "&quot;") + ']';

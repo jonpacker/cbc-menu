@@ -1,10 +1,9 @@
 doctype html
-html
+html(manifest="app.cache")
   head
     title CBC 2016
     meta(name="viewport", content="width=device-width, initial-scale=1")
 
-    link(href='https://fonts.googleapis.com/css?family=Oswald:400,700', rel='stylesheet', type='text/css')
     link(href="/css/cbc.css", type="text/css", rel="stylesheet")
     script(type="text/javascript").
       window.beers = !{JSON.stringify(beers)};
@@ -40,7 +39,7 @@ html
         a(href="#beerlist", class="all-beers-sel") All Beers
 
   script(type="text/html", class="template", data-template-id="beerlist")
-    #beerlist(class="{{typeclass}} {{saved}} {{tasted}} order-{{order}} ms-{{metastyle}}")
+    #beerlist(class="{{typeclass}} {{saved}} {{tasted}} order-{{order}} ms-{{metastyle}} mini-{{mini}}")
       h1 {{title}}
         sub {{beer_count}} beers, {{breweries.length}} brewers listed
         a.back(href="#index") ↫
@@ -60,6 +59,7 @@ html
           a.saved(href='{{#tset}}saved=saved{{/tset}}') ★
           a.not-saved(href='{{#tset}}saved=not-saved{{/tset}}') NOT ★
           a(href='{{#tset}}saved=!,tasted=!{{/tset}}') ✘ Reset
+          a.mini(href='{{#tset}}mini=!mini{{/tset}}') Small UI
         .key.bar
           | {{#metastyles}}
           a.style-border(class="{{.}}", href='{{#tset}}metastyle={{.}}{{/tset}}') {{.}}

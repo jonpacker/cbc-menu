@@ -1,4 +1,24 @@
 @require 'clrs.styl'
+
+/* oswald-regular - latin */
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Oswald Regular'), local('Oswald-Regular'),
+       url('../fonts/oswald-v10-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('../fonts/oswald-v10-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* oswald-700 - latin */
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Oswald Bold'), local('Oswald-Bold'),
+       url('../fonts/oswald-v10-latin-700.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('../fonts/oswald-v10-latin-700.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
 html
 body
   width: 100%
@@ -127,8 +147,8 @@ html
       top: -25%
       text-decoration: none
       font-size: 8rem
-      color: white
       position: absolute
+      color:black
       display: block
       &:hover
         background-color: rgba(white, 25%)
@@ -194,12 +214,14 @@ html
   &.ms-Classic .key .Classic
   &.ms-Hoppy .key .Hoppy
   &.ms-Extreme .key .Extreme
-  &.ms-Brett-fermented .key .Brett-fermented
+  &.ms-Mixed-fermentation .key .Mixed-fermentation
   &.ms-Sour .key .Sour
   &.ms-Belgian .key .Belgian
   &.ms-Experimental .key .Experimental
   &.ms-Cider .key .Cider
   &.ms-Mead .key .Mead
+  &.ms-Wine .key .Wine
+  &.ms-Sake .key .Sake
   &.ms-Pumpkin .key .Pumpkin
   &.order-score .order .avg
   &.order-hype .order .hype
@@ -261,6 +283,13 @@ html
       padding: 1.5rem 2.5rem
       background-color: #333
       color: white
+
+  &.mini-true
+    .beer .headline
+      .ratings
+      .expanded
+        display: none
+    
 
   .beer
     margin-bottom: 0.5rem
@@ -378,8 +407,12 @@ html
 
   &.Extreme
     border-left: 1rem solid black
+  &.Wine
+    border-left: 1rem solid maroon
+  &.Sake
+    border-left: 1rem solid olive
 
-  &.Brett-fermented
+  &.Mixed-fermentation
     border-left: 1rem solid blue
 
   &.Sour
@@ -392,6 +425,7 @@ html
     border-left: 1rem solid red
 
   &.Cider
+    border-left: 1rem solid orange
   &.Mead
     border-left: 1rem solid teal
 
