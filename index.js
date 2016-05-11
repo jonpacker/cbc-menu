@@ -96,10 +96,12 @@ var cf = cache.newCache([
     'fonts/oswald-v10-latin-regular.woff',
     'fonts/oswald-v10-latin-regular.woff2'
 ]);
-app.get('/app.cache', function(req, res) {
-  res.writeHead(200, {'Content-Type': 'text/cache-manifest'});
-  res.end(cf);
-});
+if (!argv.noappcache) {
+  app.get('/app.cache', function(req, res) {
+    res.writeHead(200, {'Content-Type': 'text/cache-manifest'});
+    res.end(cf);
+  });
+}
 
 app.use(express.static(__dirname + '/public'));
 app.listen(8090,'0.0.0.0');

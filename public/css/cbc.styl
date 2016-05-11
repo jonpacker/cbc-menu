@@ -311,11 +311,11 @@ html
     .tick
       text-shadow: 1px 1px 0px black
       color: lighten(silver, 50%)
-      vertical-align: top
-      margin-top: -0.2em
-      margin: 0 0.1em
+      margin-top: -0.3em
+      padding: 0.1em
+      display: inline-block
       cursor: pointer
-      font-size: 1.2em
+      font-size: 1.5em
     &.saved .star
     &.tasted .tick
       color: yellow
@@ -333,18 +333,24 @@ html
 
       .name
         font-weight: bold
-        width: 50%
+        width: 42.5%
 
       .abv
-        width: 15%
+        width: 12%
         font-size: 1.75rem
+        &:after
+          content:'%'
+          font-size: 0.6em
+          display: inline-block
+          position: relative
+          top: -0.6em
 
       .style
-        width: 25%
+        width: 26.5%
         font-size: 1.5rem
 
       .marks
-        width: 10%
+        width: 19%
 
       .ratings
         width: 100%

@@ -56,8 +56,8 @@ html(manifest="app.cache")
           a(href='{{#tset}}order=!{{/tset}}') ✘ Reset
           | {{/order}}
         .filter.bar
-          a.tasted(href='{{#tset}}tasted=tasted{{/tset}}') ✔
-          a.not-tasted(href='{{#tset}}tasted=not-tasted{{/tset}}') NOT ✔
+          a.tasted(href='{{#tset}}tasted=tasted{{/tset}}') ✓
+          a.not-tasted(href='{{#tset}}tasted=not-tasted{{/tset}}') NOT ✓
           a.saved(href='{{#tset}}saved=saved{{/tset}}') ★
           a.not-saved(href='{{#tset}}saved=not-saved{{/tset}}') NOT ★
           a(href='{{#tset}}saved=!,tasted=!{{/tset}}') ✘ Reset
@@ -77,11 +77,11 @@ html(manifest="app.cache")
             .beer.style-border(class="{{metastyle}} {{session}} {{saved}} {{tasted}}", data-id="{{id}}")
               .headline
                 .name {{name}}
-                .abv {{percent}}%
+                .abv {{percent}}
                 .style {{superstyle}}
                 .marks 
                   a.star ★
-                  a.tick ✔
+                  a.tick ✓
                 .ratings
                   .site-bg-style.score.avg {{avg_score_fixed}}{{score_rank_br}}
                   .site-bg-style.score.hype {{hype_score_fixed}}{{hype_rank_br}}
