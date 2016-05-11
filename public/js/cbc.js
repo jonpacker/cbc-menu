@@ -135,7 +135,7 @@ var renderers = {
     localStorage.setItem('tastedBeers', JSON.stringify(tastedBeers));
     updateBeersMarked();
     localStorage.setItem('msg',  savedBeers.length + " saved, " + tastedBeers.length + " tasted beers loaded");
-    location.hash = '/#index'
+    location.hash = '/#index';
     return '';
   },
   loadb: function(opts) {
@@ -144,13 +144,13 @@ var renderers = {
     var newSavedBeers = data.savedBeers;
     var newTastedBeers = data.tastedBeers;
     var newBeerData = data.beerData;
-    localStorage.setItem('savedBeers', JSON.stringify(savedBeers));
-    localStorage.setItem('tastedBeers', JSON.stringify(tastedBeers));
-    localStorage.setItem('beerData', JSON.stringify(beerData));
+    localStorage.setItem('savedBeers', JSON.stringify(newSavedBeers));
+    localStorage.setItem('tastedBeers', JSON.stringify(newTastedBeers));
+    localStorage.setItem('beerData', JSON.stringify(newBeerData));
     updateBeersMarked();
-    var noteCount = _.reduce(beerData, function(c, d) { return c + (d.notes ? 1 : 0) }, 0);
-    var ratingCount = _.reduce(beerData, function(c, d) { return c + (d.rating ? 1 : 0) }, 0);
-    localStorage.setItem('msg', noteCount + ' notes, ' + ratingCount + ' ratings, ' + savedBeers.length + " saved, " + tastedBeers.length + " tasted beers loaded");
+    var noteCount = _.reduce(newBeerData, function(c, d) { return c + (d.notes ? 1 : 0) }, 0);
+    var ratingCount = _.reduce(newBeerData, function(c, d) { return c + (d.rating ? 1 : 0) }, 0);
+    localStorage.setItem('msg', noteCount + ' notes, ' + ratingCount + ' ratings, ' + newSavedBeers.length + " saved, " + newTastedBeers.length + " tasted beers loaded");
     window.location = '/#index';
     return '';
   }
