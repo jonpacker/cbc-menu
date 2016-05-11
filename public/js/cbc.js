@@ -135,15 +135,15 @@ var renderers = {
     localStorage.setItem('tastedBeers', JSON.stringify(tastedBeers));
     updateBeersMarked();
     localStorage.setItem('msg',  savedBeers.length + " saved, " + tastedBeers.length + " tasted beers loaded");
-    location.hash = '#index'
+    location.hash = '/#index'
     return '';
   },
   loadb: function(opts) {
     if (!opts.d) return renderers.index(opts);
     var data = JSON.parse(atob(opts.d));
-    var savedBeers = data.savedBeers;
-    var tastedBeers = data.tastedBeers;
-    var beerData = data.beerData;
+    var newSavedBeers = data.savedBeers;
+    var newTastedBeers = data.tastedBeers;
+    var newBeerData = data.beerData;
     localStorage.setItem('savedBeers', JSON.stringify(savedBeers));
     localStorage.setItem('tastedBeers', JSON.stringify(tastedBeers));
     localStorage.setItem('beerData', JSON.stringify(beerData));
@@ -151,7 +151,7 @@ var renderers = {
     var noteCount = _.reduce(beerData, function(c, d) { return c + (d.notes ? 1 : 0) }, 0);
     var ratingCount = _.reduce(beerData, function(c, d) { return c + (d.rating ? 1 : 0) }, 0);
     localStorage.setItem('msg', noteCount + ' notes, ' + ratingCount + ' ratings, ' + savedBeers.length + " saved, " + tastedBeers.length + " tasted beers loaded");
-    location.hash = '#index';
+    window.location = '/#index';
     return '';
   }
 };
