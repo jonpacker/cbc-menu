@@ -74,7 +74,7 @@ html(manifest="app.cache")
           h2 {{name}}
           .beers
             | {{#beers}}
-            .beer.style-border(class="{{metastyle}} {{session}} {{saved}} {{tasted}}", data-id="{{id}}")
+            .beer.style-border(class="{{metastyle}} {{session}} {{saved}} {{tasted}} {{#notes}}has-notes{{/notes}} {{#rating}}has-rating r-{{.}}{{/rating}}", data-id="{{id}}")
               .headline
                 .name {{name}}
                 .abv {{percent}}
@@ -89,8 +89,16 @@ html(manifest="app.cache")
                   a.site-bg-style.score.ratebeer(href="{{ratebeer_url}}", target="_blank") {{ratebeer}}{{ratebeer_rank_br}}
                   .site-bg-style.score.beeradvocate(href="{{beeradvocate_url}}", target="_blank") {{beeradvocate_clamped}}{{beeradvocate_rank_br}}
                 .expanded
+                  a.add-rating Rate
                   .style Brewer's description: <strong>{{style}}</strong>
                   .desc {{trunc_desc}}
+
+                .rate-box
+                  label(for="rslider") Rating
+                  input.rating-slider(name="rslider", type="range", min="0", max="5", step=".25" value="{{rating}}")
+                  .rating-text {{rating}}
+                  textarea(name="rnotes", placeholder="Notes").notes {{notes}}
+
 
 
             | {{/beers}}

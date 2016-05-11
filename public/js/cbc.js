@@ -25,6 +25,7 @@ $(".template").each(function() {
 
 var savedBeers = JSON.parse(localStorage.getItem('savedBeers') || '[]');
 var tastedBeers = JSON.parse(localStorage.getItem('tastedBeers') || '[]');
+var beerData = JSON.parse(localStorage.getItem('beerData') || '{}');
 
 var view = $('#window');
 function render(renderer, opts) {
@@ -136,6 +137,22 @@ var renderers = {
     localStorage.setItem('msg',  savedBeers.length + " saved, " + tastedBeers.length + " tasted beers loaded");
     location.hash = '#index'
     return '';
+  },
+  loadb: function(opts) {
+    if (!opts.d) return renderers.index(opts);
+    var data = JSON.parse(atob(opts.d));
+    var savedBeers = data.savedBeers;
+    var tastedBeers = data.tastedBeers;
+    var beerData = data.beerData;
+    localStorage.setItem('savedBeers', JSON.stringify(savedBeers));
+    localStorage.setItem('tastedBeers', JSON.stringify(tastedBeers));
+    localStorage.setItem('beerData', JSON.stringify(beerData));
+    updateBeersMarked();
+    var noteCount = _.reduce(beerData, function(c, d) { return c + (d.notes ? 1 : 0) }, 0);
+    var ratingCount = _.reduce(beerData, function(c, d) { return c + (d.rating ? 1 : 0) }, 0);
+    localStorage.setItem('msg', noteCount + ' notes, ' + ratingCount + ' ratings, ' + savedBeers.length + " saved, " + tastedBeers.length + " tasted beers loaded");
+    location.hash = '#index';
+    return '';
   }
 };
 
@@ -144,6 +161,11 @@ function updateBeersMarked() {
   window.beers.forEach(function(beer) {
     if (savedBeers.indexOf(beer.id) != -1) beer.saved = 'saved';
     if (tastedBeers.indexOf(beer.id) != -1) beer.tasted = 'tasted';
+    if (beerData[beer.id]) {
+      beer.notes = beerData[beer.id].notes;
+      beer.rating = beerData[beer.id].rating;
+    }
+    if (!beer.rating) beer.rating = 0;
   });
 }
 updateBeersMarked();
@@ -152,20 +174,12 @@ $('body').on('click', '.beer .star', function(e) {
   var beerId = beer.data().id;
   var willSave = savedBeers.indexOf(beer.data().id) == -1;
   toggleBeerSaved(beerId, willSave);
-  beer.toggleClass('saved', willSave);
-  window.beers.forEach(function(beer) {
-    if (beer.id == beerId) beer.saved = willSave ? 'saved' : undefined;
-  });
 });
 $('body').on('click', '.beer .tick', function(e) {
   var beer = $(e.target).parents('.beer');
   var beerId = beer.data().id;
   var willSave = tastedBeers.indexOf(beer.data().id) == -1;
   toggleBeerTasted(beerId, willSave);
-  beer.toggleClass('tasted', willSave);
-  window.beers.forEach(function(beer) {
-    if (beer.id == beerId) beer.tasted = willSave ? 'tasted' : undefined;
-  });
 });
 function toggleBeerSaved(id, saved) {
   if (!saved) {
@@ -173,7 +187,11 @@ function toggleBeerSaved(id, saved) {
   } else {
     savedBeers.push(id);
   }
+  window.beers.forEach(function(beer) {
+    if (beer.id == id) beer.saved = saved ? 'saved' : undefined;
+  });
   localStorage.setItem('savedBeers', JSON.stringify(savedBeers));
+  $(".beer[data-id=" + id + "]").toggleClass('saved', saved);
   updateExportLink();
 }
 function toggleBeerTasted(id, tasted) {
@@ -182,13 +200,69 @@ function toggleBeerTasted(id, tasted) {
   } else {
     tastedBeers.push(id);
   }
+  window.beers.forEach(function(beer) {
+    if (beer.id == id) beer.tasted = tasted ? 'tasted' : undefined;
+  });
+  $(".beer[data-id=" + id + "]").toggleClass('tasted', tasted);
   localStorage.setItem('tastedBeers', JSON.stringify(tastedBeers));
   updateExportLink();
 }
+function updateBeerData(id, data) {
+  beerData = JSON.parse(localStorage.getItem('beerData') || '{}');
+  if (beerData[id]) {
+    data = _.extend(beerData[id], data);
+  }
+  beerData[id] = data;
+  window.beers.forEach(function(beer) {
+    if (beer.id == id) {
+      beer.notes = data.notes;
+      beer.rating = data.rating; 
+    }
+  });
+  var beerEls = $(".beer[data-id=" + id + "]");
+  beerEls.find('.rating-slider').val(data.rating);
+  beerEls.find('textarea').val(data.notes || '');
+  if (data.notes) beerEls.addClass('has-notes');
+  if (data.rating != null) beerEls.addClass('has-rating');
+  localStorage.setItem('beerData', JSON.stringify(beerData));
+  updateExportLink();
+}
+
+$('body').on('input', '.rating-slider', function(e) {
+  var slider = $(e.target);
+  var num = slider.val();
+  slider.next('.rating-text').text(num);
+})
+$('body').on('change', '.rating-slider', function(e) {
+  var slider = $(e.target);
+  var textarea = slider.siblings('textarea');
+  var num = slider.val();
+  var beer = slider.parents('.beer');
+  var beerId = beer.data().id;
+  toggleBeerTasted(beerId, true);
+  updateBeerData(beerId, { rating: num, notes: textarea.val() });
+});
+$('body').on('change', '.beer textarea', function(e) {
+  var textarea = $(e.target);
+  var notes = textarea.val();
+  var beer = textarea.parents('.beer');
+  var beerId = beer.data().id;
+  toggleBeerTasted(beerId, true);
+  updateBeerData(beerId, { notes: notes });
+});
+
+$('body').on('click', 'a.add-rating', function(e) {
+  e.preventDefault();
+  var button = $(e.target);
+  var parent = button.parents('.beer');
+  parent.toggleClass('add-rating');
+  button.toggleClass('is-rating');
+});
+
 
 function updateExportLink() {
-  $('#export').val('http://' + window.location.hostname + window.location.pathname + '#load[' +
-      JSON.stringify({data:{saved:savedBeers.join(','),tasted:tastedBeers.join(',')}}) + ']');
+  $('#export').val('http://' + window.location.hostname + window.location.pathname + '#loadb[{"d":"' +
+      btoa(JSON.stringify({savedBeers:savedBeers,tastedBeers:tastedBeers,beerData:beerData})) + '"}]');
 }
 
 if (location.hash) route(location.hash);
