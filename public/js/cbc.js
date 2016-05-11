@@ -255,7 +255,6 @@ $('body').on('change', '.beer textarea', function(e) {
 });
 
 $('body').on('click', 'a.add-rating', function(e) {
-  e.preventDefault();
   var button = $(e.target);
   var parent = button.parents('.beer');
   parent.toggleClass('add-rating');
