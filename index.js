@@ -19,6 +19,11 @@ app.use('/css', stylus.middleware({ src: __dirname + '/public/css' , compile: co
 
 app.set('view engine', 'jade');
 app.set('views', __dirname + '/views');
+express.static.mime.define({
+   'application/x-font-woff': ['woff'],
+   'application/font-woff': ['woff'],
+   'font/woff2': ['woff2']
+}); 
 
 var beerQuery = fs.readFileSync(__dirname + '/beer.cypher', 'utf8');
 

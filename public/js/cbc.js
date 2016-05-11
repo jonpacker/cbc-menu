@@ -5,7 +5,7 @@ function route(path) {
   var opts = {};
   if (segments[3]) {
     try {
-      opts = JSON.parse(segments[3]);
+      opts = JSON.parse(decodeURIComponent(segments[3]));
     } catch (e) {
       return;
     }
