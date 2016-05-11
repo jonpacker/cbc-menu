@@ -147,6 +147,9 @@ var renderers = {
     localStorage.setItem('savedBeers', JSON.stringify(newSavedBeers));
     localStorage.setItem('tastedBeers', JSON.stringify(newTastedBeers));
     localStorage.setItem('beerData', JSON.stringify(newBeerData));
+    savedBeers = newSavedBeers;
+    tastedBeers = newTastedBeers;
+    beerData = newBeerData;
     updateBeersMarked();
     var noteCount = _.reduce(newBeerData, function(c, d) { return c + (d.notes ? 1 : 0) }, 0);
     var ratingCount = _.reduce(newBeerData, function(c, d) { return c + (d.rating ? 1 : 0) }, 0);
