@@ -107,15 +107,25 @@ function calcBeerList(opts) {
   };
 }
 
+function checkMini(opts) {
+  if (opts.mini != null) localStorage.setItem('mini', opts.mini ? '1' : '0');
+  var mini = localStorage.getItem('mini')
+  mini = !(mini == false);
+  opts.mini = mini;
+};
+
+
 var renderers = {
   session: function(opts) {
     if (!opts.colour) return;
     calcBeerList(opts);
+    checkMini(opts);
     opts.typeclass = opts.title = opts.colour + ' session'
     return Mustache.render(templates.beerlist, opts);
   },
   beerlist: function(opts) {
     calcBeerList(opts);
+    checkMini(opts);
     opts.typeclass = 'beer-list';
     opts.title = 'All Beers';
     return Mustache.render(templates.beerlist, opts);
