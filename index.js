@@ -191,7 +191,7 @@ var cf = cache.newCache([
 if (!argv.noappcache) {
   app.get('/app.cache', function(req, res) {
     res.writeHead(200, {'Content-Type': 'text/cache-manifest'});
-    res.end([cf, '','NETWORK:', 'latest.json'].join('\r\n'));
+    res.end([cf, '','NETWORK:', 'latest.json', '/mbcc-2017-dump-jonpacker.csv','*'].join('\r\n'));
   });
 }
 
