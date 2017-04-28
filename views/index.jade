@@ -1,7 +1,7 @@
 doctype html
 html(manifest="app.cache")
   head
-    title CBC 2016
+    title MBCC 2017
     meta(name="viewport", content="width=device-width, initial-scale=1")
 
     link(href="/css/cbc.css", type="text/css", rel="stylesheet")
@@ -10,18 +10,31 @@ html(manifest="app.cache")
       window.breweries = !{JSON.stringify(breweries)};
       window.superstyles = !{JSON.stringify(superstyles)};
       window.metastyles = !{JSON.stringify(metastyles)};
+      fetch('/latest.json').then(function(res) {
+        return res.json();
+      }).then(function(latest) {
+        window.beers = latest.beers;
+        window.breweries = latest.breweries;
+        window.superstyles = latest.superstyles;
+        window.metastyles = latest.metastyles;
+      });
   body
     #window
+      img.loader(src="/img/puff.svg")
+      .status-text
     #exportfield
       label(for="export") Copy this link to another device to transfer your saved/tasted beers.
       input#export
-
+      
+  script(type="text/html", class="template", data-template-id="loading")
+    img.loader(src="/img/puff.svg")
+    .status-text
   script(type="text/html", class="template", data-template-id="index")
     #main-menu
       | {{#msg}}
       .msg {{.}}
       | {{/msg}}
-      h1 Sessions
+      h1 MBCC 2017
       .sessions
         a(href='#session[{"colour":"yellow"}]', class="session yellow") 
           h2 Yellow
@@ -37,8 +50,23 @@ html(manifest="app.cache")
           .sub Saturday 16-20
       .beer-lists
         a(href="#beerlist", class="all-beers-sel") All Beers
+      .untappd
+        img(src='/img/ut_icon_144.png')
+        | {{#untappd_token}}
+        .ut-user Logged into Untappd as {{untappd_user}}. 
+          a(href='#ut_logout') Log out
+        .ut-sync
+          a(href='#snapshot') Save snapshot for {{untappd_user}}
+          a(href='#loadsnapshot') Load snapshot for {{untappd_user}}
+          .expl Saving/loading snapshots requires internet. This will save your starred/checks/ratings to the server so that you can easily load them on another device by connecting it to your untappd account and pressing the "load snapshot" button. If you are just using the one device, you do not need to use snapshots, all your data is saved on that device :).
+        | {{/untappd_token}}
+        | {{^untappd_token}}
+        a.ut-auth(href="https://untappd.com/oauth/authenticate/?client_id={{untappd_cid}}&response_type=token&redirect_url={{untappd_redir_url}}") Tap here to connect to Untappd.
+        .ut-info This will allow you to send checkins to untappd in the background, from the app (if you have internet access).
+        | {{/untappd_token}}
       .info
-        p Made by <a href="http://github.com/jonpacker">Jon Packer</a>. Please note that there's probably a few mistakes/poorly linked ratings, there were a lot of beers to enter...
+        p Made by <a href="http://github.com/jonpacker">Jon Packer</a>. Please note that there&apos;s probably a few mistakes/poorly linked ratings, there were a lot of beers to enter...
+        p Prefer spreadsheets? <a href="/mbcc-2017-dump-jonpacker.csv">Download the data as a csv.</a>
 
   script(type="text/html", class="template", data-template-id="beerlist")
     #beerlist(class="{{typeclass}} {{saved}} {{tasted}} order-{{order}} ms-{{metastyle}} mini-{{mini}}")
@@ -47,22 +75,25 @@ html(manifest="app.cache")
         a.back(href="#index") ↫
       .container
         .order.bar
-          a.site-bg-style.avg(href='{{#tset}}order=score{{/tset}}') Avg
-          a.site-bg-style.hype(href='{{#tset}}order=hype{{/tset}}') Hype
-          a.site-bg-style.untappd(href='{{#tset}}order=untappd{{/tset}}') UT
-          a.site-bg-style.ratebeer(href='{{#tset}}order=ratebeer{{/tset}}') RB
-          a.site-bg-style.beeradvocate(href='{{#tset}}order=beeradvocate{{/tset}}') BA
+          span.info Display Options
+          a.mini(href='{{#tset}}mini=!mini{{/tset}}') Small UI
+          span.info Sort by
+          a.site-bg-style.ut_rating(href='{{#tset}}order=ut_rating{{/tset}}') Rating
           | {{#order}}
-          a(href='{{#tset}}order=!{{/tset}}') ✘ Reset
+          a.ordering(href='{{#tset}}order=!{{/tset}}') Brewery
+          | {{/order}}
+          | {{^order}}
+          a.ordering.order-by-name.selected(href='{{#tset}}order=!{{/tset}}') Brewery
           | {{/order}}
         .filter.bar
+          span.info Filter by 
           a.tasted(href='{{#tset}}tasted=tasted{{/tset}}') ✓
           a.not-tasted(href='{{#tset}}tasted=not-tasted{{/tset}}') NOT ✓
           a.saved(href='{{#tset}}saved=saved{{/tset}}') ★
           a.not-saved(href='{{#tset}}saved=not-saved{{/tset}}') NOT ★
           a(href='{{#tset}}saved=!,tasted=!{{/tset}}') ✘ Reset
-          a.mini(href='{{#tset}}mini=!mini{{/tset}}') Small UI
         .key.bar
+          span.info Filter by  
           | {{#metastyles}}
           a.style-border(class="{{.}}", href='{{#tset}}metastyle={{.}}{{/tset}}') {{.}}
           | {{/metastyles}}
@@ -74,23 +105,27 @@ html(manifest="app.cache")
           h2 {{name}}
           .beers
             | {{#beers}}
-            .beer.style-border(class="{{metastyle}} {{session}} {{saved}} {{tasted}} {{#notes}}has-notes{{/notes}} {{#rating}}has-rating r-{{.}}{{/rating}}", data-id="{{id}}")
+            .beer.style-border(class="{{metastyle}} {{session}} {{saved}} {{tasted}} {{#notes}}has-notes{{/notes}} {{#rating}}has-rating r-{{.}}{{/rating}} {{#ut_checked_in}}ut-checked-in{{/ut_checked_in}} {{#ut_h_ch}}ut-historic-checked-in{{/ut_h_ch}}", data-id="{{id}}")
               .headline
-                .name {{name}}
-                .abv {{percent}}
-                .style {{superstyle}}
+                .name-block
+                  .name {{name}}
+                  .abv {{#percent}}{{percent}}{{/percent}}{{^percent}}?{{/percent}}
+                  | {{#ut_rating}}
+                  .ut-avg 
+                    img(src="/img/ut_icon_144.png")
+                    | {{ut_rating_clamped}}
+                  | {{/ut_rating}}
+                  .style {{superstyle}}
                 .marks 
                   a.star ★
                   a.tick ✓
                 .ratings
-                  .site-bg-style.score.avg {{avg_score_fixed}}{{score_rank_br}}
-                  .site-bg-style.score.hype {{hype_score_fixed}}{{hype_rank_br}}
-                  a.site-bg-style.score.untappd(href="{{untappd_url}}", target="_blank") {{untappd}}{{untappd_rank_br}}
-                  a.site-bg-style.score.ratebeer(href="{{ratebeer_url}}", target="_blank") {{ratebeer}}{{ratebeer_rank_br}}
-                  .site-bg-style.score.beeradvocate(href="{{beeradvocate_url}}", target="_blank") {{beeradvocate_clamped}}{{beeradvocate_rank_br}}
-                .expanded
+                  a.site-bg-style.score.untappd(href="https://untappd.com/b/_/{{ut_bid}}", target="_blank") Untappd: {{#ut_rating}}{{ut_rating_clamped}}{{ut_rating_rank_br}}{{/ut_rating}}{{^ut_rating}}no rating{{/ut_rating}}
+                  | {{#ut_h_ch}}
+                  a.site-bg-style.score.untappd(href="https://untappd.com/user/{{untappd_user}}/checkin/{{ut_h_id}}", target="_blank") You (UT): {{ut_h_ra}}
+                  | {{/ut_h_ch}}
                   a.add-rating Rate
-                  .style Brewer's description: <strong>{{style}}</strong>
+                .expanded
                   .desc {{trunc_desc}}
 
                 .rate-box
@@ -98,6 +133,18 @@ html(manifest="app.cache")
                   input.rating-slider(name="rslider", type="range", min="0", max="5", step=".25" value="{{rating}}")
                   .rating-text {{rating}}
                   textarea(name="rnotes", placeholder="Notes").notes {{notes}}
+                  | {{#untappd_token}}{{#ut_bid}}
+                  .untappd
+                    a.send-to-untappd(data-bid="{{ut_bid}}")
+                      img(src="/img/ut_icon_144.png")
+                      | Send to Untappd
+                    span.sending-untappd-checkin
+                      img(src="/img/spin.svg").load
+                    span.untappd-error-text
+                    .sent-to-untappd
+                      .beer-check-mark
+                      | you have sent this checkin to untappd
+                  | {{/ut_bid}}{{/untappd_token}}
 
 
 

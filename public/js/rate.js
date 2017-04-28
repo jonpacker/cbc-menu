@@ -15,18 +15,10 @@ function orderByProp(prop) {
     .value()
 }
 
-window.beersByHype = orderByProp('hype_score');
-window.beersByScore = orderByProp('avg_score');
-window.beersByUntappd = orderByProp('untappd');
-window.beersByRatebeer = orderByProp('ratebeer');
-window.beersByBeeradvocate = orderByProp('beeradvocate');
+window.beersByUntappd = orderByProp('ut_rating');
 
 var rankGroups = {
-  'hype': beersByHype,
-  'score': beersByScore,
-  'untappd': beersByUntappd,
-  'ratebeer': beersByRatebeer,
-  'beeradvocate': beersByBeeradvocate
+  'ut_rating': beersByUntappd,
 };
 
 window.beerSubsetWithRankings = function(filter) {
@@ -47,4 +39,3 @@ window.beerSubsetWithRankings = function(filter) {
     })
     .value();
 }
-

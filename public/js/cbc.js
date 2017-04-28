@@ -1,5 +1,5 @@
 function route(path) {
-  var segments = path.match(/#(\w+)(\[(.*)\])?/i);
+  var segments = path.match(/#(\w+)(\[(.*)\])?(=([\d\w]+))?/i);
   if (!segments) return;
   var renderer = segments[1];
   var opts = {};
@@ -10,9 +10,14 @@ function route(path) {
       return;
     }
   }
+  else if (segments[5]) {
+    opts.arg = segments[5];
+  }
 
   render(renderer, opts);
 }
+
+var UT_CLIENT = '7E07FC9AC3B3866F4F620819996F262F087EAC92';
 
 _.templateSettings = {
   interpolate: /\{\{=(.+?)\}\}/g,
@@ -23,16 +28,45 @@ $(".template").each(function() {
   templates[this.dataset.templateId] = this.innerHTML;
 });
 
-var savedBeers = JSON.parse(localStorage.getItem('savedBeers') || '[]');
-var tastedBeers = JSON.parse(localStorage.getItem('tastedBeers') || '[]');
-var beerData = JSON.parse(localStorage.getItem('beerData') || '{}');
+var savedBeers = JSON.parse(localStorage.getItem('savedBeers17') || '[]');
+var tastedBeers = JSON.parse(localStorage.getItem('tastedBeers17') || '[]');
+var beerData = JSON.parse(localStorage.getItem('beerData17') || '{}');
 
 var view = $('#window');
 function render(renderer, opts) {
   if (!renderers[renderer]) return;
   opts.page = renderer;
-  view.empty().html(renderers[renderer](opts))
+  var html = renderers[renderer](opts);
+  if (html) view.empty().html(html)
 };
+
+var _loadingTemplate;
+function showLoading() {
+  if (!_loadingTemplate) _loadingTemplate = Mustache.render(templates.loading);
+  view.empty().html(_loadingTemplate);
+}
+
+function fetchUntappd(path, opts) {
+  if (!opts) 
+    opts = { };
+
+  var token = opts.token || localStorage.getItem('untappd_token');
+  delete opts.token;
+    
+  if (opts.body) {
+    opts.body.access_token = token;
+    opts.body = $.param(opts.body)
+    var headers = new Headers();
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+    headers.append('Content-Length', opts.body.length);
+    opts.headers = headers;
+  }
+
+  if (opts.query) opts.query = '&' + opts.query;
+  
+  return fetch('https://api.untappd.com/v4/' + path + '?access_token=' + token + (opts.query || ''), opts)
+    .then(function(res) { return res.json() })
+}
 
 function calcBeerList(opts) {
   var beers = beerSubsetWithRankings(function(beer) { 
@@ -52,9 +86,6 @@ function calcBeerList(opts) {
 
     if (!breweries[brewery]) breweries[brewery] = [];
     
-    beer.beeradvocate_clamped = beer.beeradvocate > 0 ? beer.beeradvocate : '';
-    beer.avg_score_fixed = beer.avg_score ? beer.avg_score.toFixed(2) : '';
-    beer.hype_score_fixed = beer.hype_score ? beer.hype_score.toFixed(2) : '';
     beer.trunc_desc = beer.desc ? beer.desc.length > 250 ? beer.desc.slice(0, 200) + '...' : beer.desc : '';
 
     breweries[brewery].push(beer);
@@ -114,18 +145,24 @@ function checkMini(opts) {
   opts.mini = mini;
 };
 
+function addUntappdUser(opts) {
+  opts.untappd_token = localStorage.getItem('untappd_token');
+  opts.untappd_user = localStorage.getItem('untappd_user');
+}
 
 var renderers = {
   session: function(opts) {
     if (!opts.colour) return;
     calcBeerList(opts);
     checkMini(opts);
+    addUntappdUser(opts);
     opts.typeclass = opts.title = opts.colour + ' session'
     return Mustache.render(templates.beerlist, opts);
   },
   beerlist: function(opts) {
     calcBeerList(opts);
     checkMini(opts);
+    addUntappdUser(opts);
     opts.typeclass = 'beer-list';
     opts.title = 'All Beers';
     return Mustache.render(templates.beerlist, opts);
@@ -135,14 +172,94 @@ var renderers = {
       opts.msg = localStorage.getItem('msg');
       localStorage.removeItem('msg');
     }
+    addUntappdUser(opts);
+    opts.untappd_redir_url = "http://cbc.jonpacker.com";
+    opts.untappd_cid = UT_CLIENT;
     return Mustache.render(templates.index, opts);
+  },
+  access_token: function(opts) {
+    fetchUntappd('/user/info', {token:opts.arg}).then(function(data) {
+      localStorage.setItem('untappd_user', data.response.user.user_name);
+      localStorage.setItem('untappd_token', opts.arg);
+      window.location = '/#index';
+    }).catch(function() {
+      localStorage.setItem('msg', 'Untappd authentication failed 😨');
+      window.location = '/#index';
+    });
+  },
+  unicorn: function() {
+    var untappdUser = localStorage.getItem('untappd_user');
+    if (!untappdUser) {
+      localStorage.setItem('msg', 'You are not logged in to untappd! 😨');
+      window.location = '/#index';
+      return;
+    }
+    showLoading();
+    readUntappdCheckins(untappdUser, function(count) {
+      localStorage.setItem('msg', 'Marked ' + count + ' beers as checked-in on untappd');
+      window.location = '/#index';
+    });
+  },
+  snapshot: function() {
+    var untappdUser = localStorage.getItem('untappd_user');
+    if (!untappdUser) {
+      localStorage.setItem('msg', 'You are not logged in to untappd! 😨');
+      window.location = '/#index';
+      return;
+    }
+    showLoading();
+    fetch('/snapshot/' + untappdUser, {
+      method: 'POST',
+      body: btoa(JSON.stringify({savedBeers:savedBeers,tastedBeers:tastedBeers,beerData:beerData}))
+    }).then(function(res) {
+      if (res.status == 200) {
+        localStorage.setItem('msg', 'Snapshot saved!');
+      } else {
+        localStorage.setItem('msg', 'Snapshot failed 😱 - ' + res.statusText);
+      }
+      window.location = '/#index';
+    }).catch(function(err) {
+      localStorage.setItem('msg', 'Snapshot failed 😱 - ' + err.message);
+      window.location = '/#index';
+    });
+  },
+  loadsnapshot: function() {
+    var untappdUser = localStorage.getItem('untappd_user');
+    if (!untappdUser) {
+      localStorage.setItem('msg', 'You are not logged in to untappd! 😨');
+      window.location = '/#index';
+      return;
+    }
+    if (!confirm("Load snapshot? This will overwrite any existing stars/checks/ratings with data from the snapshot")) {
+      window.location = '/#index';
+      return;
+    }
+    showLoading();
+    fetch('/snapshot/' + untappdUser).then(function(res) {
+      if (res.status != 200) {
+        localStorage.setItem('msg', 'Couldn\'t load snapshot 😱 - ' + res.statusText);
+        window.location = '/#index';
+      } else {
+        return res.text().then(function(text) {
+          window.location = '/#loadb[{"d":"' + text + '"}]';
+        });
+      }
+    }).catch(function(err) {
+      localStorage.setItem('msg', 'Couldn\'t load snapshot 😱 - ' + err.message);
+      window.location = '/#index';
+    });
+  },
+  ut_logout: function() {
+    localStorage.removeItem('untappd_user');
+    localStorage.removeItem('untappd_token');
+    window.location = '/#index';
   },
   load: function(opts) {
     if (!opts.data) return renderers.index(opts);
     var savedBeers = _.compact(opts.data.saved.split(','));
     var tastedBeers = _.compact(opts.data.tasted.split(','));
-    localStorage.setItem('savedBeers', JSON.stringify(savedBeers));
-    localStorage.setItem('tastedBeers', JSON.stringify(tastedBeers));
+    localStorage.setItem('savedBeers17', JSON.stringify(savedBeers));
+    localStorage.setItem('tastedBeers17', JSON.stringify(tastedBeers));
     updateBeersMarked();
     localStorage.setItem('msg',  savedBeers.length + " saved, " + tastedBeers.length + " tasted beers loaded");
     location.hash = '/#index';
@@ -154,9 +271,9 @@ var renderers = {
     var newSavedBeers = data.savedBeers;
     var newTastedBeers = data.tastedBeers;
     var newBeerData = data.beerData;
-    localStorage.setItem('savedBeers', JSON.stringify(newSavedBeers));
-    localStorage.setItem('tastedBeers', JSON.stringify(newTastedBeers));
-    localStorage.setItem('beerData', JSON.stringify(newBeerData));
+    localStorage.setItem('savedBeers17', JSON.stringify(newSavedBeers));
+    localStorage.setItem('tastedBeers17', JSON.stringify(newTastedBeers));
+    localStorage.setItem('beerData17', JSON.stringify(newBeerData));
     savedBeers = newSavedBeers;
     tastedBeers = newTastedBeers;
     beerData = newBeerData;
@@ -177,23 +294,72 @@ function updateBeersMarked() {
     if (beerData[beer.id]) {
       beer.notes = beerData[beer.id].notes;
       beer.rating = beerData[beer.id].rating;
+      beer.ut_checked_in = beerData[beer.id].ut_checked_in;
+      beer.ut_h_ch = beerData[beer.id].ut_h_ch;
+      beer.ut_h_id = beerData[beer.id].ut_h_id;
+      beer.ut_h_ra = beerData[beer.id].ut_h_ra;
     }
     if (!beer.rating) beer.rating = 0;
   });
 }
 updateBeersMarked();
+
+$('body').on('click', '.mini-true .beer', function(e) {
+  var beer = $(e.target).parents('.beer');
+  if ($(e.target).is('.star, .tick, textarea, input, a')) return;
+  beer.toggleClass('expand');
+});
 $('body').on('click', '.beer .star', function(e) {
+  e.stopPropagation();
   var beer = $(e.target).parents('.beer');
   var beerId = beer.data().id;
   var willSave = savedBeers.indexOf(beer.data().id) == -1;
   toggleBeerSaved(beerId, willSave);
 });
 $('body').on('click', '.beer .tick', function(e) {
+  e.stopPropagation();
   var beer = $(e.target).parents('.beer');
   var beerId = beer.data().id;
   var willSave = tastedBeers.indexOf(beer.data().id) == -1;
   toggleBeerTasted(beerId, willSave);
 });
+$('body').on('click', '.beer .send-to-untappd', function(e) {
+  e.stopPropagation();
+  var target = $(e.target);
+  var beer = target.parents('.beer');
+  var beerId = beer.data().id;
+  var untappdId = target.closest('.send-to-untappd').data().bid;
+  var rating = parseFloat(beer.find('.rating-slider').val());
+  var comments = beer.find('.notes').val();
+  var loader = beer.find('.sending-untappd-checkin').show()
+  
+  var handleError = function() {
+    loader.hide();
+    var errorText =beer.find('.untappd-error-text');
+    errorText.text('Error! 😰 Try again?! 🔂');
+    setTimeout(function() {
+      errorText.text('');
+    }, 5000);
+  }
+  
+  fetchUntappd('/checkin/add', {
+    method: 'POST',
+    body: {
+      timezone: 'CET',
+      gmt_offset: 2,
+      bid: untappdId,
+      shout: comments,
+      rating: rating > 0 ? rating : undefined
+    }
+  }).then(function(res) {
+    loader.hide();
+    if (res.meta.code >= 300) {
+      return handleError();
+    }
+    beer.addClass('ut-checked-in');
+    updateBeerData(beerId, {ut_checked_in:true})
+  }).catch(handleError);
+})
 function toggleBeerSaved(id, saved) {
   if (!saved) {
     savedBeers = _.without(savedBeers, id);
@@ -203,7 +369,7 @@ function toggleBeerSaved(id, saved) {
   window.beers.forEach(function(beer) {
     if (beer.id == id) beer.saved = saved ? 'saved' : undefined;
   });
-  localStorage.setItem('savedBeers', JSON.stringify(savedBeers));
+  localStorage.setItem('savedBeers17', JSON.stringify(savedBeers));
   $(".beer[data-id=" + id + "]").toggleClass('saved', saved);
   updateExportLink();
 }
@@ -217,11 +383,11 @@ function toggleBeerTasted(id, tasted) {
     if (beer.id == id) beer.tasted = tasted ? 'tasted' : undefined;
   });
   $(".beer[data-id=" + id + "]").toggleClass('tasted', tasted);
-  localStorage.setItem('tastedBeers', JSON.stringify(tastedBeers));
+  localStorage.setItem('tastedBeers17', JSON.stringify(tastedBeers));
   updateExportLink();
 }
 function updateBeerData(id, data) {
-  beerData = JSON.parse(localStorage.getItem('beerData') || '{}');
+  beerData = JSON.parse(localStorage.getItem('beerData17') || '{}');
   if (beerData[id]) {
     data = _.extend(beerData[id], data);
   }
@@ -230,14 +396,16 @@ function updateBeerData(id, data) {
     if (beer.id == id) {
       beer.notes = data.notes;
       beer.rating = data.rating; 
+      beer.ut_checked_in = data.ut_checked_in;
     }
   });
   var beerEls = $(".beer[data-id=" + id + "]");
   beerEls.find('.rating-slider').val(data.rating);
   beerEls.find('textarea').val(data.notes || '');
+  beerEls.toggleClass('ut_checked_in', !!data.ut_checked_in);
   if (data.notes) beerEls.addClass('has-notes');
   if (data.rating != null) beerEls.addClass('has-rating');
-  localStorage.setItem('beerData', JSON.stringify(beerData));
+  localStorage.setItem('beerData17', JSON.stringify(beerData));
   updateExportLink();
 }
 
@@ -265,12 +433,39 @@ $('body').on('change', '.beer textarea', function(e) {
 });
 
 $('body').on('click', 'a.add-rating', function(e) {
+  e.stopPropagation();
   var button = $(e.target);
   var parent = button.parents('.beer');
   parent.toggleClass('add-rating');
   button.toggleClass('is-rating');
 });
 
+function readUntappdCheckins(user, cb, start, count) {
+  if (!start) { 
+    start = 0;
+    count = 0;
+  }
+  fetchUntappd('/user/beers', {query: 'offset='+start+'&limit=50'})
+    .then(function(result) {
+      if (result.meta.code != 200) return cb(count);
+      start += result.response.beers.count;
+      if (result.response.beers.count == 0) {
+        return cb(count);
+      }
+      var checkins = result.response.beers.items;
+      checkins.forEach(function(checkin) {
+        for (var i = 0; i < beers.length; ++i) {
+          if (beers[i].ut_bid == checkin.beer.bid) {
+            updateBeerData(beers[i].id+"", {ut_h_ch:true, ut_h_ra:checkin.rating_score, ut_h_id:checkin.first_checkin_id});
+            count++;
+            break;
+          }
+        }
+      });
+      $('.status-text').text(start + " beers read, " + count + " beers matched");
+      readUntappdCheckins(user, cb, start, count);
+    });
+}
 
 function updateExportLink() {
   $('#export').val('http://' + window.location.hostname + window.location.pathname + '#loadb[{"d":"' +

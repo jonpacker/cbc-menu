@@ -45,6 +45,15 @@ h1
     padding: 1rem
     text-align: center
     font-family: inherit
+    
+.loader
+  width: 8rem
+  height: 8rem
+  margin: 5rem auto
+  display: block
+.status-text
+  font-size: 3rem
+  text-align: center
 
 #main-menu
   .msg
@@ -62,7 +71,7 @@ h1
     flex-wrap: wrap
     box-sizing: border-box
     justify-content: center
-    padding: 5% 0
+    padding: 2.5% 0 2.5%
     .session
       width: 45%
       box-sizing: border-box
@@ -83,6 +92,37 @@ h1
   .info
     text-align: center
     font-size: 2rem
+    
+  .untappd
+    text-align: center
+    font-size: 2rem
+    outline: 0.5rem solid #ffcc00
+    padding: 2rem
+    box-sizing: border-box
+    width: 90vw
+    margin: 0 auto
+    margin-bottom: 5%
+    .ut-user
+      display: inline-block
+    .ut-info
+      font-size: 1.5rem
+      margin-top: 0.5rem
+    .ut-sync
+      margin-top: 0.75rem
+      font-size: 1.4rem
+      .expl
+        font-size: 1.25rem
+        margin-top: 0.5rem
+      a
+        background-color: #ffcc00
+        padding: 0.25rem 1rem
+        border-radius: 0.2rem
+        margin: 0 0.5rem
+    img
+      width: 4rem
+      height: 4rem
+      margin-right: 2rem
+      vertical-align: middle
 
   .beer-lists
     display: flex
@@ -90,7 +130,7 @@ h1
     flex-wrap: wrap
     flex-direction: vertical
     justify-content: center
-    padding: 5% 0
+    padding: 0 0 5%
 
     .all-beers-sel
       width: 90%
@@ -204,6 +244,10 @@ html
     text-align: center
     margin-top: 1rem
     width: 100%
+    span.info
+      margin-right: 1rem
+      &:after
+        content: ':'
   .key .style-border
     display: inline-block
     padding: 1rem
@@ -214,9 +258,10 @@ html
     color: inherit
 
   &.ms-Dark .key .Dark
-  &.ms-Classic .key .Classic
+  &.ms-Traditional .key .Traditional
   &.ms-Hoppy .key .Hoppy
-  &.ms-Extreme .key .Extreme
+  &.ms-Imperial.Stout .key .Imperial.Stout
+  &.ms-Barley.Wine .key .Barley.Wine
   &.ms-Mixed-fermentation .key .Mixed-fermentation
   &.ms-Sour .key .Sour
   &.ms-Belgian .key .Belgian
@@ -228,14 +273,15 @@ html
   &.ms-Pumpkin .key .Pumpkin
   &.order-score .order .avg
   &.order-hype .order .hype
-  &.order-untappd .order .untappd
+  &.order-ut_rating .order .ut_rating
   &.order-ratebeer .order .ratebeer
   &.order-beeradvocate .order .beeradvocate
   &.saved .filter .saved
   &.not-saved .filter .not-saved
   &.tasted .filter .tasted
   &.not-tasted .filter .not-tasted
-  &.mini-true .filter .mini
+  &.mini-true .order .mini
+  .order-by-name.selected
     outline: 0.5rem solid fuchsia
 
   .order
@@ -251,11 +297,19 @@ html
       padding: 0.5rem
       text-align: center
       font-size: 1.5rem
-      &:before
+      &:not(.site-bg-style)
+        background-color: silver
+      &.ordering:before
         content: '⇳ '
-
-      &:last-child
-        content: ''
+      
+    span.info
+      margin-right: 1rem
+      margin-left: 2rem
+      vertical-align: middle
+      margin-top: 0.9rem
+      &:after
+        content: ':'
+      
 
 
   .filter
@@ -263,6 +317,11 @@ html
     padding: 1rem 5%
     box-sizing: border-box
     text-align: center
+    
+    span.info
+      margin-right: 1rem
+      &:after
+        content: ':'
 
     a
       display: inline-block
@@ -293,6 +352,15 @@ html
       .ratings
       .expanded
         display: none
+    .beer.expand .headline
+      .ratings
+      .expanded
+        display: block
+  &.mini-false
+    .beer .headline
+      .name-block .ut-avg
+        display: none
+      
     
 
   .beer
@@ -305,6 +373,12 @@ html
 
     &.tasted
       opacity: 0.5
+      
+    &.ut-checked-in .headline
+    &.ut-historic-checked-in .headline
+      background-image: url(/img/drank_flag.png)
+      background-repeat: no-repeat
+      background-position: top right
 
     .star
     .tick
@@ -330,38 +404,53 @@ html
       align-items: center
       flex-wrap: wrap
 
-      .name
-        font-weight: bold
-        width: 42.5%
+      .name-block
+        width: 81%
+        display: flex
+        flex-wrap: wrap
 
-      .abv
-        width: 12%
-        font-size: 1.75rem
-        &:after
-          content:'%'
-          font-size: 0.6em
-          display: inline-block
-          position: relative
-          top: -0.6em
+        .name
+          font-weight: bold
+          width: 80%
 
-      .style
-        width: 26.5%
-        font-size: 1.5rem
+        .abv
+          width: 20%
+          font-size: 1.75rem
+          &:after
+            content:'%'
+            font-size: 0.6em
+            display: inline-block
+            position: relative
+            top: -0.6em
+
+        .style
+          width: 80%
+          font-size: 1.5rem
+          
+        .ut-avg
+          width: 20%
+          font-size: 1.5rem
+          img
+            width: 1.5rem
+            height: 1.5rem
+            vertical-align: baseline
+            border-radius: 0.25rem
+            margin-right: 0.3rem
 
       .marks
         width: 19%
 
       .ratings
         width: 100%
-        display: flex
         margin-top: 0.5rem
         font-size: 1.25rem
 
         .score
-          width: 20%
+          width: 40%
           text-align: center
           box-sizing: border-box
           padding: 0.5rem
+          float: left
 
           &[href=""]
             text-decoration: none
@@ -372,15 +461,6 @@ html
         .yours
           background-color: fuchsia
           color: white
-
-
-      .expanded
-        width: 100%
-        margin-top: 0.5rem
-
-        div.style
-          font-size: 1.4rem
-          margin-bottom: 0.25rem
 
         .add-rating
           width: 20%
@@ -397,6 +477,15 @@ html
 
           &.is-rating
             box-shadow: 0px 0px 15px red
+
+
+      .expanded
+        width: 100%
+        margin-top: 0.5rem
+
+        div.style
+          font-size: 1.4rem
+          margin-bottom: 0.25rem
 
 
         div
@@ -433,12 +522,65 @@ html
           font-size: 2rem
           display: inline-block
           display: none
+          
+        .untappd
+          margin-top: 0.2rem
+          width: 100%
+          
+        .previous-checkin
+          margin-right: 1rem
+          display: inline-block
+        
+        .send-to-untappd
+          width: 40%
+          vertical-align: top
+          background-color: #ffcc00
+          display: inline-block
+          box-shadow: inset 0px 0px 0px 3px rgba(white, 25%), 0px 1px 0px rgba(black, 50%)
+          border-radius: 5px
+          align-self: flex-end
+          font-size: 1.25rem
+          text-align: center
+          box-sizing: border-box
+          padding: 0.2rem 1rem
+          cursor: pointer
+          img
+            width: 2.5rem
+            height: 2.5rem
+            margin-right: 0.5rem
+            vertical-align: middle
+            
+        .sent-to-untappd
+          color: mix(black, #ffcc00, 75%)
+          font-size: 1.25rem
+          display: none
+          .beer-check-mark
+            width: 2rem
+            height: 2rem
+            display: inline-block
+            vertical-align: middle
+            margin-right: 0.5rem
+            background-color: #ffcc00
+            background-image: url(/img/beer_icon_check.png)
+            background-size: 1.4rem
+            background-repeat: no-repeat
+            background-position: center
+            
+        .sending-untappd-checkin
+          display: none
+          
+          img
+            width: 3rem
+            height: 3rem
+            vertical-align: middle
 
     &.has-rating:not(.r-0)
       .headline .rate-box
         display: flex
         label, input, .rating-text
           display: inline-block
+        .untappd
+          display: block
 
     &.has-notes
       .headline .rate-box
@@ -453,6 +595,17 @@ html
           display: block
         label, input, .rating-text
           display: inline-block
+        .untappd
+          display: block
+    
+    &.ut-checked-in
+      .headline .rate-box
+        .sent-to-untappd
+          display: block
+        .send-to-untappd
+        .have-i-drunk-it
+          display: none
+    
 
   &.beer-list
     .beer .name:before
@@ -476,17 +629,16 @@ html
 
 .style-border
   &.Dark
-    border-left: 1rem solid maroon
+    border-left: 1rem solid navy
 
+  &.Traditional
   &.Classic
     border-left: 1rem solid silver
 
   &.Hoppy
     border-left: 1rem solid green
 
-  &.Extreme
-    border-left: 1rem solid black
-  &.Wine
+  &.Strong
     border-left: 1rem solid maroon
   &.Sake
     border-left: 1rem solid olive
@@ -495,18 +647,18 @@ html
     border-left: 1rem solid blue
 
   &.Sour
-    border-left: 1rem solid navy
-
-  &.Belgian
     border-left: 1rem solid fuchsia
 
-  &.Experimental
+  &.Belgian
+    border-left: 1rem solid blue
+
+  &.Traditional
     border-left: 1rem solid red
 
   &.Cider
-    border-left: 1rem solid orange
-  &.Mead
     border-left: 1rem solid teal
+  &.Mead
+    border-left: 1rem solid orange  
 
   &.Pumpkin
     border-left: 1rem solid orange
@@ -519,6 +671,7 @@ html
     color: white
 
   &.untappd
+  &.ut_rating
     background-color: #ffcc00
     color: black
 
