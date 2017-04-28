@@ -191,7 +191,7 @@ var cf = cache.newCache([
 if (!argv.noappcache) {
   app.get('/app.cache', function(req, res) {
     res.writeHead(200, {'Content-Type': 'text/cache-manifest'});
-    res.end(cf);
+    res.end([cf, '','NETWORK:', 'latest.json'].join('\r\n'));
   });
 }
 

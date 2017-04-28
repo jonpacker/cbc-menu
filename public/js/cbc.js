@@ -196,6 +196,8 @@ var renderers = {
     }
     showLoading();
     readUntappdCheckins(untappdUser, function(count) {
+      updateExportLink();
+      updateBeersMarked();
       localStorage.setItem('msg', 'Marked ' + count + ' beers as checked-in on untappd');
       window.location = '/#index';
     });
@@ -278,6 +280,7 @@ var renderers = {
     tastedBeers = newTastedBeers;
     beerData = newBeerData;
     updateBeersMarked();
+    updateExportLink();
     var noteCount = _.reduce(newBeerData, function(c, d) { return c + (d.notes ? 1 : 0) }, 0);
     var ratingCount = _.reduce(newBeerData, function(c, d) { return c + (d.rating ? 1 : 0) }, 0);
     localStorage.setItem('msg', noteCount + ' notes, ' + ratingCount + ' ratings, ' + newSavedBeers.length + " saved, " + newTastedBeers.length + " tasted beers loaded");
