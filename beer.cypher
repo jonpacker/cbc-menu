@@ -1,4 +1,5 @@
 MATCH (beer:beer)--(brewery:brewery), (beer)--(session:session)
+WHERE beer.deleted IS NULL or beer.deleted <> true
 OPTIONAL MATCH (beer)--(superstyle:superstyle), (beer)--(metastyle:metastyle)
 RETURN beer, 
        brewery.name as brewery, 
