@@ -121,7 +121,7 @@ html(manifest="app.cache")
                   a.star ★
                   a.tick ✓
                 .ratings
-                  a.site-bg-style.score.untappd(href="https://untappd.com/b/_/{{ut_bid}}", target="_blank") Untappd: {{#ut_rating}}{{ut_rating_clamped}}{{ut_rating_rank_br}}{{/ut_rating}}{{^ut_rating}}no rating{{/ut_rating}}
+                  a.site-bg-style.score.untappd(href="https://untappd.com/{{#is_mobile}}qr/{{/is_mobile}}beer/{{ut_bid}}", target="_blank") Untappd: {{#ut_rating}}{{ut_rating_clamped}}{{ut_rating_rank_br}}{{/ut_rating}}{{^ut_rating}}no rating{{/ut_rating}}
                   | {{#ut_h_ch}}
                   a.site-bg-style.score.untappd(href="https://untappd.com/user/{{untappd_user}}/checkin/{{ut_h_id}}", target="_blank") You (UT): {{ut_h_ra}}
                   | {{/ut_h_ch}}
