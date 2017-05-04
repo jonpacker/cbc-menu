@@ -520,13 +520,19 @@ function updateLiveRating(id, count, rating) {
 
 function readUntappdCheckins(user, cb, start, count) {
   if (!start) { 
-    start = 0;
-    count = 0;
+    if (localStorage.getItem('ut_uniques_start')) {
+      start = parseInt(localStorage.getItem('ut_uniques_start'));
+      count = parseInt(localStorage.getItem('ut_uniques_count')) || 0;
+    } else {
+      start = 0;
+      count = 0;
+    }
   }
   fetchUntappd('/user/beers', {query: 'offset='+start+'&limit=50'})
     .then(function(result) {
       if (result.meta.code != 200) return cb(count);
       start += result.response.beers.count;
+      localStorage.setItem('ut_uniques_start', start);
       if (result.response.beers.count == 0) {
         return cb(count);
       }
@@ -536,6 +542,7 @@ function readUntappdCheckins(user, cb, start, count) {
           if (beers[i].ut_bid == checkin.beer.bid) {
             updateBeerData(beers[i].id+"", {ut_h_ch:true, ut_h_ra:checkin.rating_score, ut_h_id:checkin.first_checkin_id});
             count++;
+            localStorage.setItem('ut_uniques_count', count);
             break;
           }
         }
