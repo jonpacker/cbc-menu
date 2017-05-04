@@ -65,6 +65,10 @@ html(manifest="app.cache")
         a.ut-auth(href="https://untappd.com/oauth/authenticate/?client_id={{untappd_cid}}&response_type=token&redirect_url={{untappd_redir_url}}") Tap here to connect to Untappd.
         .ut-info This will allow you to send checkins to untappd in the background, from the app (if you have internet access).
         | {{/untappd_token}}
+      .live-ratings
+        | 👥 Live Ratings are turned <strong>{{#live_ratings}}on{{/live_ratings}}{{^live_ratings}}off{{/live_ratings}}</strong>.
+        a(href="#toggle_live_ratings") Turn live ratings {{#live_ratings}}off{{/live_ratings}}{{^live_ratings}}on{{/live_ratings}}
+        .expl When live ratings are turned on, an average based on ratings from users of this app is generated and updated in real time, as people drink beer and rate. This feature requires internet.
       .info
         p Made by <a href="http://github.com/jonpacker">Jon Packer</a>. Please note that there&apos;s probably a few mistakes/poorly linked ratings, there were a lot of beers to enter...
         p Prefer spreadsheets? <a href="/mbcc-2017-dump-jonpacker.csv">Download the data as a csv.</a>
@@ -79,7 +83,12 @@ html(manifest="app.cache")
           span.info Display Options
           a.mini(href='{{#tset}}mini=!mini{{/tset}}') Small UI
           span.info Sort by
-          a.site-bg-style.ut_rating(href='{{#tset}}order=ut_rating{{/tset}}') Rating
+          a.site-bg-style.ut_rating(href='{{#tset}}order=ut_rating{{/tset}}') 
+            img(src="/img/ut_icon_144.png")
+            | Rating
+          | {{#live_ratings}}
+          a.site-bg-style.avg.live-rating(href='{{#tset}}order=live_rating{{/tset}}') 👥 Rating
+          | {{/live_ratings}}
           | {{#order}}
           a.ordering(href='{{#tset}}order=!{{/tset}}') Brewery
           | {{/order}}
@@ -116,6 +125,9 @@ html(manifest="app.cache")
                     img(src="/img/ut_icon_144.png")
                     | {{ut_rating_clamped}}
                   | {{/ut_rating}}
+                  | {{#live_ratings}}
+                  .live-avg {{#live_rating}}👥 {{live_rating_clamped}}{{/live_rating}}
+                  | {{/live_ratings}}
                   .style {{superstyle}}
                 .marks 
                   a.star ★
@@ -125,6 +137,14 @@ html(manifest="app.cache")
                   | {{#ut_h_ch}}
                   a.site-bg-style.score.untappd(href="https://untappd.com/user/{{untappd_user}}/checkin/{{ut_h_id}}", target="_blank") You (UT): {{ut_h_ra}}
                   | {{/ut_h_ch}}
+                  | {{#live_ratings}}
+                  | {{#live_rating}}
+                  a.site-bg-style.score.avg.live-rating Users ({{live_rating_count}}): {{live_rating_clamped}}
+                  | {{/live_rating}}
+                  | {{^live_rating}}
+                  a.site-bg-style.score.avg.live-rating(style="display:none")
+                  | {{/live_rating}}
+                  | {{/live_ratings}}
                   a.add-rating Rate
                 .expanded
                   .desc {{trunc_desc}}
@@ -157,5 +177,6 @@ html(manifest="app.cache")
   script(type="text/javascript", src="/js/jquery-2.2.3.min.js")
   script(type="text/javascript", src="/js/underscore-min.js")
   script(type="text/javascript", src="/js/mustache.min.js")
+  script(type="text/javascript", src="/socket.io/socket.io.js")
   script(type="text/javascript", src="/js/rate.js")
   script(type="text/javascript", src="/js/cbc.js")

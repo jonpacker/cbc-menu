@@ -19,6 +19,7 @@ window.beersByUntappd = orderByProp('ut_rating');
 
 var rankGroups = {
   'ut_rating': beersByUntappd,
+  'live_rating': orderByProp('live_rating')
 };
 
 window.beerSubsetWithRankings = function(filter) {

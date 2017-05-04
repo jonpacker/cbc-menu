@@ -17,6 +17,35 @@ function route(path) {
   render(renderer, opts);
 }
 
+function connectToWebsocket() {
+  window.socket = io();
+
+  socket.on('rate', function(data) {
+    beers.forEach(function(beer) {
+      if (beer.id != data.beer) return;
+      beer.live_rating = data.rating;
+      beer.live_rating_count = data.count;
+      beer.live_rating_clamped = data.rating.toFixed(2);
+      if (data.flag) return;
+      data.flag = true;
+      updateLiveRating(beer.id, data.count, data.rating);
+    });
+  });
+
+  socket.on('update', function(data) {
+    beers.forEach(function(beer) {
+      if (!data[beer.id]) return;
+      beer.live_rating = data[beer.id].rating;
+      beer.live_rating_clamped = data[beer.id].rating.toFixed(2);
+      beer.live_rating_count = data[beer.id].count;
+      if (data[beer.id].flag) return;
+      data[beer.id].flag = true;
+      updateLiveRating(beer.id, data[beer.id].count, data[beer.id].rating);
+    });
+  });
+}
+if (!localStorage.getItem('disable_live_rating')) connectToWebsocket();
+
 var UT_CLIENT = '7E07FC9AC3B3866F4F620819996F262F087EAC92';
 
 // credit http://stackoverflow.com/a/11381730
@@ -164,7 +193,8 @@ var renderers = {
     checkMini(opts);
     addUntappdUser(opts);
     opts.is_mobile = isMobile;
-    opts.typeclass = opts.title = opts.colour + ' session'
+    opts.typeclass = opts.title = opts.colour + ' session';
+    opts.live_ratings = !localStorage.getItem('disable_live_rating');
     return Mustache.render(templates.beerlist, opts);
   },
   beerlist: function(opts) {
@@ -174,6 +204,7 @@ var renderers = {
     opts.is_mobile = isMobile;
     opts.typeclass = 'beer-list';
     opts.title = 'All Beers';
+    opts.live_ratings = !localStorage.getItem('disable_live_rating');
     return Mustache.render(templates.beerlist, opts);
   },
   index: function(opts) {
@@ -184,7 +215,19 @@ var renderers = {
     addUntappdUser(opts);
     opts.untappd_redir_url = "http://mbcc.jonpacker.com";
     opts.untappd_cid = UT_CLIENT;
+    opts.live_ratings = !localStorage.getItem('disable_live_rating');
     return Mustache.render(templates.index, opts);
+  },
+  toggle_live_ratings: function() {
+    if (localStorage.getItem('disable_live_rating')) {
+      localStorage.removeItem('disable_live_rating');
+      connectToWebsocket();
+    } else {
+      localStorage.setItem('disable_live_rating', '1');
+      socket.close();
+      window.socket = undefined;
+    }
+    window.location = '/#index';
   },
   access_token: function(opts) {
     fetchUntappd('/user/info', {token:opts.arg}).then(function(data) {
@@ -315,8 +358,7 @@ function updateBeersMarked() {
   });
 }
 updateBeersMarked();
-
-$('body').on('click', '.mini-true .beer', function(e) {
+$('#window').on('click', '.mini-true .beer', function(e) {
   var beer = $(e.target).parents('.beer');
   if ($(e.target).is('.star, .tick, textarea, input, a')) return;
   beer.toggleClass('expand');
@@ -429,14 +471,27 @@ $('body').on('input', '.rating-slider', function(e) {
   var num = slider.val();
   slider.next('.rating-text').text(num);
 })
+var timeouts = {};
 $('body').on('change', '.rating-slider', function(e) {
   var slider = $(e.target);
   var textarea = slider.siblings('textarea');
   var num = slider.val();
   var beer = slider.parents('.beer');
   var beerId = beer.data().id;
+  var hasTastedBefore = tastedBeers.indexOf(beerId) != -1;
   toggleBeerTasted(beerId, true);
   updateBeerData(beerId, { rating: num, notes: textarea.val() });
+  if (timeouts[beerId]) {
+    clearTimeout(timeouts[beerId]);
+    delete timeouts[beerId];
+  }
+  timeouts[beerId] = setTimeout(function() {
+    delete timeouts[beerId];
+    fetch('/rate/' + beerId, {
+      method: hasTastedBefore ? 'PUT' : 'POST',
+      body: num.toString()
+    })
+  }, 5000);
 });
 $('body').on('change', '.beer textarea', function(e) {
   var textarea = $(e.target);
@@ -454,6 +509,14 @@ $('body').on('click', 'a.add-rating', function(e) {
   parent.toggleClass('add-rating');
   button.toggleClass('is-rating');
 });
+
+function updateLiveRating(id, count, rating) {
+  var beer = $('.beer[data-id='+id+']');
+  var lrBig = beer.find('.live-rating');
+  var lrSmall = beer.find('.live-avg');
+  lrSmall.text("👥 " + rating.toFixed(2))
+  lrBig.text("Users (" + count + "): " + rating.toFixed(2)).show()
+}
 
 function readUntappdCheckins(user, cb, start, count) {
   if (!start) { 

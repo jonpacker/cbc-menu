@@ -123,6 +123,21 @@ h1
       height: 4rem
       margin-right: 2rem
       vertical-align: middle
+      
+  .live-ratings
+    text-align: center
+    font-size: 2rem
+    outline: 0.5rem solid orange
+    padding: 2rem
+    box-sizing: border-box
+    width: 90vw
+    margin: 0 auto
+    margin-bottom: 5%
+    a
+      display: block
+    .expl
+      font-size: 1.25rem
+      margin-top: 0.5rem
 
   .beer-lists
     display: flex
@@ -276,6 +291,7 @@ html
   &.order-ut_rating .order .ut_rating
   &.order-ratebeer .order .ratebeer
   &.order-beeradvocate .order .beeradvocate
+  &.order-live_rating .order .live-rating
   &.saved .filter .saved
   &.not-saved .filter .not-saved
   &.tasted .filter .tasted
@@ -292,7 +308,7 @@ html
     justify-content: center
     a
       display: block
-      width: 16%
+      min-width: 16%
       max-width: 60px
       padding: 0.5rem
       text-align: center
@@ -301,6 +317,10 @@ html
         background-color: silver
       &.ordering:before
         content: '⇳ '
+      img
+        width: 2rem
+        height: 2rem
+        vertical-align: middle
       
     span.info
       margin-right: 1rem
@@ -359,6 +379,7 @@ html
   &.mini-false
     .beer .headline
       .name-block .ut-avg
+      .name-block .live-avg
         display: none
       
     
@@ -424,12 +445,13 @@ html
             top: -0.6em
 
         .style
-          width: 80%
-          font-size: 1.5rem
+          width: 70%
+          font-size: 1.4rem
           
         .ut-avg
-          width: 20%
-          font-size: 1.5rem
+        .live-avg
+          width: 15%
+          font-size: 1.4rem
           img
             width: 1.5rem
             height: 1.5rem

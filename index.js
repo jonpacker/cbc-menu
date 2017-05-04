@@ -8,9 +8,11 @@ var async = require('async');
 var _ = require('underscore');
 var cache = require('appcache-node');
 var app = express();
+var server = require('http').createServer(app);
 var csvWriter = require('csv-write-stream');
 var redisClient = require('redis');
 var redis = redisClient.createClient();
+var io = require('socket.io')(server);
 
 function compile(str, path) {
   return stylus(str)
@@ -51,41 +53,93 @@ if (argv.disk) {
 
 
 function getBeerData(cb) {
-  async.parallel({
-    beers: function(cb) {
-      db.query(beerQuery, function(err, beers) {
-        if (err) return cb(err);
-        else cb(null, beers.map(function(row) {
-          var beer = row.beer;
-          if (beer.ut_rating) beer.ut_rating_clamped = beer.ut_rating.toFixed(2)
-          beer.brewery = row.brewery;
-          beer.session = row.session;
-          beer.superstyle = row.superstyle;
-          beer.metastyle = row.metastyle;
-          return beer;
-        }));
-      }); 
-    },
-    breweries: function(cb) {
-      db.query("MATCH (brewery:brewery) RETURN brewery", function(err, breweries) {
-        if (err) return cb(err);
-        cb(null, breweries.map(function(b) { return b.name }));
-      });
-    },
-    superstyles: function(cb) {
-      db.query("MATCH (superstyle:superstyle) RETURN superstyle", function(err, superstyles) {
-        if (err) return cb(err);
-        cb(null, superstyles.map(function(s) { return s.name }));
-      });
-    },
-    metastyles: function(cb) {
-      db.query("MATCH (metastyle:metastyle) RETURN metastyle", function(err, metastyle) {
-        if (err) return cb(err);
-        cb(null, metastyle.map(function(m) { return m.name }));
-      });
-    }
-  }, cb);
+  updateRatingCache(() => {
+    async.parallel({
+      beers: function(cb) {
+        db.query(beerQuery, function(err, beers) {
+          if (err) return cb(err);
+          else cb(null, beers.map(function(row) {
+            var beer = row.beer;
+            if (beer.ut_rating) beer.ut_rating_clamped = beer.ut_rating.toFixed(2)
+            beer.brewery = row.brewery;
+            beer.session = row.session;
+            beer.superstyle = row.superstyle;
+            beer.metastyle = row.metastyle;
+            if (memoryRatingCache[beer.id]) {
+              beer.live_rating = memoryRatingCache[beer.id].rating;
+              beer.live_rating_clamped = memoryRatingCache[beer.id].rating.toFixed(2);
+              beer.live_rating_count = memoryRatingCache[beer.id].count;
+            }
+            return beer;
+          }));
+        }); 
+      },
+      breweries: function(cb) {
+        db.query("MATCH (brewery:brewery) RETURN brewery", function(err, breweries) {
+          if (err) return cb(err);
+          cb(null, breweries.map(function(b) { return b.name }));
+        });
+      },
+      superstyles: function(cb) {
+        db.query("MATCH (superstyle:superstyle) RETURN superstyle", function(err, superstyles) {
+          if (err) return cb(err);
+          cb(null, superstyles.map(function(s) { return s.name }));
+        });
+      },
+      metastyles: function(cb) {
+        db.query("MATCH (metastyle:metastyle) RETURN metastyle", function(err, metastyle) {
+          if (err) return cb(err);
+          cb(null, metastyle.map(function(m) { return m.name }));
+        });
+      }
+    }, cb);
+  });
 };
+
+var memoryRatingCache = {};
+function updateRatingCache(cb) {
+  redis.keys('_br*', (err, keys) => {
+    if (err) return cb(err);
+    redis.mget(keys, (err, values) => {
+      if (err) return cb(err);
+      keys.forEach((key, i) => {
+        var subkeys = key.match(/(\d+)_(\w+)/);
+        memoryRatingCache[subkeys[1]] = memoryRatingCache[subkeys[1]] || {};
+        memoryRatingCache[subkeys[1]][subkeys[2]] = parseFloat(values[i]);
+      });
+      cb();
+    });
+  });
+}
+
+io.on('connection', (socket) => {
+  socket.emit('update', memoryRatingCache);
+});
+
+var handleRate = (req, res) => {
+  var id = parseInt(req.params.id);
+  if (isNaN(id)) return res.send(400);
+  var body = '';
+  req.on('data', (ch) => { body += ch.toString() })
+  req.on('end', () => {
+    var newRating = parseFloat(body);
+    if (isNaN(newRating)) return res.send(400);
+    if (memoryRatingCache[id]) {
+      var cached = memoryRatingCache[id];
+      var newCount = req.method == 'POST' ? ++cached.count : cached.count;
+      newRating = cached.rating = (cached.rating*(newCount-1) + newRating) / newCount;
+      cached.count = newCount;
+    } else {
+      memoryRatingCache[id] = { rating: newRating, count: 1 };
+    }
+    redis.set(`_br${id}_rating`, newRating);
+    redis.incr(`_br${id}_count`);
+    res.sendStatus(200);
+    io.emit('rate', {beer:id,rating:newRating,count:memoryRatingCache[id].count});
+  }); 
+};
+app.post('/rate/:id', handleRate);
+app.put('/rate/:id', handleRate);
 
 app.get('/', function(req, res) {
   res.render('index', beers);
@@ -140,6 +194,7 @@ app.get('/latest.json', function(req, res) {
       if (err) return res.sendStatus(500);
       dataCache.time = Date.now();
       dataCache.data = updates;
+      beers = updates;
       res.json(updates);
     });
   } else {
@@ -196,4 +251,4 @@ if (!argv.noappcache) {
 }
 
 app.use(express.static(__dirname + '/public'));
-app.listen(8090,'0.0.0.0');
+server.listen(8090,'0.0.0.0');
