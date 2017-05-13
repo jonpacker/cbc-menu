@@ -105,6 +105,7 @@ function fetchUntappd(path, opts) {
 }
 
 function calcBeerList(opts) {
+  if (opts.order == 'live_rating') rankGroups.live_rating = orderByProp('live_rating');
   var beers = beerSubsetWithRankings(function(beer) { 
     var match = true;
     if (opts.metastyle) match = match && beer.metastyle == opts.metastyle;
@@ -553,8 +554,10 @@ function readUntappdCheckins(user, cb, start, count) {
 }
 
 function updateExportLink() {
-  $('#export').val('http://' + window.location.hostname + window.location.pathname + '#loadb[{"d":"' +
-      btoa(JSON.stringify({savedBeers:savedBeers,tastedBeers:tastedBeers,beerData:beerData})) + '"}]');
+  try {
+    $('#export').val('http://' + window.location.hostname + window.location.pathname + '#loadb[{"d":"' +
+        btoa(JSON.stringify({savedBeers:savedBeers,tastedBeers:tastedBeers,beerData:beerData})) + '"}]');
+  } catch(e) {}
 }
 
 if (location.hash) route(location.hash);

@@ -6,6 +6,7 @@ window.beers.forEach(function(beer) {
   indexedBeers[beer.id] = beer;
 });
 
+
 var idArray = _.pluck(window.beers, 'id');
 
 function orderByProp(prop) {
