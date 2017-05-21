@@ -294,7 +294,6 @@ var renderers = {
       if(!tempLoad[i]) break;
       if(tempLoad[i][tempLoad[i].length - 1] === '=') {
         var data = Object.values(tempLoad).join('');
-        debugger;
         window.location = '/#loadb[{"d":"' + data + '"}]';
         localStorage.removeItem('tempLoad');
         return '';
