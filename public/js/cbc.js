@@ -283,6 +283,25 @@ var renderers = {
     localStorage.setItem('msg', noteCount + ' notes, ' + ratingCount + ' ratings, ' + newSavedBeers.length + " saved, " + newTastedBeers.length + " tasted beers loaded");
     window.location = '/#index';
     return '';
+  },
+  loadc: function(opts) {
+    var tempLoad = JSON.parse(localStorage.getItem('tempLoad') || '{}');
+    for (var i = 0; i < 10; i++) {
+      if(opts['l'+i]) tempLoad[i] = opts['l'+i]
+    }
+    localStorage.setItem('tempLoad', JSON.stringify(tempLoad));  
+    for (var i = 0; i < 10; i++) {
+      if(!tempLoad[i]) break;
+      if(tempLoad[i][tempLoad[i].length - 1] === '=') {
+        var data = Object.values(tempLoad).join('');
+        window.location = '/#loadb[{"d":"' + data + '"}]';
+        localStorage.removeItem('tempLoad');
+        return '';
+      }
+    }
+    localStorage.setItem('msg', 'Need more urls to load. Have part '+Object.keys(tempLoad));
+    window.location = '/#index';
+    return '';
   }
 };
 
@@ -468,8 +487,16 @@ function readUntappdCheckins(user, cb, start, count) {
 }
 
 function updateExportLink() {
-  $('#export').val('http://' + window.location.hostname + window.location.pathname + '#loadb[{"d":"' +
-      btoa(JSON.stringify({savedBeers:savedBeers,tastedBeers:tastedBeers,beerData:beerData})) + '"}]');
+  for (var i = 9; i >= 0; i--) {
+    $('#export'+i).hide();
+  }
+  var url = 'http://' + window.location.hostname + (window.location.port?':'+window.location.port:'') + window.location.pathname;
+  var dataArray = btoa(JSON.stringify({savedBeers:savedBeers,tastedBeers:tastedBeers,beerData:beerData})).match(/.{1,9000}/g);
+  var urls = "";
+  dataArray.forEach(function(data, index) {
+    $('#export'+index).show();
+    $('#export'+index).val(url + '#loadc[{"l' + index + '":"' + data + '"}]');
+  });
 }
 
 if (location.hash) route(location.hash);

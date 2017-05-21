@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "redis": "docker run -d --name mbcc-redis -p 6379:6379 redis",
+    "neo": "docker run --name mbcc-neo -p 7474:7474 --env=NEO4J_AUTH=none neo4j"
   },
   "author": "",
   "license": "ISC",
