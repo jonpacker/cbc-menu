@@ -214,7 +214,7 @@ var renderers = {
       localStorage.removeItem('msg');
     }
     addUntappdUser(opts);
-    opts.untappd_redir_url = "http://mbcc.jonpacker.com";
+    opts.untappd_redir_url = "http://btex.jonpacker.com";
     opts.untappd_cid = UT_CLIENT;
     opts.live_ratings = !localStorage.getItem('disable_live_rating');
     return Mustache.render(templates.index, opts);
