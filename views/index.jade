@@ -1,7 +1,7 @@
 doctype html
 html(manifest="app.cache")
   head
-    title BTEX 2017
+    title BØ 2017
     meta(name="viewport", content="width=device-width, initial-scale=1")
 
     link(href="/css/cbc.css", type="text/css", rel="stylesheet")
@@ -32,16 +32,16 @@ html(manifest="app.cache")
       | {{#msg}}
       .msg {{.}}
       | {{/msg}}
-      h1 Beavertown Extravaganza 2017
+      h1 Bergen Ølfestival 2017
       .sessions
         a(href='#session[{"colour":"friday"}]', class="session friday") 
           h2 Friday
-          .sub Friday 15-22
+          .sub Friday 12-21
         a(href='#session[{"colour":"saturday"}]', class="session saturday") 
           h2 Saturday
-          .sub Saturday 13-20
+          .sub Friday 12-20
       .beer-lists
-        a(href="#beerlist", class="all-beers-sel") All Beers
+        a(href="#beerlist", class="all-beers-sel") Beer List
       .untappd
         img(src='/img/ut_icon_144.png')
         | {{#untappd_token}}
@@ -108,7 +108,7 @@ html(manifest="app.cache")
             .beer.style-border(class="{{metastyle}} {{session}} {{saved}} {{tasted}} {{#notes}}has-notes{{/notes}} {{#rating}}has-rating r-{{.}}{{/rating}} {{#ut_checked_in}}ut-checked-in{{/ut_checked_in}} {{#ut_h_ch}}ut-historic-checked-in{{/ut_h_ch}}", data-id="{{id}}")
               .headline
                 .name-block
-                  .name {{name}}
+                  .name(class="price-{{price}}") {{name}}
                   .abv {{#percent}}{{percent}}{{/percent}}{{^percent}}?{{/percent}}
                   | {{#ut_rating}}
                   .ut-avg 

@@ -276,7 +276,7 @@ html
   &.ms-Traditional .key .Traditional
   &.ms-Hoppy .key .Hoppy
   &.ms-Imperial.Stout .key .Imperial.Stout
-  &.ms-Barley.Wine .key .Barley.Wine
+  &.ms-Barley.Wine .key .Barley.Wine 
   &.ms-Mixed-fermentation .key .Mixed-fermentation
   &.ms-Sour .key .Sour
   &.ms-Belgian .key .Belgian
@@ -433,6 +433,24 @@ html
         .name
           font-weight: bold
           width: 80%
+        
+          &:after
+            font-size: 0.7em
+            margin-left: 1em
+          &.price-1:after
+            background-color: yellow
+            content: '(1 bong)'
+          &.price-2:after
+            background-color: orange
+            content: '(2 bonger)'
+          &.price-3:after
+            background-color: red
+            color: white
+            content: '(3 bonger?!)'
+          &.price-4:after
+            background-color: magenta
+            color: white
+            content: '(4 bonger)'
 
         .abv
           width: 20%
@@ -632,27 +650,67 @@ html
   &.beer-list
     .beer .name:before
       display: inline-block
-      height: 2rem
-      width: 2rem
-      border-radius: 1rem
+      height: 2.3rem
+      width: 2.3rem
+      border-radius: 1.15rem
       content: ''
       vertical-align: middle
-      box-shadow: 0px 0px 0px 1px #333
       margin-right: 0.8rem
+      box-shadow: 0px 0px 0px 1px rgba(black, 50%)
+      box-sizing: border-box
+    .beer .name:after
+      font-size: 0.7em
+      margin-left: 1em
     .beer.yellow .name:before
       background-color: yellow
     .beer.saturday .name:before
-      background-color: blue
+      border: 2px solid red
     .beer.friday .name:before
-      background-color: red
+      border: 2px solid red
+    .beer.friday  .headline .name-block .name:after
+      background-color: transparent
+      content: '(fri)'
+    .beer.saturday .headline .name-block .name:after
+      background-color: transparent
+      content: '(sat)'
+    .beer.friday.saturday .headline .name-block .name:after
+      background-color: transparent
+      content: '(fri, sat)'
+    .beer.friday.saturday .name:before
+      border-left: 2px solid red
+      border-top: 2px solid red
+      border-right: 2px solid blue
+      border-bottom: 2px solid blue
+      
     .beer.green .name:before
       background-color: green
+    .beer.friday .headline .name-block .name
+    .beer.saturday .headline .name-block .name
+    .beer.bø .headline .name-block .name
+      &:before
+        font-size: 1.3rem
+        text-align: center
+      &.price-1:before
+        background-color: yellow
+        content: '1'
+      &.price-2:before
+        background-color: orange
+        content: '2'
+      &.price-3:before
+        background-color: red
+        content: '3'
+      &.price-4:before
+        background-color: magenta
+        content: '4'
 
 
 .style-border
   &.Dark
   &.Imperial.Stout
     border-left: 1rem solid navy
+    
+  &.Barley.Wine
+    border-left: 1rem solid yellow
 
   &.Traditional
   &.Classic
@@ -674,12 +732,14 @@ html
 
   &.Belgian
     border-left: 1rem solid blue
+  &.Experimental
+    border-left: 1rem solid teal
 
   &.Traditional
     border-left: 1rem solid red
 
   &.Cider
-    border-left: 1rem solid teal
+    border-left: 1rem solid olive
   &.Mead
     border-left: 1rem solid orange  
 

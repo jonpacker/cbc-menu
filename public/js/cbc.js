@@ -114,6 +114,23 @@ function calcBeerList(opts) {
     if (opts.saved) match = match && (opts.saved == 'not-saved' ? !beer.saved : beer.saved === opts.saved);
     return match;
   });
+  
+  if (!opts.colour) { 
+    beers = _.values(beers.reduce(function(unique, beer) {
+      if (unique[beer.id]) {
+        unique[beer.id].session.push(beer.session);
+      } else {
+        unique[beer.id] = beer;
+        beer.session = [beer.session];
+      }
+      return unique;
+    }, {})).map(function(beer) {
+      beer.session = beer.session.join(' ');
+      return beer;
+    });
+    console.log(beers)
+  }
+  
   var breweries = beers.reduce(function(breweries, beer) {
     var brewery = beer.brewery;
     if (opts.order) {
@@ -214,7 +231,7 @@ var renderers = {
       localStorage.removeItem('msg');
     }
     addUntappdUser(opts);
-    opts.untappd_redir_url = "http://btex.jonpacker.com";
+    opts.untappd_redir_url = "http://bo.jonpacker.com";
     opts.untappd_cid = UT_CLIENT;
     opts.live_ratings = !localStorage.getItem('disable_live_rating');
     return Mustache.render(templates.index, opts);
