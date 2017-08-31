@@ -1,25 +1,35 @@
-var sessions = {yellow: 1, blue: 2, red: 3, green: 4};
-window.beers = _.sortBy(window.beers, function(beer) { return sessions[beer.session] });
+var sessions = {friday: 1, saturday: 2};
 
 var indexedBeers = {};
-window.beers.forEach(function(beer) {
-  indexedBeers[beer.id] = beer;
-});
+var idArray;
 
+window.indexBeers = function() {
+  window.beers = _.sortBy(window.beers, function(beer) { return sessions[beer.session] });
+  window.indexedBeers = {};
+  window.beers.forEach(function(beer) {
+    if (window.indexedBeers[beer.id]) {
+      window.indexedBeers[beer.id].sessions.push(beer.session);
+    } else {
+      window.indexedBeers[beer.id] = _.clone(beer);
+      window.indexedBeers[beer.id].sessions = [beer.session];
+    }
+  });
+  idArray = _.pluck(window.beers, 'id');
+}
 
-var idArray = _.pluck(window.beers, 'id');
+indexBeers();
 
 function orderByProp(prop) {
   return _.chain(idArray)
-    .reject(function(beer) { return !indexedBeers[beer][prop] })
+    .reject(function(beer) { return indexedBeers[beer][prop] == null })
     .sortBy(function(beer) { return -indexedBeers[beer][prop] })
     .value()
 }
 
 window.beersByUntappd = orderByProp('ut_rating');
 
-var rankGroups = {
-  'ut_rating': beersByUntappd,
+window.rankGroups = {
+  'ut_rating': orderByProp('ut_rating'),
   'live_rating': orderByProp('live_rating')
 };
 

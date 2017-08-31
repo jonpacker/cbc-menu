@@ -106,10 +106,12 @@ function fetchUntappd(path, opts) {
 
 function calcBeerList(opts) {
   if (opts.order == 'live_rating') rankGroups.live_rating = orderByProp('live_rating');
+  if (opts.order == 'ut_rating') rankGroups.ut_rating = orderByProp('ut_rating');
+  
   var beers = beerSubsetWithRankings(function(beer) { 
     var match = true;
     if (opts.metastyle) match = match && beer.metastyle == opts.metastyle;
-    if (opts.colour) match = match && beer.session == opts.colour;
+    if (opts.colour) match = match && ((beer.sessions && beer.sessions.indexOf(opts.colour) != -1) || beer.session == opts.colour);
     if (opts.tasted) match = match && (opts.tasted == 'not-tasted' ? !beer.tasted : beer.tasted === opts.tasted);
     if (opts.saved) match = match && (opts.saved == 'not-saved' ? !beer.saved : beer.saved === opts.saved);
     return match;
@@ -118,17 +120,16 @@ function calcBeerList(opts) {
   if (!opts.colour) { 
     beers = _.values(beers.reduce(function(unique, beer) {
       if (unique[beer.id]) {
-        unique[beer.id].session.push(beer.session);
+        unique[beer.id].sessionSet.push(beer.session);
       } else {
         unique[beer.id] = beer;
-        beer.session = [beer.session];
+        beer.sessionSet = [beer.session];
       }
       return unique;
     }, {})).map(function(beer) {
-      beer.session = beer.session.join(' ');
+      beer.sessionSet = beer.sessionSet.join(' ');
       return beer;
     });
-    console.log(beers)
   }
   
   var breweries = beers.reduce(function(breweries, beer) {
