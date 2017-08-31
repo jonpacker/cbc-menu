@@ -422,9 +422,9 @@ $('body').on('click', '.beer .send-to-untappd', function(e) {
       gmt_offset: 2,
       bid: untappdId,
       shout: comments,
-      foursquare_id: '59070ec7dd12f8527b483536',
-      geolat: 55.669541,
-      geolng: 12.562007,
+      foursquare_id: '598adb412632ec20beab192d',
+      geolat: 60.399374,
+      geolng: 5.318766,
       rating: rating > 0 ? rating : undefined
     }
   }).then(function(res) {
