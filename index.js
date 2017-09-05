@@ -63,6 +63,7 @@ function getBeerData(cb) {
             if (beer.ut_rating) beer.ut_rating_clamped = beer.ut_rating.toFixed(2)
             beer.brewery = row.brewery;
             beer.session = row.session;
+            beer.location = row.location;
             beer.superstyle = row.superstyle;
             beer.metastyle = row.metastyle;
             if (memoryRatingCache[beer.id]) {

@@ -105,6 +105,7 @@ html(manifest="app.cache")
         | {{#breweries}}
         .brewery
           h2 {{name}}
+            .location {{location}}
           .beers
             | {{#beers}}
             .beer.style-border(class="{{metastyle}} {{session}} {{sessionSet}} {{saved}} {{tasted}} {{#no_info_available}}no-info{{/no_info_available}} {{#notes}}has-notes{{/notes}} {{#rating}}has-rating r-{{.}}{{/rating}} {{#ut_checked_in}}ut-checked-in{{/ut_checked_in}} {{#ut_h_ch}}ut-historic-checked-in{{/ut_h_ch}}", data-id="{{id}}")

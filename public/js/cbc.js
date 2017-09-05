@@ -112,6 +112,7 @@ function calcBeerList(opts) {
 
     return {
       name: brewery,
+      location: breweries[brewery][0].location,
       beers: breweries[brewery]
     }
   });
