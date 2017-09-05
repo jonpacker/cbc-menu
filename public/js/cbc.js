@@ -74,6 +74,7 @@ function render(renderer, opts) {
   opts.page = renderer;
   var html = renderers[renderer](opts);
   if (html) view.empty().html(html)
+  addSliderListeners(view);
 };
 
 var _loadingTemplate;
@@ -214,6 +215,7 @@ var renderers = {
     opts.is_mobile = isMobile;
     opts.typeclass = opts.title = opts.colour + ' session';
     opts.live_ratings = !localStorage.getItem('disable_live_rating');
+    opts.rating_as_percent = function() { return this.rating / 5 * 100 };
     return Mustache.render(templates.beerlist, opts);
   },
   beerlist: function(opts) {
@@ -224,6 +226,7 @@ var renderers = {
     opts.typeclass = 'beer-list';
     opts.title = 'All Beers';
     opts.live_ratings = !localStorage.getItem('disable_live_rating');
+    opts.rating_as_percent = function() { return this.rating / 5 * 100 };
     return Mustache.render(templates.beerlist, opts);
   },
   index: function(opts) {
@@ -377,9 +380,46 @@ function updateBeersMarked() {
   });
 }
 updateBeersMarked();
+
+function addSliderListeners(view) {
+  view.find('.rating-slider-control').each(function() {
+    var container = $(this);
+    var label;
+    var handle = $(this.children[1]);
+    var hasPrepped = false;
+    var listener = DragListener(handle, 0, function() { return container.width() }, {
+      stopPropagation: true
+    });
+    var prep = function() {
+      label = container.next('.rating-text');
+      hasPrepped = true;
+    };
+    var moveTo = function(pct) {
+      handle.css({left: (Math.round(pct * 20) * 5) + '%'});
+      label.text(Math.round(pct * 20) / 4);
+    };
+    var moveToAndSave = function(pct) {
+      moveTo(pct)
+      $('body').trigger('rating-slider:rate', [container, Math.round(pct * 20) / 4]);
+    }
+    listener.on('dragStart', prep);
+    listener.on('drag', moveTo);
+    listener.on('dragFinish', moveToAndSave);
+    container.on('click', function(event) {
+      if (!hasPrepped) prep();
+      moveToAndSave(event.offsetX / container.width());
+    });
+    handle.on('click', function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+  });
+}
+
 $('#window').on('click', '.mini-true .beer', function(e) {
   var beer = $(e.target).parents('.beer');
-  if ($(e.target).is('.star, .tick, textarea, input, a')) return;
+  if ($(e.target).is('.star, .tick, textarea, input, a, .rating-slider-control, .rating-slider-control > *')) return;
+  console.log('expand', e.target);
   beer.toggleClass('expand');
 });
 $('body').on('click', '.beer .star', function(e) {
@@ -485,16 +525,9 @@ function updateBeerData(id, data) {
   updateExportLink();
 }
 
-$('body').on('input', '.rating-slider', function(e) {
-  var slider = $(e.target);
-  var num = slider.val();
-  slider.next('.rating-text').text(num);
-})
 var timeouts = {};
-$('body').on('change', '.rating-slider', function(e) {
-  var slider = $(e.target);
+$('body').on('rating-slider:rate', function(e, slider, num) {
   var textarea = slider.siblings('textarea');
-  var num = slider.val();
   var beer = slider.parents('.beer');
   var beerId = beer.data().id;
   var hasTastedBefore = tastedBeers.indexOf(beerId) != -1;

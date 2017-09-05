@@ -531,6 +531,41 @@ html
         input.rating-slider
           width: 70%
           display: none
+          
+        .rating-slider-control
+          width: 68%
+          margin-right: 2%
+          
+          position: relative
+          height: 2.6rem
+          .track
+            width: 100%
+            height: 3px
+            border-radius: 0.2rem
+            background-color: #444
+            margin-top: 1.2rem
+          .handle
+            position: absolute
+            width: 4rem
+            height: 4rem
+            top: 50%
+            left: 0px
+            margin-top: -2rem
+            margin-left: -2rem
+            
+            &:after
+              content: ''
+              position: absolute
+              left: 1rem
+              top: 1rem
+              width: 2rem
+              height: 2rem
+              box-sizing: border-box
+              border: 2px solid black
+              background-color: magenta
+              box-shadow: 0px 0px 0px 1px white, 0px 0px 0px 2px rgba(black, 50%)
+              border-radius: 1rem
+            
 
         textarea
           width: 100%
@@ -599,7 +634,7 @@ html
     &.has-rating:not(.r-0)
       .headline .rate-box
         display: flex
-        label, input, .rating-text
+        label, .rating-slider-control, .rating-text
           display: inline-block
         .untappd
           display: block
@@ -615,7 +650,7 @@ html
         display: flex
         textarea
           display: block
-        label, input, .rating-text
+        label, .rating-slider-control, .rating-text
           display: inline-block
         .untappd
           display: block

@@ -144,6 +144,9 @@ html(manifest="app.cache")
                 .rate-box
                   label(for="rslider") Rating
                   input.rating-slider(name="rslider", type="range", min="0", max="5", step=".25" value="{{rating}}")
+                  .rating-slider-control
+                    .track
+                    .handle(style="left:{{rating_as_percent}}%;")
                   .rating-text {{rating}}
                   textarea(name="rnotes", placeholder="Notes").notes {{notes}}
                   | {{#untappd_token}}{{#ut_bid}}
@@ -169,6 +172,7 @@ html(manifest="app.cache")
   script(type="text/javascript", src="/js/jquery-2.2.3.min.js")
   script(type="text/javascript", src="/js/underscore-min.js")
   script(type="text/javascript", src="/js/mustache.min.js")
+  script(type="text/javascript", src="/js/drag-listener.min.js")
   script(type="text/javascript", src="/socket.io/socket.io.js")
   script(type="text/javascript", src="/js/rate.js")
   script(type="text/javascript", src="/js/cbc.js")

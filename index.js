@@ -230,6 +230,7 @@ var cf = cache.newCache([
     'js/jquery-2.2.3.min.js',
     'js/mustache.min.js',
     'js/underscore-min.js',
+    'js/drag-listener.min.js',
     'js/rate.js',
     'js/cbc.js',
     'css/cbc.css',
