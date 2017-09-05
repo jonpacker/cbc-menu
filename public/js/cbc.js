@@ -96,7 +96,7 @@ function calcBeerList(opts) {
   
   var breweries = beers.reduce(function(breweries, beer) {
     var brewery = beer.brewery;
-    if (opts.order) {
+    if (opts.order && opts.order != 'location') {
       if (beer[opts.order + '_rank']) brewery = beer[opts.order + '_rank'] + '. ' + brewery;
       else brewery = 'UNRANKED - ' + brewery;
     }
@@ -116,8 +116,11 @@ function calcBeerList(opts) {
       beers: breweries[brewery]
     }
   });
-  opts.breweries = _.sortBy(opts.breweries, 'name');
-  if (opts.order) {
+  
+  if (opts.order == 'location') _.sortBy(opts.breweries, 'location')
+  else opts.breweries = _.sortBy(opts.breweries, 'name');
+  
+  if (opts.order && opts.order != 'location') {
     opts.breweries = _.sortBy(opts.breweries, function(brewery) {
       return brewery.beers[0][opts.order + '_rank'];
     });
