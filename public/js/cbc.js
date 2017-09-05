@@ -17,34 +17,6 @@ function route(path) {
   render(renderer, opts);
 }
 
-function connectToWebsocket() {
-  window.socket = io();
-
-  socket.on('rate', function(data) {
-    beers.forEach(function(beer) {
-      if (beer.id != data.beer) return;
-      beer.live_rating = data.rating;
-      beer.live_rating_count = data.count;
-      beer.live_rating_clamped = data.rating.toFixed(2);
-      if (data.flag) return;
-      data.flag = true;
-      updateLiveRating(beer.id, data.count, data.rating);
-    });
-  });
-
-  socket.on('update', function(data) {
-    beers.forEach(function(beer) {
-      if (!data[beer.id]) return;
-      beer.live_rating = data[beer.id].rating;
-      beer.live_rating_clamped = data[beer.id].rating.toFixed(2);
-      beer.live_rating_count = data[beer.id].count;
-      if (data[beer.id].flag) return;
-      data[beer.id].flag = true;
-      updateLiveRating(beer.id, data[beer.id].count, data[beer.id].rating);
-    });
-  });
-}
-if (!localStorage.getItem('disable_live_rating')) connectToWebsocket();
 
 var UT_CLIENT = '7E07FC9AC3B3866F4F620819996F262F087EAC92';
 
@@ -408,7 +380,6 @@ function addSliderListeners(view) {
 $('#window').on('click', '.mini-true .beer', function(e) {
   var beer = $(e.target).parents('.beer');
   if ($(e.target).is('.star, .tick, textarea, input, a, .rating-slider-control, .rating-slider-control > *')) return;
-  console.log('expand', e.target);
   beer.toggleClass('expand');
 });
 $('body').on('click', '.beer .star', function(e) {
