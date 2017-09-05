@@ -1,10 +1,9 @@
-var sessions = {friday: 1, saturday: 2};
+var sessions = {friday: 1, 'friday saturday': 3, 'saturday friday': 3, saturday: 2};
 
 var indexedBeers = {};
 var idArray;
 
 window.indexBeers = function() {
-  window.beers = _.sortBy(window.beers, function(beer) { return sessions[beer.session] });
   window.indexedBeers = {};
   window.beers.forEach(function(beer) {
     if (window.indexedBeers[beer.id]) {
@@ -14,6 +13,14 @@ window.indexBeers = function() {
       window.indexedBeers[beer.id].sessions = [beer.session];
     }
   });
+  
+  window.beers = window.beers.map(function(beer) {
+    beer.sessionSet = window.indexedBeers[beer.id].sessions.join(' ');
+    return beer;
+  });
+  
+  window.beers = _.sortBy(window.beers, function(beer) { return window.sessions[beer.sessionSet] });
+  
   idArray = _.pluck(window.beers, 'id');
 }
 

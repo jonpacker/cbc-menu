@@ -119,18 +119,7 @@ function calcBeerList(opts) {
   });
   
   if (!opts.colour) { 
-    beers = _.values(beers.reduce(function(unique, beer) {
-      if (unique[beer.id]) {
-        unique[beer.id].sessionSet.push(beer.session);
-      } else {
-        unique[beer.id] = beer;
-        beer.sessionSet = [beer.session];
-      }
-      return unique;
-    }, {})).map(function(beer) {
-      beer.sessionSet = beer.sessionSet.join(' ');
-      return beer;
-    });
+    beers = _.uniq(beers, function(beer) { return beer.id });
   }
   
   var breweries = beers.reduce(function(breweries, beer) {
