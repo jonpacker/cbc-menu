@@ -82,7 +82,7 @@ html(manifest="app.cache")
           | {{#live_ratings}}
           a.site-bg-style.avg.live-rating(href='{{#tset}}order=live_rating{{/tset}}') 👥 Rating
           | {{/live_ratings}}
-          a.ordering(href='{{#tset}}order=location{{/tset}}') Location
+          a.ordering.order-location(href='{{#tset}}order=location{{/tset}}') Location
           | {{#order}}
           a.ordering(href='{{#tset}}order=!{{/tset}}') Brewery
           | {{/order}}
