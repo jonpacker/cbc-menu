@@ -117,7 +117,9 @@ function calcBeerList(opts) {
     }
   });
   
-  if (opts.order == 'location') _.sortBy(opts.breweries, 'location')
+  if (opts.order == 'location') opts.breweries = _.sortBy(opts.breweries, function(brewery) {
+    return brewery.location ? parseInt(brewery.location.match(/\d+$/)[0]) : Number.MAX_VALUE;
+  })
   else opts.breweries = _.sortBy(opts.breweries, 'name');
   
   if (opts.order && opts.order != 'location') {
