@@ -53,6 +53,7 @@ html(manifest="app.cache")
           a(href='#snapshot') Save snapshot for {{untappd_user}}
           a(href='#loadsnapshot') Load snapshot for {{untappd_user}}
           .expl Saving/loading snapshots requires internet. This will save your starred/checks/ratings to the server so that you can easily load them on another device by connecting it to your untappd account and pressing the "load snapshot" button. If you are just using the one device, you do not need to use snapshots, all your data is saved on that device :).
+          .load-ratings Want to automatically check off your checked-in beers? You can do that. You should do it a couple of hours before the festival however, since it is pretty easy to get rate limited after using this feature. You will get rate limited if you have more than 5000 unique checkins. Click <a href="/#unicorn">here</a> to link. Checkin markings will be saved with snapshots for transferring between devices.
         | {{/untappd_token}}
         | {{^untappd_token}}
         a.ut-auth(href="https://untappd.com/oauth/authenticate/?client_id={{untappd_cid}}&response_type=token&redirect_url={{untappd_redir_url}}") Tap here to connect to Untappd.
