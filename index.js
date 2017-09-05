@@ -126,9 +126,9 @@ var handleRate = (req, res) => {
     if (isNaN(newRating)) return res.send(400);
     if (memoryRatingCache[id]) {
       var cached = memoryRatingCache[id];
-      var newCount = req.method == 'POST' ? ++cached.count : cached.count;
-      newRating = cached.rating = (cached.rating*(newCount-1) + newRating) / newCount;
+      var newCount = req.method == 'POST' ? cached.count + 1 : cached.count;
       cached.count = newCount;
+      newRating = cached.rating = (cached.rating*(newCount-1) + newRating) / newCount;
     } else {
       memoryRatingCache[id] = { rating: newRating, count: 1 };
     }
