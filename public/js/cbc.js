@@ -85,12 +85,14 @@ function calcBeerList(opts) {
     var match = true;
     if (opts.metastyle) match = match && beer.metastyle == opts.metastyle;
     if (opts.colour) match = match && ((beer.sessions && beer.sessions.indexOf(opts.colour) != -1) || beer.session == opts.colour);
+    if (opts.today == 'true') match = match && (beer.sessionSet && beer.sessionSet == opts.colour);
     if (opts.tasted) match = match && (opts.tasted == 'not-tasted' ? !beer.tasted : beer.tasted === opts.tasted);
     if (opts.saved) match = match && (opts.saved == 'not-saved' ? !beer.saved : beer.saved === opts.saved);
-    if (opts.frisat == 'true') match = match && (beer.sessionSet && beer.sessionSet.match(/friday/i) && beer.sessionSet.match(/saturday/i));
     return match;
   });
   
+  
+  console.log(beers.length)
   if (!opts.colour) { 
     beers = _.uniq(beers, function(beer) { return beer.id });
   }
@@ -141,7 +143,7 @@ function calcBeerList(opts) {
         order: opts.order,
         tasted: opts.tasted,
         saved: opts.saved,
-        frisat: opts.frisat,
+        today: opts.today,
         mini: opts.mini
       };
       updates = updates.reduce(function(u, update) {
