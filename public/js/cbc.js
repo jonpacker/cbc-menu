@@ -87,6 +87,7 @@ function calcBeerList(opts) {
     if (opts.colour) match = match && ((beer.sessions && beer.sessions.indexOf(opts.colour) != -1) || beer.session == opts.colour);
     if (opts.tasted) match = match && (opts.tasted == 'not-tasted' ? !beer.tasted : beer.tasted === opts.tasted);
     if (opts.saved) match = match && (opts.saved == 'not-saved' ? !beer.saved : beer.saved === opts.saved);
+    if (opts.frisat == 'true') match = match && (beer.sessionSet && beer.sessionSet.match(/friday/i) && beer.sessionSet.match(/saturday/i));
     return match;
   });
   
@@ -140,6 +141,7 @@ function calcBeerList(opts) {
         order: opts.order,
         tasted: opts.tasted,
         saved: opts.saved,
+        frisat: opts.frisat,
         mini: opts.mini
       };
       updates = updates.reduce(function(u, update) {
