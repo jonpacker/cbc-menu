@@ -97,10 +97,14 @@ function calcBeerList(opts) {
     beers = _.uniq(beers, function(beer) { return beer.id });
   }
   
-  var breweries = beers.reduce(function(breweries, beer) {
+  if (opts.order && opts.order != 'location') {
+    beers = _.sortBy(beers, function(beer) { return beer[opts.order + '_rank'] });
+  }
+  
+  var breweries = beers.reduce(function(breweries, beer, i) {
     var brewery = beer.brewery;
     if (opts.order && opts.order != 'location') {
-      if (beer[opts.order + '_rank']) brewery = beer[opts.order + '_rank'] + '. ' + brewery;
+      if (beer[opts.order + '_rank']) brewery = (i+1) + '. ' + brewery;
       else brewery = 'UNRANKED - ' + brewery;
     }
 
