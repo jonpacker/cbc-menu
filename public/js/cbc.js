@@ -119,7 +119,7 @@ function calcBeerList(opts) {
     return {
       name: brewery,
       location: breweries[brewery][0].location,
-      beers: _.sortBy(breweries[brewery], function(b) { return b.tag })
+      beers: _.sortBy(breweries[brewery], function(b) { return b.session.toString() + b.tag })
     }
   });
   
