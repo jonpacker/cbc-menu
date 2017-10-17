@@ -435,9 +435,9 @@ $('body').on('click', '.beer .send-to-untappd', function(e) {
       gmt_offset: 2,
       bid: untappdId,
       shout: comments,
-      foursquare_id: '5946c990dff8157f6851a388',
-      geolat: 51.497440,
-      geolng: -0.044144,
+      foursquare_id: '59e5d6846fa81f4ea5407189',
+      geolat: 58.969173,
+      geolng: 5.758406,
       rating: rating > 0 ? rating : undefined
     }
   }).then(function(res) {
