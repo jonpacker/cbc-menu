@@ -706,17 +706,36 @@ html
     border-top: none
     background-color: rgba(magenta, 0.1)
     font-size: 1.25rem
+    
+  .beer.early
+  .beer.late 
+    .name:after
+      font-size: 0.5em 
+      padding: 0.2rem 0.4rem
+      font-weight: 400
+      border-radius: 0.2rem
+      color: black
+      display: inline-block
+      vertical-align: middle
+      margin-left: 0.5rem
+      
+    &.early .name:after
+      content: '14-18'
+      background-color: green
+    &.late .name:after
+      content: '18-22'
+      background-color: orange
       
   &.friday.session
     .beer.friday .name:before
-      content: 'fri only'
+      content: none
       background-color: red
     .beer.friday.saturday .name:before
       content: 'fri & sat'
       background-color: magenta
   &.saturday.session
     .beer.saturday .name:before
-      content: 'sat only'
+      content: none
       background-color: red
     .beer.friday.saturday .name:before
       content: 'fri & sat'

@@ -92,7 +92,6 @@ function calcBeerList(opts) {
   });
   
   
-  console.log(beers.length)
   if (!opts.colour) { 
     beers = _.uniq(beers, function(beer) { return beer.id });
   }
@@ -120,12 +119,12 @@ function calcBeerList(opts) {
     return {
       name: brewery,
       location: breweries[brewery][0].location,
-      beers: breweries[brewery]
+      beers: _.sortBy(breweries[brewery], function(b) { return b.tag })
     }
   });
   
   if (opts.order == 'location') opts.breweries = _.sortBy(opts.breweries, function(brewery) {
-    return brewery.location ? parseInt(brewery.location.match(/\d+$/)[0]) : Number.MAX_VALUE;
+    return brewery.location;
   })
   else opts.breweries = _.sortBy(opts.breweries, 'name');
   
@@ -210,7 +209,7 @@ var renderers = {
       localStorage.removeItem('msg');
     }
     addUntappdUser(opts);
-    opts.untappd_redir_url = "http://btex.jonpacker.com";
+    opts.untappd_redir_url = "http://wb.jonpacker.com";
     opts.untappd_cid = UT_CLIENT;
     opts.live_ratings = !localStorage.getItem('disable_live_rating');
     return Mustache.render(templates.index, opts);
