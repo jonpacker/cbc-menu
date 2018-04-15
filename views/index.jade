@@ -1,26 +1,10 @@
 doctype html
 html(manifest="app.cache")
   head
-    title What's Brewing 2017
+    title Beer App 2018
     meta(name="viewport", content="width=device-width, initial-scale=1")
 
     link(href="/css/cbc.css", type="text/css", rel="stylesheet")
-    script(type="text/javascript").
-      window.beers = !{JSON.stringify(beers)};
-      window.breweries = !{JSON.stringify(breweries)};
-      window.superstyles = !{JSON.stringify(superstyles)};
-      window.metastyles = !{JSON.stringify(metastyles)};
-      fetch('/latest.json').then(function(res) {
-        return res.json();
-      }).then(function(latest) {
-        window.beers = latest.beers;
-        window.breweries = latest.breweries;
-        window.superstyles = latest.superstyles;
-        window.metastyles = latest.metastyles;
-        indexBeers();
-        updateBeersMarked();
-        route(location.hash);
-      });
   body
     #window
       img.loader(src="/img/puff.svg")
@@ -177,7 +161,23 @@ html(manifest="app.cache")
   script(type="text/javascript", src="/js/underscore-min.js")
   script(type="text/javascript", src="/js/mustache.min.js")
   script(type="text/javascript", src="/js/drag-listener.min.js")
-  script(type="text/javascript", src="/js/rate.js")
   script(type="text/javascript", src="/js/app/cbc.js")
-  script(type="text/javascript", src="/socket.io/socket.io.js")
-  script(type="text/javascript", src="/js/cbc-live.js")
+  script(type="text/javascript").
+    var initData = {
+      beers: !{JSON.stringify(beers)},
+      breweries: !{JSON.stringify(breweries)},
+      superstyles: !{JSON.stringify(superstyles)},
+      metastyles: !{JSON.stringify(metastyles)}
+    };
+    window.BeerApp = beerAppInit(initData);
+    fetch('/latest.json').then(function(res) {
+      return res.json();
+    }).then(function(latest) {
+      window.beers = latest.beers;
+      window.breweries = latest.breweries;
+      window.superstyles = latest.superstyles;
+      window.metastyles = latest.metastyles;
+      indexBeers();
+      updateBeersMarked();
+      route(location.hash);
+    });

@@ -38,7 +38,6 @@ export default class State {
   constructor() {
     Object.keys(KEYS).forEach(key => {
       this.refresh(key)
-      console.log
       Object.defineProperty(this, key, {
         enumerable: true,
         get: () => this[`_${key}`],
