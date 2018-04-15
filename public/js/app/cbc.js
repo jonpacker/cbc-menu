@@ -10,16 +10,11 @@ _.templateSettings = {
 };
 
 import route from './router'
-import renderer from './renderers'
+import readTemplates from './read_templates'
+const templates = readTemplates();
 
-var templates = {};
-$(".template").each(function() {
-  templates[this.dataset.templateId] = this.innerHTML;
-});
-
-var savedBeers = JSON.parse(localStorage.getItem('savedBeers17') || '[]');
-var tastedBeers = JSON.parse(localStorage.getItem('tastedBeers17') || '[]');
-var beerData = JSON.parse(localStorage.getItem('beerData17') || '{}');
+import State from './local_persistence'
+const db = new State();
 
 var view = $('#window');
 function render(renderer, opts) {
@@ -40,7 +35,7 @@ function fetchUntappd(path, opts) {
   if (!opts) 
     opts = { };
 
-  var token = opts.token || localStorage.getItem('untappd_token');
+  var token = opts.token || db.untappdToken;;
   delete opts.token;
     
   if (opts.body) {
@@ -150,15 +145,13 @@ function calcBeerList(opts) {
 }
 
 function checkMini(opts) {
-  if (opts.mini != null) localStorage.setItem('mini', opts.mini ? '1' : '0');
-  var mini = localStorage.getItem('mini')
-  mini = !(mini == false);
-  opts.mini = mini;
+  if (opts.mini != null) db.mini = opts.mini;
+  opts.mini = db.mini;
 };
 
 function addUntappdUser(opts) {
-  opts.untappd_token = localStorage.getItem('untappd_token');
-  opts.untappd_user = localStorage.getItem('untappd_user');
+  opts.untappd_token = db.untappdToken;
+  opts.untappd_user = db.untappdUser;
 }
 
 var renderers = {
@@ -169,7 +162,7 @@ var renderers = {
     addUntappdUser(opts);
     opts.is_mobile = isMobile;
     opts.typeclass = opts.title = opts.colour + ' session';
-    opts.live_ratings = !localStorage.getItem('disable_live_rating');
+    opts.live_ratings = !db.disableLiveRating;
     opts.rating_as_percent = function() { return this.rating / 5 * 100 };
     return Mustache.render(templates.beerlist, opts);
   },
@@ -180,27 +173,27 @@ var renderers = {
     opts.is_mobile = isMobile;
     opts.typeclass = 'beer-list';
     opts.title = 'All Beers';
-    opts.live_ratings = !localStorage.getItem('disable_live_rating');
+    opts.live_ratings = !db.disableLiveRating;
     opts.rating_as_percent = function() { return this.rating / 5 * 100 };
     return Mustache.render(templates.beerlist, opts);
   },
   index: function(opts) {
-    if (localStorage.getItem('msg')) {
-      opts.msg = localStorage.getItem('msg');
-      localStorage.removeItem('msg');
+    if (db.msg) {
+      opts.msg = db.msg;
+      db.msg = null;
     }
     addUntappdUser(opts);
     opts.untappd_redir_url = "http://wb.jonpacker.com";
     opts.untappd_cid = UT_CLIENT;
-    opts.live_ratings = !localStorage.getItem('disable_live_rating');
+    opts.live_ratings = !db.disableLiveRating;
     return Mustache.render(templates.index, opts);
   },
   toggle_live_ratings: function() {
-    if (localStorage.getItem('disable_live_rating')) {
-      localStorage.removeItem('disable_live_rating');
+    if (db.disableLiveRating) {
+      db.disableLiveRating = null;
       connectToWebsocket();
     } else {
-      localStorage.setItem('disable_live_rating', '1');
+      db.disableLiveRating = true;
       socket.close();
       window.socket = undefined;
     }
@@ -208,18 +201,18 @@ var renderers = {
   },
   access_token: function(opts) {
     fetchUntappd('/user/info', {token:opts.arg}).then(function(data) {
-      localStorage.setItem('untappd_user', data.response.user.user_name);
-      localStorage.setItem('untappd_token', opts.arg);
+      db.untappdUser = data.response.user.user_name;
+      db.untappdToken = opts.arg;
       window.location = '/#index';
     }).catch(function() {
-      localStorage.setItem('msg', 'Untappd authentication failed 😨');
+      db.msg = 'Untappd authentication failed 😨';
       window.location = '/#index';
     });
   },
   unicorn: function() {
-    var untappdUser = localStorage.getItem('untappd_user');
+    let {untappdUser} = db;
     if (!untappdUser) {
-      localStorage.setItem('msg', 'You are not logged in to untappd! 😨');
+      db.msg = 'You are not logged in to untappd! 😨';
       window.location = '/#index';
       return;
     }
@@ -227,37 +220,37 @@ var renderers = {
     readUntappdCheckins(untappdUser, function(count) {
       updateExportLink();
       updateBeersMarked();
-      localStorage.setItem('msg', 'Marked ' + count + ' beers as checked-in on untappd');
+      db.msg = 'Marked ' + count + ' beers as checked-in on untappd';
       window.location = '/#index';
     });
   },
   snapshot: function() {
-    var untappdUser = localStorage.getItem('untappd_user');
+    let {untappdUser} = db;
     if (!untappdUser) {
-      localStorage.setItem('msg', 'You are not logged in to untappd! 😨');
+      db.msg = 'You are not logged in to untappd! 😨';
       window.location = '/#index';
       return;
     }
     showLoading();
     fetch('/snapshot/' + untappdUser, {
       method: 'POST',
-      body: btoa(JSON.stringify({savedBeers:savedBeers,tastedBeers:tastedBeers,beerData:beerData}))
+      body: btoa(JSON.stringify({savedBeers: db.savedBeers,tastedBeers:db.tastedBeers,beerData:db.beerData}))
     }).then(function(res) {
       if (res.status == 200) {
-        localStorage.setItem('msg', 'Snapshot saved!');
+        db.msg = 'Snapshot saved!';
       } else {
-        localStorage.setItem('msg', 'Snapshot failed 😱 - ' + res.statusText);
+        db.msg = 'Snapshot failed 😱 - ' + res.statusText;
       }
       window.location = '/#index';
     }).catch(function(err) {
-      localStorage.setItem('msg', 'Snapshot failed 😱 - ' + err.message);
+      db.msg = 'Snapshot failed 😱 - ' + err.message;
       window.location = '/#index';
     });
   },
   loadsnapshot: function() {
-    var untappdUser = localStorage.getItem('untappd_user');
+    let {untappdUser} = db;
     if (!untappdUser) {
-      localStorage.setItem('msg', 'You are not logged in to untappd! 😨');
+      db.msg = 'You are not logged in to untappd! 😨';
       window.location = '/#index';
       return;
     }
@@ -268,7 +261,7 @@ var renderers = {
     showLoading();
     fetch('/snapshot/' + untappdUser).then(function(res) {
       if (res.status != 200) {
-        localStorage.setItem('msg', 'Couldn\'t load snapshot 😱 - ' + res.statusText);
+        db.msg = 'Couldn\'t load snapshot 😱 - ' + res.statusText;
         window.location = '/#index';
       } else {
         return res.text().then(function(text) {
@@ -276,43 +269,35 @@ var renderers = {
         });
       }
     }).catch(function(err) {
-      localStorage.setItem('msg', 'Couldn\'t load snapshot 😱 - ' + err.message);
+      db.msg =  'Couldn\'t load snapshot 😱 - ' + err.message;
       window.location = '/#index';
     });
   },
   ut_logout: function() {
-    localStorage.removeItem('untappd_user');
-    localStorage.removeItem('untappd_token');
+    db.untappdUser = null;
+    db.untappdToken = null;
     window.location = '/#index';
   },
   load: function(opts) {
     if (!opts.data) return renderers.index(opts);
-    var savedBeers = _.compact(opts.data.saved.split(','));
-    var tastedBeers = _.compact(opts.data.tasted.split(','));
-    localStorage.setItem('savedBeers17', JSON.stringify(savedBeers));
-    localStorage.setItem('tastedBeers17', JSON.stringify(tastedBeers));
+    db.savedBeers = _.compact(opts.data.saved.split(','));
+    db.tastedBeers = _.compact(opts.data.tasted.split(','));
     updateBeersMarked();
-    localStorage.setItem('msg',  savedBeers.length + " saved, " + tastedBeers.length + " tasted beers loaded");
+    db.msg =  savedBeers.length + " saved, " + tastedBeers.length + " tasted beers loaded";
     location.hash = '/#index';
     return '';
   },
   loadb: function(opts) {
     if (!opts.d) return renderers.index(opts);
     var data = JSON.parse(atob(opts.d));
-    var newSavedBeers = data.savedBeers;
-    var newTastedBeers = data.tastedBeers;
-    var newBeerData = data.beerData;
-    localStorage.setItem('savedBeers17', JSON.stringify(newSavedBeers));
-    localStorage.setItem('tastedBeers17', JSON.stringify(newTastedBeers));
-    localStorage.setItem('beerData17', JSON.stringify(newBeerData));
-    savedBeers = newSavedBeers;
-    tastedBeers = newTastedBeers;
-    beerData = newBeerData;
+    db.savedBeers = data.savedBeers;
+    db.tastedBeers = data.tastedBeers;
+    db.beerData = data.beerData;
     updateBeersMarked();
     updateExportLink();
-    var noteCount = _.reduce(newBeerData, function(c, d) { return c + (d.notes ? 1 : 0) }, 0);
-    var ratingCount = _.reduce(newBeerData, function(c, d) { return c + (d.rating ? 1 : 0) }, 0);
-    localStorage.setItem('msg', noteCount + ' notes, ' + ratingCount + ' ratings, ' + newSavedBeers.length + " saved, " + newTastedBeers.length + " tasted beers loaded");
+    var noteCount = _.reduce(db.beerData, function(c, d) { return c + (d.notes ? 1 : 0) }, 0);
+    var ratingCount = _.reduce(db.beerData, function(c, d) { return c + (d.rating ? 1 : 0) }, 0);
+    db.msg = noteCount + ' notes, ' + ratingCount + ' ratings, ' + db.savedBeers.length + " saved, " + db.tastedBeers.length + " tasted beers loaded";
     window.location = '/#index';
     return '';
   }
@@ -321,15 +306,15 @@ var renderers = {
 updateExportLink();
 function updateBeersMarked() {
   window.beers.forEach(function(beer) {
-    if (savedBeers.indexOf(beer.id) != -1) beer.saved = 'saved';
-    if (tastedBeers.indexOf(beer.id) != -1) beer.tasted = 'tasted';
-    if (beerData[beer.id]) {
-      beer.notes = beerData[beer.id].notes;
-      beer.rating = beerData[beer.id].rating;
-      beer.ut_checked_in = beerData[beer.id].ut_checked_in;
-      beer.ut_h_ch = beerData[beer.id].ut_h_ch;
-      beer.ut_h_id = beerData[beer.id].ut_h_id;
-      beer.ut_h_ra = beerData[beer.id].ut_h_ra;
+    if (db.savedBeers.indexOf(beer.id) != -1) beer.saved = 'saved';
+    if (db.tastedBeers.indexOf(beer.id) != -1) beer.tasted = 'tasted';
+    if (db.beerData[beer.id]) {
+      beer.notes = db.beerData[beer.id].notes;
+      beer.rating = db.beerData[beer.id].rating;
+      beer.ut_checked_in = db.beerData[beer.id].ut_checked_in;
+      beer.ut_h_ch = db.beerData[beer.id].ut_h_ch;
+      beer.ut_h_id = db.beerData[beer.id].ut_h_id;
+      beer.ut_h_ra = db.beerData[beer.id].ut_h_ra;
     }
     if (!beer.rating) beer.rating = 0;
   });
@@ -380,14 +365,14 @@ $('body').on('click', '.beer .star', function(e) {
   e.stopPropagation();
   var beer = $(e.target).parents('.beer');
   var beerId = beer.data().id;
-  var willSave = savedBeers.indexOf(beer.data().id) == -1;
+  var willSave = db.savedBeers.indexOf(beer.data().id) == -1;
   toggleBeerSaved(beerId, willSave);
 });
 $('body').on('click', '.beer .tick', function(e) {
   e.stopPropagation();
   var beer = $(e.target).parents('.beer');
   var beerId = beer.data().id;
-  var willSave = tastedBeers.indexOf(beer.data().id) == -1;
+  var willSave = db.tastedBeers.indexOf(beer.data().id) == -1;
   toggleBeerTasted(beerId, willSave);
 });
 $('body').on('click', '.beer .send-to-untappd', function(e) {
@@ -431,6 +416,7 @@ $('body').on('click', '.beer .send-to-untappd', function(e) {
   }).catch(handleError);
 })
 function toggleBeerSaved(id, saved) {
+  let {savedBeers} = db;
   if (!saved) {
     savedBeers = _.without(savedBeers, id);
   } else {
@@ -439,11 +425,12 @@ function toggleBeerSaved(id, saved) {
   window.beers.forEach(function(beer) {
     if (beer.id == id) beer.saved = saved ? 'saved' : undefined;
   });
-  localStorage.setItem('savedBeers17', JSON.stringify(savedBeers));
+  db.savedBeers = savedBeers;
   $(".beer[data-id=" + id + "]").toggleClass('saved', saved);
   updateExportLink();
 }
 function toggleBeerTasted(id, tasted) {
+  let {tastedBeers} = db;
   if (!tasted) {
     tastedBeers = _.without(tastedBeers, id);
   } else {
@@ -453,11 +440,12 @@ function toggleBeerTasted(id, tasted) {
     if (beer.id == id) beer.tasted = tasted ? 'tasted' : undefined;
   });
   $(".beer[data-id=" + id + "]").toggleClass('tasted', tasted);
-  localStorage.setItem('tastedBeers17', JSON.stringify(tastedBeers));
+  db.tastedBeers = tastedBeers;
   updateExportLink();
 }
 function updateBeerData(id, data) {
-  beerData = JSON.parse(localStorage.getItem('beerData17') || '{}');
+  db.refresh('beerData');
+  let {beerData} = db;
   if (beerData[id]) {
     data = _.extend(beerData[id], data);
   }
@@ -475,7 +463,7 @@ function updateBeerData(id, data) {
   beerEls.toggleClass('ut_checked_in', !!data.ut_checked_in);
   if (data.notes) beerEls.addClass('has-notes');
   if (data.rating != null) beerEls.addClass('has-rating');
-  localStorage.setItem('beerData17', JSON.stringify(beerData));
+  db.beerData = beerData;
   updateExportLink();
 }
 
@@ -484,7 +472,7 @@ $('body').on('rating-slider:rate', function(e, slider, num) {
   var textarea = slider.siblings('textarea');
   var beer = slider.parents('.beer');
   var beerId = beer.data().id;
-  var hasTastedBefore = tastedBeers.indexOf(beerId) != -1;
+  var hasTastedBefore = db.tastedBeers.indexOf(beerId) != -1;
   toggleBeerTasted(beerId, true);
   updateBeerData(beerId, { rating: num, notes: textarea.val() });
   if (timeouts[beerId]) {
@@ -561,7 +549,7 @@ function readUntappdCheckins(user, cb, start, count) {
 function updateExportLink() {
   try {
     $('#export').val('http://' + window.location.hostname + window.location.pathname + '#loadb[{"d":"' +
-        btoa(JSON.stringify({savedBeers:savedBeers,tastedBeers:tastedBeers,beerData:beerData})) + '"}]');
+        btoa(JSON.stringify({savedBeers:db.savedBeers,tastedBeers:db.tastedBeers,beerData:db.beerData})) + '"}]');
   } catch(e) {}
 }
 
