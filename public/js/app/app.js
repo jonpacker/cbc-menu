@@ -3,11 +3,11 @@ import _ from 'underscore'
 import config from './keys'
 import io from 'socket.io-client'
 import {connectToWebsocket} from './live_ratings'
-import execRoute from './router'
 import readTemplates from './read_templates'
 import State from './local_persistence'
 import Renderer from './renderer'
 import BeerSet from './beer_set' 
+import Untappd from './untappd'
 
 _.templateSettings = {
   interpolate: /\{\{=(.+?)\}\}/g,
@@ -32,6 +32,7 @@ export default class App {
     this.renderer.on('didRender', () => this.afterRender());
 
     this.beerset = new BeerSet(beers);
+    this.untappd = new Untappd(this);
 
     this.updateExportLink();
     this.updateBeersMarked();
@@ -80,11 +81,11 @@ export default class App {
   }
 
   setTemplateGlobals(renderer) {
-    renderer.globals.metastyles = metastyles;
-    renderer.globals.is_mobile = this.isMobile;
+    this.renderer.globals.metastyles = this.metastyles;
+    this.renderer.globals.is_mobile = this.isMobile;
     
     const calc = (prop, getProp) => {
-      Object.defineProperty(renderer.globals, prop, {
+      Object.defineProperty(this.renderer.globals, prop, {
         enumerable: true,
         get: getProp
       })
@@ -156,14 +157,10 @@ export default class App {
   async downloadUserUntappdCheckins() {
     let {untappdUser} = this.db;
     if (!untappdUser) throw new Error('You are not logged in to untappd! 😨');
-    // TODO: promisify readUntappdCheckins
-    await new Promise((res, rej) => {
-      readUntappdCheckins(untappdUser, count => {
-        this.updateExportLink();
-        this.updateBeersMarked();
-        res(count);
-      });
-    });  
+    const count = await this.untappd.readUntappdCheckins()
+    this.updateExportLink();
+    this.updateBeersMarked();
+    return count;
   }
 
   async takeSnapshot() {
@@ -227,15 +224,15 @@ export default class App {
 
   updateBeersMarked() {
     this.beerset.arr.forEach(beer => {
-      if (db.savedBeers.indexOf(beer.id) != -1) beer.saved = 'saved';
-      if (db.tastedBeers.indexOf(beer.id) != -1) beer.tasted = 'tasted';
-      if (db.beerData[beer.id]) {
-        beer.notes = db.beerData[beer.id].notes;
-        beer.rating = db.beerData[beer.id].rating;
-        beer.ut_checked_in = db.beerData[beer.id].ut_checked_in;
-        beer.ut_h_ch = db.beerData[beer.id].ut_h_ch;
-        beer.ut_h_id = db.beerData[beer.id].ut_h_id;
-        beer.ut_h_ra = db.beerData[beer.id].ut_h_ra;
+      if (this.db.savedBeers.indexOf(beer.id) != -1) beer.saved = 'saved';
+      if (this.db.tastedBeers.indexOf(beer.id) != -1) beer.tasted = 'tasted';
+      if (this.db.beerData[beer.id]) {
+        beer.notes = this.db.beerData[beer.id].notes;
+        beer.rating = this.db.beerData[beer.id].rating;
+        beer.ut_checked_in = this.db.beerData[beer.id].ut_checked_in;
+        beer.ut_h_ch = this.db.beerData[beer.id].ut_h_ch;
+        beer.ut_h_id = this.db.beerData[beer.id].ut_h_id;
+        beer.ut_h_ra = this.db.beerData[beer.id].ut_h_ra;
       }
       if (!beer.rating) beer.rating = 0;
     });
@@ -385,11 +382,7 @@ export default class App {
       data = _.extend(beerData[id], data);
     }
     beerData[id] = data;
-    this.beerset.forAllBeersWithId(id, beer => {
-      beer.notes = data.notes;
-      beer.rating = data.rating; 
-      beer.ut_checked_in = data.ut_checked_in;
-    });
+    this.beerset.forAllBeersWithId(id, beer => Object.assign(beer, data));
     const beerEls = $(`.beer[data-id=${id}]`);
     beerEls.find('.rating-slider').val(data.rating);
     beerEls.find('textarea').val(data.notes || '');
@@ -408,65 +401,4 @@ export default class App {
     lrBig.text(`Users (${count}): ${rating.toFixed(2)}`).show()
   }
 }
-
-
-function fetchUntappd(path, opts) {
-  if (!opts) 
-    opts = { };
-
-  var token = opts.token || db.untappdToken;;
-  delete opts.token;
-    
-  if (opts.body) {
-    opts.body.access_token = token;
-    opts.body = $.param(opts.body)
-    var headers = new Headers();
-    headers.append('Content-Type', 'application/x-www-form-urlencoded');
-    headers.append('Content-Length', opts.body.length);
-    opts.headers = headers;
-  }
-
-  if (opts.query) opts.query = '&' + opts.query;
-  
-  return fetch('https://api.untappd.com/v4/' + path + '?access_token=' + token + (opts.query || ''), opts)
-    .then(function(res) { return res.json() })
-}
-
-
-
-
-function readUntappdCheckins(user, cb, start, count) {
-  if (!start) { 
-    if (localStorage.getItem('ut_uniques_start')) {
-      start = parseInt(localStorage.getItem('ut_uniques_start'));
-      count = parseInt(localStorage.getItem('ut_uniques_count')) || 0;
-    } else {
-      start = 0;
-      count = 0;
-    }
-  }
-  fetchUntappd('/user/beers', {query: 'offset='+start+'&limit=50'})
-    .then(function(result) {
-      if (result.meta.code != 200) return cb(count);
-      start += result.response.beers.count;
-      localStorage.setItem('ut_uniques_start', start);
-      if (result.response.beers.count == 0) {
-        return cb(count);
-      }
-      var checkins = result.response.beers.items;
-      checkins.forEach(function(checkin) {
-        for (var i = 0; i < beers.length; ++i) {
-          if (beers[i].ut_bid == checkin.beer.bid) {
-            updateBeerData(beers[i].id+"", {ut_h_ch:true, ut_h_ra:checkin.rating_score, ut_h_id:checkin.first_checkin_id});
-            count++;
-            localStorage.setItem('ut_uniques_count', count);
-            break;
-          }
-        }
-      });
-      $('.status-text').text(start + " beers read, " + count + " beers matched");
-      readUntappdCheckins(user, cb, start, count);
-    });
-}
-
 

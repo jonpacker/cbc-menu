@@ -169,7 +169,7 @@ html(manifest="app.cache")
       superstyles: !{JSON.stringify(superstyles)},
       metastyles: !{JSON.stringify(metastyles)}
     };
-    window.BeerApp = beerAppInit(initData);
+    window.BeerApp = initBeerApp(initData);
     fetch('/latest.json').then(function(res) {
       return res.json();
     }).then(function(latest) {

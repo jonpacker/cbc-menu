@@ -3,6 +3,7 @@ import _ from 'underscore'
 import EventEmitter from 'events'
 export default class Renderer extends EventEmitter {
   constructor(app, templates, view) {
+    super();
     this.app = app;
     this.templates = templates;
     this.view = view;
@@ -66,7 +67,7 @@ export default class Renderer extends EventEmitter {
     }
   }
 
-  renderer_unicorn() {
+  async renderer_unicorn() {
     this.showLoading();
     try { 
       const count = await this.app.downloadUserUntappdCheckins();
@@ -78,10 +79,10 @@ export default class Renderer extends EventEmitter {
     }
   }
 
-  renderer_snapshot() {
+  async renderer_snapshot() {
     this.showLoading();
     try {
-      this.app.takeSnapshot();
+      await this.app.takeSnapshot();
       db.msg = 'Snapshot saved!';
     } catch (e) {
       db.msg = 'Snapshot failed 😱 - ' + err.message;
@@ -90,14 +91,14 @@ export default class Renderer extends EventEmitter {
     }
   }
 
-  renderer_loadsnapshot() {
+  async renderer_loadsnapshot() {
     if (!confirm("Load snapshot? This will overwrite any existing stars/checks/ratings with data from the snapshot")) {
       window.location = '/#index';
       return;
     }
     this.showLoading();
     try {
-      this.app.loadSnapshot();
+      await this.app.loadSnapshot();
     } catch (e) {
       db.msg =  `Couldn't load snapshot 😱 - ${err.message}`;
       window.location = '/#index';

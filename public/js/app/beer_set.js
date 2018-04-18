@@ -7,15 +7,16 @@ const SESSION_GROUPS = {
   saturday: 2
 };
 
-export default BeerSet {
+export default class BeerSet {
   constructor(beers) { 
+    this.indexes = ['ut_bid'];
     this.setBeers(beers);
   }
 
   get obj() { return this.indexedBeers }
   get arr() { return this.indexedBeerSet }
 
-  get rankGroups { 
+  get rankGroups() { 
     return {
       ut_rating: this.orderByProp('ut_rating'),
       live_rating: this.orderByProp('live_rating')
@@ -60,8 +61,23 @@ export default BeerSet {
     [this.obj[id]].concat(this.obj[id].copies || []).forEach(fn);
   }
 
+  forAllBeersIndexedBy(index, key, fn) {
+    if (!this.hasBeerIndexedBy(index, key)) return;
+    this.specialIndexes[index][key].forEach(fn)
+  }
+
+  hasBeerIndexedBy(index, key) {
+    return !this.specialIndexes[index] || this.specialIndexes[index][key] == null;
+  }
+
+  getBeersIndexedBy(index, key) {
+    return this.specialIndexes[index][key];
+  }
+
   _indexBeers(beers) {
     let indexedBeers = {};
+    let beersIndexedByUntappdId = {};
+    let specialIndexes = this.indexes.reduce((o, i) => (o[i] = [], o), {});
 
     let indexedBeerSet = beers.map(beer => {
       beer = _.clone(beer);
@@ -73,6 +89,11 @@ export default BeerSet {
         indexedBeers[beer.id] = beer;
         indexedBeers[beer.id].sessions = [beer.session];
       }
+      this.indexes.forEach(index => {
+        if (!beer[index] == null) return;
+        if (!specialIndexes[index][beer[index]]) specialIndexes[index][beer[index]] = [beer];
+        else specialIndexes[index][beer[index]].push(beer);
+      });
       return beer;
     });
     
@@ -84,6 +105,6 @@ export default BeerSet {
     indexedBeerSet = _.sortBy(indexedBeerSet, beer => SESSION_GROUPS[beer.sessionSet]);
     let idArray = _.pluck(beers, 'id');
 
-    return { idArray, indexedBeerSet, indexedBeers };
+    return { idArray, indexedBeerSet, indexedBeers, specialIndexes };
   }
 }
