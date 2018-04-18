@@ -173,11 +173,5 @@ html(manifest="app.cache")
     fetch('/latest.json').then(function(res) {
       return res.json();
     }).then(function(latest) {
-      window.beers = latest.beers;
-      window.breweries = latest.breweries;
-      window.superstyles = latest.superstyles;
-      window.metastyles = latest.metastyles;
-      indexBeers();
-      updateBeersMarked();
-      route(location.hash);
+      BeerApp.updateData(latest);
     });

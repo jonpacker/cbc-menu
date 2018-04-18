@@ -7,9 +7,7 @@ export default class Renderer extends EventEmitter {
     this.app = app;
     this.templates = templates;
     this.view = view;
-    this.globals = {
-      tset: createLinkToSetParam
-    };
+    this.globals = {}; 
   }
 
   canRender(viewName) {
@@ -18,6 +16,7 @@ export default class Renderer extends EventEmitter {
 
   render(viewName, opts) {
     Object.assign(opts, this.globals);
+    opts.tset = createLinkToSetParam(opts);
     const html = this[`renderer_${viewName}`](opts);
     if (html) this.view.empty().html(html);
     this.emit('didRender');
@@ -26,7 +25,7 @@ export default class Renderer extends EventEmitter {
   renderer_session(opts) {
     if (!opts.colour) return;
 
-    const {breweries, beer_count} = calcBeerList(app.beers, opts);
+    const {breweries, beer_count} = calcBeerList(this.app.beerset, opts);
     opts.breweries = breweries;
     opts.beer_count = beer_count;
     opts.typeclass = opts.title = `${opts.colour} session`;
@@ -133,34 +132,35 @@ export default class Renderer extends EventEmitter {
   }
 }
 
-const createLinkToSetParam = function() {
-  return function(val, render) {
-    val = render(val);
-    var updates = val.split(',');
-    var settings = {
-      colour: opts.colour,
-      metastyle: opts.metastyle,
-      order: opts.order,
-      tasted: opts.tasted,
-      saved: opts.saved,
-      today: opts.today,
-      mini: opts.mini
-    };
-    updates = updates.reduce(function(u, update) {
-      var kv = update.split('=');
-      var key = kv[0].trim();
-      var val = kv[1].trim();
-      if (val == '!') {
-        delete settings[key];
+const createLinkToSetParam = (opts) => {
+  return function() {
+    return function(val, render) {
+      val = render(val);
+      var updates = val.split(',');
+      var settings = {
+        colour: opts.colour,
+        metastyle: opts.metastyle,
+        order: opts.order,
+        tasted: opts.tasted,
+        saved: opts.saved,
+        today: opts.today,
+        mini: opts.mini
+      };
+      updates = updates.reduce(function(u, update) {
+        var kv = update.split('=');
+        var key = kv[0].trim();
+        var val = kv[1].trim();
+        if (val == '!') {
+          delete settings[key];
+          return u;
+        } else if (val.match(/!\w+/)) {
+          settings[key] = !settings[key];
+          return u;
+        }
+        u[key] = val;
         return u;
-      } else if (val.match(/!\w+/)) {
-        settings[key] = !settings[key];
-        return u;
-      }
-      u[key] = val;
-      return u;
-    }, {});
-    return '#' + opts.page + '[' + JSON.stringify(_.extend(settings,updates)).replace(/"/g, "&quot;") + ']';
-  }
-};
-
+      }, {});
+      return '#' + opts.page + '[' + JSON.stringify(_.extend(settings,updates)).replace(/"/g, "&quot;") + ']';
+    }
+  };
+}

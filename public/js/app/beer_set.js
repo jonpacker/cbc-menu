@@ -30,7 +30,7 @@ export default class BeerSet {
   orderByProp(prop) {
     return _.chain(this.idArray)
       .reject(beer => this.indexedBeers[beer][prop] == null)
-      .sortBy(beer => -indexedBeers[beer][prop])
+      .sortBy(beer => -this.indexedBeers[beer][prop])
       .value()
   }
 
@@ -43,7 +43,7 @@ export default class BeerSet {
     const groupNames = Object.keys(rankGroups);
     let groupSubsets = {};
     groupNames.forEach(group => {
-      groupSubsets[group] = rankGroups[group].filter(beer => filter(indexedBeers[beer]))
+      groupSubsets[group] = rankGroups[group].filter(beer => filter(this.indexedBeers[beer]))
     });
     return this.arr.filter(filter).map(beer => {
       groupNames.forEach(group => {

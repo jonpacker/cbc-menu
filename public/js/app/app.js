@@ -76,6 +76,15 @@ export default class App {
     this.renderer.render(viewName, opts);
   }
 
+  updateData(data) {
+    this.breweries = data.breweries;
+    this.metastyles = data.metastyles;
+    this.superstyles = data.superstyles;
+    this.beerset.setBeers(data.beers);
+    this.updateBeersMarked();
+    this.route(location.hash || '#index');
+  }
+
   savePersistentOptions(opts) {
     if (opts.mini != null) this.db.mini = opts.mini;
   }
