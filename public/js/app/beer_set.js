@@ -55,20 +55,28 @@ export default BeerSet {
     })
   }
 
+  forAllBeersWithId(id, fn) {
+    if (!this.obj[id]) return;
+    [this.obj[id]].concat(this.obj[id].copies || []).forEach(fn);
+  }
+
   _indexBeers(beers) {
     let indexedBeers = {};
 
-    beers.forEach((beer) => {
+    let indexedBeerSet = beers.map(beer => {
+      beer = _.clone(beer);
       if (indexedBeers[beer.id]) {
         indexedBeers[beer.id].sessions.push(beer.session);
+        if (!indexedBeers[beer.id].copies) indexedBeers[beer.id].copies = [beer];
+        else indexedBeers[beer.id].copies.push(beer);
       } else {
-        indexedBeers[beer.id] = _.clone(beer);
+        indexedBeers[beer.id] = beer;
         indexedBeers[beer.id].sessions = [beer.session];
       }
+      return beer;
     });
     
-    let indexedBeerSet = beers.map(beer => {
-      const beer = _.clone(beer);
+    beers.forEach(beer => {
       beer.sessionSet = indexedBeers[beer.id].sessions.join(' ');
       return beer;
     });

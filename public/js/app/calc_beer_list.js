@@ -52,7 +52,7 @@ export default function calcBeerList(beerset, opts) {
   else breweries = _.sortBy(breweries, 'name');
   
   return {
-    beer_count: beer_count,
+    beer_count: beers.length,
     breweries
   }
 }

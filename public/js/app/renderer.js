@@ -1,4 +1,5 @@
 import calcBeerList from './calc_beer_list'
+import _ from 'underscore'
 import EventEmitter from 'events'
 export default class Renderer extends EventEmitter {
   constructor(app, templates, view) {
@@ -78,85 +79,51 @@ export default class Renderer extends EventEmitter {
   }
 
   renderer_snapshot() {
-    let {untappdUser} = db;
-    if (!untappdUser) {
-      db.msg = 'You are not logged in to untappd! 😨';
-      window.location = '/#index';
-      return;
-    }
-    showLoading();
-    fetch('/snapshot/' + untappdUser, {
-      method: 'POST',
-      body: btoa(JSON.stringify({savedBeers: db.savedBeers,tastedBeers:db.tastedBeers,beerData:db.beerData}))
-    }).then(function(res) {
-      if (res.status == 200) {
-        db.msg = 'Snapshot saved!';
-      } else {
-        db.msg = 'Snapshot failed 😱 - ' + res.statusText;
-      }
-      window.location = '/#index';
-    }).catch(function(err) {
+    this.showLoading();
+    try {
+      this.app.takeSnapshot();
+      db.msg = 'Snapshot saved!';
+    } catch (e) {
       db.msg = 'Snapshot failed 😱 - ' + err.message;
+    } finally {
       window.location = '/#index';
-    });
+    }
   }
 
   renderer_loadsnapshot() {
-    let {untappdUser} = db;
-    if (!untappdUser) {
-      db.msg = 'You are not logged in to untappd! 😨';
-      window.location = '/#index';
-      return;
-    }
     if (!confirm("Load snapshot? This will overwrite any existing stars/checks/ratings with data from the snapshot")) {
       window.location = '/#index';
       return;
     }
-    showLoading();
-    fetch('/snapshot/' + untappdUser).then(function(res) {
-      if (res.status != 200) {
-        db.msg = 'Couldn\'t load snapshot 😱 - ' + res.statusText;
-        window.location = '/#index';
-      } else {
-        return res.text().then(function(text) {
-          window.location = '/#loadb[{"d":"' + text + '"}]';
-        });
-      }
-    }).catch(function(err) {
-      db.msg =  'Couldn\'t load snapshot 😱 - ' + err.message;
+    this.showLoading();
+    try {
+      this.app.loadSnapshot();
+    } catch (e) {
+      db.msg =  `Couldn't load snapshot 😱 - ${err.message}`;
       window.location = '/#index';
-    });
+    } 
   }
 
   renderer_ut_logout() {
-    db.untappdUser = null;
-    db.untappdToken = null;
+    this.app.db.untappdUser = null;
+    this.app.db.untappdToken = null;
     window.location = '/#index';
   }
 
   renderer_load(opts) {
-    if (!opts.data) return renderers.index(opts);
-    db.savedBeers = _.compact(opts.data.saved.split(','));
-    db.tastedBeers = _.compact(opts.data.tasted.split(','));
-    updateBeersMarked();
-    db.msg =  savedBeers.length + " saved, " + tastedBeers.length + " tasted beers loaded";
+    if (!opts.data) return this.renderer_index(opts);
+    this.app.db.savedBeers = _.compact(opts.data.saved.split(','));
+    this.app.db.tastedBeers = _.compact(opts.data.tasted.split(','));
+    this.app.updateBeersMarked();
+    this.app.db.msg = `${this.app.db.savedBeers.length} saved,
+      ${this.app.db.tastedBeers.length} tasted beers loaded`;
     location.hash = '/#index';
-    return '';
   }
 
   renderer_loadb(opts) {
-    if (!opts.d) return renderers.index(opts);
-    var data = JSON.parse(atob(opts.d));
-    db.savedBeers = data.savedBeers;
-    db.tastedBeers = data.tastedBeers;
-    db.beerData = data.beerData;
-    updateBeersMarked();
-    updateExportLink();
-    var noteCount = _.reduce(db.beerData, function(c, d) { return c + (d.notes ? 1 : 0) }, 0);
-    var ratingCount = _.reduce(db.beerData, function(c, d) { return c + (d.rating ? 1 : 0) }, 0);
-    db.msg = noteCount + ' notes, ' + ratingCount + ' ratings, ' + db.savedBeers.length + " saved, " + db.tastedBeers.length + " tasted beers loaded";
+    if (!opts.d) return this.renderer_index(opts);
+    this.app.importSnapshotFromString(opts.d)
     window.location = '/#index';
-    return '';
   }
 
   showLoading() {
