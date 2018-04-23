@@ -18,7 +18,7 @@ const browserify = require('browserify-middleware');
 function compile(str, path) {
   return stylus(str)
     .set('filename', path)
-    .set('compress', true)
+  //.set('compress', true) 
     .use(nib());
 }
 
@@ -26,18 +26,21 @@ app.use('/css', stylus.middleware({ src: __dirname + '/public/css' , compile: co
 app.use('/js/app/', browserify(`${__dirname}/public/js/app`, { 
   transform: [
     ['babelify', {
-      presets: [['env', {
-        targets: {
-          browsers: [
-            "Chrome >= 52",
-            "FireFox >= 44",
-            "Safari >= 7",
-            "Explorer 11",
-            "last 4 Edge versions"
-          ]
-        },
-        useBuiltIns: true
-      }]],
+      presets: [
+        ['env', {
+          targets: {
+            browsers: [
+              "Chrome >= 52",
+              "FireFox >= 44",
+              "Safari >= 7",
+              "Explorer 11",
+              "last 4 Edge versions"
+            ]
+          },
+          useBuiltIns: true
+        }],
+        ['react']
+      ],
       plugins: ["transform-object-rest-spread"]
     }]
   ]

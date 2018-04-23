@@ -1,1 +1,880 @@
-@font-face{font-family:'oswald';font-style:normal;font-weight:400;src:local('Oswald Regular'),local('Oswald-Regular'),url("/fonts/oswald-v10-latin-regular.woff2") format('woff2'),url("/fonts/oswald-v10-latin-regular.woff") format('woff')}@font-face{font-family:'oswald';font-style:normal;font-weight:700;src:local('Oswald Bold'),local('Oswald-Bold'),url("/fonts/oswald-v10-latin-700.woff2") format('woff2'),url("/fonts/oswald-v10-latin-700.woff") format('woff')}html,body{width:100%;padding:0;margin:0}body{font-family:oswald}h1{text-align:center;font-size:4rem}#exportfield{width:100%;margin-top:5rem;padding-bottom:2rem;font-size:2rem;text-align:center;}#exportfield input{display:block;border:.5rem dashed #fcd174;width:80%;margin:1rem auto;padding:1rem;text-align:center;font-family:inherit}.loader{width:8rem;height:8rem;margin:5rem auto;display:block}.status-text{font-size:3rem;text-align:center}#main-menu .msg{width:80%;margin:4vw auto 0;padding:3vw 5vw;font-weight:bold;font-size:3vw;border:1vw dashed #fcd174;text-align:center}#main-menu .sessions{width:100%;display:flex;flex-wrap:wrap;box-sizing:border-box;justify-content:center;padding:2.5% 0 2.5%;}#main-menu .sessions .session{width:45%;box-sizing:border-box;color:#111;padding:4rem;text-align:center;display:block;text-decoration:none;}#main-menu .sessions .session h2{font-size:3.5rem;margin:0}#main-menu .sessions .session .sub{font-size:1.5rem;font-style:italic}#main-menu .info{text-align:center;font-size:2rem}#main-menu .untappd{text-align:center;font-size:2rem;outline:.5rem solid #fc0;padding:2rem;box-sizing:border-box;width:90vw;margin:0 auto;margin-bottom:5%;}#main-menu .untappd .ut-user{display:inline-block}#main-menu .untappd .ut-info{font-size:1.5rem;margin-top:.5rem}#main-menu .untappd .ut-sync{margin-top:.75rem;font-size:1.4rem;}#main-menu .untappd .ut-sync .expl{font-size:1.25rem;margin-top:.5rem}#main-menu .untappd .ut-sync .load-ratings{font-size:1rem;margin-top:1rem}#main-menu .untappd .ut-sync a{background-color:#fc0;padding:.25rem 1rem;border-radius:.2rem;margin:0 .5rem}#main-menu .untappd img{width:4rem;height:4rem;margin-right:2rem;vertical-align:middle}#main-menu .live-ratings{text-align:center;font-size:2rem;outline:.5rem solid #fbad2f;padding:2rem;box-sizing:border-box;width:90vw;margin:0 auto;margin-bottom:5%;}#main-menu .live-ratings a{display:block}#main-menu .live-ratings .expl{font-size:1.25rem;margin-top:.5rem}#main-menu .beer-lists{display:flex;box-sizing:border-box;flex-wrap:wrap;flex-direction:vertical;justify-content:center;padding:0 0 5%;}#main-menu .beer-lists .all-beers-sel{width:90%;background-color:#fbad2f;margin-bottom:1.5rem;font-size:2.5rem;padding:1rem 4rem;box-sizing:border-box;color:#111;text-decoration:none;}#main-menu .beer-lists .all-beers-sel:after{content:'➜';float:right}html{font-size:9px;}@media (min-width:2160px) and (max-width:2700px){html{font-size:.3vw}}@media (min-width:1800px) and (max-width:2160px){html{font-size:.4vw}}@media (min-width:1440px) and (max-width:1800px){html{font-size:.5vw}}@media (min-width:1080px) and (max-width:1350px){html{font-size:.666667vw}}@media (min-width:720px) and (max-width:900px){html{font-size:1vw}}@media (max-width:500px){html{font-size:2vw}}#beerlist{width:100%;display:flex;justify-content:center;align-items:center;flex-direction:column;}#beerlist h1{margin:0;padding:.5rem 0;width:100%;text-transform:capitalize;font-size:4rem;position:relative;overflow:hidden;}#beerlist h1 .back{height:150%;width:20%;left:0;top:-25%;text-decoration:none;font-size:8rem;position:absolute;color:#111;display:block;}#beerlist h1 .back:hover{background-color:rgba(255,255,255,0.25)}#beerlist sub{font-size:1.5rem;display:block}#beerlist .container{display:flex;width:100%;flex-direction:column;align-items:center;flex-wrap:wrap;}@media (min-width:720px){#beerlist .container{flex-direction:row;justify-content:space-between;box-sizing:border-box;align-items:flex-start;padding:0 3vw}#beerlist .container > div{max-width:45.5vw}#beerlist .container > div.bar{max-width:100vw}}@media (min-width:1080px){#beerlist .container{padding:0 2.5vw}#beerlist .container > div{max-width:30vw}}@media (min-width:1440px){#beerlist .container{padding:0 2vw}#beerlist .container > div{max-width:22.5vw}}@media (min-width:1800px){#beerlist .container{padding:0 1.666667vw}#beerlist .container > div{max-width:18vw}}@media (min-width:2160px){#beerlist .container{padding:0 1.428571vw}#beerlist .container > div{max-width:15vw}}#beerlist .key{text-align:center;margin-top:1rem;width:100%;}#beerlist .key span.info{margin-right:1rem;}#beerlist .key span.info:after{content:':'}#beerlist .key .style-border{display:inline-block;padding:1rem;font-size:1.25rem;margin-right:1rem;margin-bottom:.5rem;background:#ccc;color:inherit}#beerlist.ms-Dark .key .Dark,#beerlist.ms-Traditional .key .Traditional,#beerlist.ms-Hoppy .key .Hoppy,#beerlist.ms-Imperial.Stout .key .Imperial.Stout,#beerlist.ms-Barley.Wine .key .Barley.Wine,#beerlist.ms-Mixed-fermentation .key .Mixed-fermentation,#beerlist.ms-Sour .key .Sour,#beerlist.ms-Belgian .key .Belgian,#beerlist.ms-Experimental .key .Experimental,#beerlist.ms-Cider .key .Cider,#beerlist.ms-Mead .key .Mead,#beerlist.ms-Wine .key .Wine,#beerlist.ms-Sake .key .Sake,#beerlist.ms-Pumpkin .key .Pumpkin,#beerlist.order-score .order .avg,#beerlist.order-hype .order .hype,#beerlist.order-ut_rating .order .ut_rating,#beerlist.order-ratebeer .order .ratebeer,#beerlist.order-beeradvocate .order .beeradvocate,#beerlist.order-live_rating .order .live-rating,#beerlist.order-location .order .order-location,#beerlist.saved .filter .saved,#beerlist.not-saved .filter .not-saved,#beerlist.today .filter .today,#beerlist.tasted .filter .tasted,#beerlist.not-tasted .filter .not-tasted,#beerlist.mini-true .order .mini,#beerlist .order-by-name.selected{outline:.5rem solid #d270d2}#beerlist .order{padding:1rem 5%;width:100%;box-sizing:border-box;display:flex;justify-content:center;}#beerlist .order a{display:block;min-width:12%;max-width:60px;padding:.5rem;text-align:center;font-size:1.5rem;}#beerlist .order a:not(.site-bg-style){background-color:#d3d3d3}#beerlist .order a.ordering:before{content:'⇳ '}#beerlist .order a img{width:2rem;height:2rem;vertical-align:middle}#beerlist .order span.info{margin-right:1rem;margin-left:2rem;vertical-align:middle;margin-top:.9rem;}#beerlist .order span.info:after{content:':'}#beerlist .filter{width:100%;padding:1rem 5%;box-sizing:border-box;text-align:center;}#beerlist .filter span.info{margin-right:1rem;}#beerlist .filter span.info:after{content:':'}#beerlist .filter a{display:inline-block;background-color:#d3d3d3;padding:.5rem;color:inherit;width:10%;margin:0 .5rem;font-size:1.5rem;max-width:60px}#beerlist .brewery{width:90%;background-color:#eee;box-sizing:border-box;margin-top:1rem;}#beerlist .brewery h2{font-size:2.5rem;margin:0;padding:1.5rem 2.5rem;background-color:#333;color:#fff;}#beerlist .brewery h2 .location{font-size:1.4rem;display:inline-block;margin-left:1rem;float:right}#beerlist.mini-true .beer .headline .ratings,#beerlist.mini-true .beer .headline .expanded{display:none}#beerlist.mini-true .beer.expand .headline .ratings,#beerlist.mini-true .beer.expand .headline .expanded{display:block}#beerlist.mini-false .beer .headline .name-block .ut-avg,#beerlist.mini-false .beer .headline .name-block .live-avg{display:none}#beerlist .beer{margin-bottom:.5rem;}#beerlist .beer:last-child{margin-bottom:0}#beerlist .beer.saved{outline:.5rem solid #d270d2}#beerlist .beer.tasted{opacity:.5}#beerlist .beer.ut-checked-in .headline,#beerlist .beer.ut-historic-checked-in .headline{background-image:url("/img/drank_flag.png");background-repeat:no-repeat;background-position:top right}#beerlist .beer .star,#beerlist .beer .tick{text-shadow:1px 1px 0 #111;color:#e9e9e9;margin-top:-.3em;padding:.1em;display:inline-block;cursor:pointer;font-size:1.5em}#beerlist .beer.saved .star,#beerlist .beer.tasted .tick{color:#fcd174;text-shadow:0 0 5px #111}#beerlist .beer .headline{padding:1rem 2.5rem;font-size:2rem;background-color:#ccc;display:flex;align-items:center;flex-wrap:wrap;}#beerlist .beer .headline .name-block{width:81%;display:flex;flex-wrap:wrap;}#beerlist .beer .headline .name-block .name{font-weight:bold;width:80%}#beerlist .beer .headline .name-block .abv{width:20%;font-size:1.75rem;}#beerlist .beer .headline .name-block .abv:after{content:'%';font-size:.6em;display:inline-block;position:relative;top:-.6em}#beerlist .beer .headline .name-block .style{width:70%;font-size:1.4rem}#beerlist .beer .headline .name-block .ut-avg,#beerlist .beer .headline .name-block .live-avg{width:15%;font-size:1.4rem;}#beerlist .beer .headline .name-block .ut-avg img,#beerlist .beer .headline .name-block .live-avg img{width:1.5rem;height:1.5rem;vertical-align:baseline;border-radius:.25rem;margin-right:.3rem}#beerlist .beer .headline .marks{width:19%}#beerlist .beer .headline .ratings{width:100%;margin-top:.5rem;font-size:1.25rem;}#beerlist .beer .headline .ratings .score{width:40%;text-align:center;box-sizing:border-box;padding:.5rem;float:left;}#beerlist .beer .headline .ratings .score[href=""]{text-decoration:none}#beerlist .beer .headline .ratings .score:empty:after{content:'—'}#beerlist .beer .headline .ratings .yours{background-color:#d270d2;color:#fff}#beerlist .beer .headline .ratings .add-rating{width:20%;background-color:#d270d2;display:block;box-shadow:inset 0 0 0 3px rgba(255,255,255,0.25),0 1px 0 rgba(17,17,17,0.5);border-radius:5px;float:right;font-size:1.25rem;text-align:center;box-sizing:border-box;padding:.5rem 1rem;cursor:pointer;}#beerlist .beer .headline .ratings .add-rating.is-rating{box-shadow:0 0 15px #eb585c}#beerlist .beer .headline .expanded{width:100%;margin-top:.5rem;}#beerlist .beer .headline .expanded div.style{font-size:1.4rem;margin-bottom:.25rem}#beerlist .beer .headline .expanded div{width:80%;font-size:1.25rem;box-sizing:border-box;padding-right:2rem}#beerlist .beer .headline .rate-box{font-size:1.5rem;margin-top:1rem;width:100%;display:none;flex-wrap:wrap;}#beerlist .beer .headline .rate-box label{font-weight:bold;width:15%;display:inline-block;display:none}#beerlist .beer .headline .rate-box input.rating-slider{width:70%;display:none}#beerlist .beer .headline .rate-box .rating-slider-control{width:68%;margin-right:2%;position:relative;height:2.6rem;}#beerlist .beer .headline .rate-box .rating-slider-control .track{width:100%;height:3px;border-radius:.2rem;background-color:#444;margin-top:1.2rem}#beerlist .beer .headline .rate-box .rating-slider-control .handle{position:absolute;width:4rem;height:4rem;top:50%;left:0;margin-top:-2rem;margin-left:-2rem;}#beerlist .beer .headline .rate-box .rating-slider-control .handle:after{content:'';position:absolute;left:1rem;top:1rem;width:2rem;height:2rem;box-sizing:border-box;border:2px solid #111;background-color:#f0f;box-shadow:0 0 0 1px #fff,0 0 0 2px rgba(17,17,17,0.5);border-radius:1rem}#beerlist .beer .headline .rate-box textarea{width:100%;height:4em;display:none}#beerlist .beer .headline .rate-box .rating-text{width:10%;text-align:center;font-weight:bold;font-size:2rem;display:inline-block;display:none}#beerlist .beer .headline .rate-box .untappd{margin-top:.2rem;width:100%}#beerlist .beer .headline .rate-box .previous-checkin{margin-right:1rem;display:inline-block}#beerlist .beer .headline .rate-box .send-to-untappd{width:40%;vertical-align:top;background-color:#fc0;display:inline-block;box-shadow:inset 0 0 0 3px rgba(255,255,255,0.25),0 1px 0 rgba(17,17,17,0.5);border-radius:5px;align-self:flex-end;font-size:1.25rem;text-align:center;box-sizing:border-box;padding:.2rem 1rem;cursor:pointer;}#beerlist .beer .headline .rate-box .send-to-untappd img{width:2.5rem;height:2.5rem;margin-right:.5rem;vertical-align:middle}#beerlist .beer .headline .rate-box .sent-to-untappd{color:#4c3f0c;font-size:1.25rem;display:none;}#beerlist .beer .headline .rate-box .sent-to-untappd .beer-check-mark{width:2rem;height:2rem;display:inline-block;vertical-align:middle;margin-right:.5rem;background-color:#fc0;background-image:url("/img/beer_icon_check.png");background-size:1.4rem;background-repeat:no-repeat;background-position:center}#beerlist .beer .headline .rate-box .sending-untappd-checkin{display:none;}#beerlist .beer .headline .rate-box .sending-untappd-checkin img{width:3rem;height:3rem;vertical-align:middle}#beerlist .beer.has-rating:not(.r-0) .headline .rate-box{display:flex;}#beerlist .beer.has-rating:not(.r-0) .headline .rate-box label,#beerlist .beer.has-rating:not(.r-0) .headline .rate-box .rating-slider-control,#beerlist .beer.has-rating:not(.r-0) .headline .rate-box .rating-text{display:inline-block}#beerlist .beer.has-rating:not(.r-0) .headline .rate-box .untappd{display:block}#beerlist .beer.has-notes .headline .rate-box{display:flex;}#beerlist .beer.has-notes .headline .rate-box textarea{display:block}#beerlist .beer.add-rating .headline .rate-box{display:flex;}#beerlist .beer.add-rating .headline .rate-box textarea{display:block}#beerlist .beer.add-rating .headline .rate-box label,#beerlist .beer.add-rating .headline .rate-box .rating-slider-control,#beerlist .beer.add-rating .headline .rate-box .rating-text{display:inline-block}#beerlist .beer.add-rating .headline .rate-box .untappd{display:block}#beerlist .beer.ut-checked-in .headline .rate-box .sent-to-untappd{display:block}#beerlist .beer.ut-checked-in .headline .rate-box .send-to-untappd,#beerlist .beer.ut-checked-in .headline .rate-box .have-i-drunk-it{display:none}#beerlist.beer-list .filter a.today{display:none}#beerlist .beer .name:before{font-size:.5em;padding:.2rem .4rem;font-weight:400;border-radius:.2rem;color:#fff;display:inline-block;vertical-align:middle;margin-right:.5rem}#beerlist .beer.friday .name:before{content:'fri';background-color:#eb585c}#beerlist .beer.friday.saturday .name:before{content:'fri & sat';background-color:#f0f}#beerlist .beer.saturday .name:before{content:'sat';background-color:#1da1cd}#beerlist .beer.no-info:after{display:block;content:'New beer, no Untappd link/info available, no auto checkin';padding:.3rem;border:.2rem solid #f0f;text-align:center;border-top:none;background-color:rgba(255,0,255,0.1);font-size:1.25rem}#beerlist .beer.early .name:after,#beerlist .beer.late .name:after{font-size:.5em;padding:.2rem .4rem;font-weight:400;border-radius:.2rem;color:#111;display:inline-block;vertical-align:middle;margin-left:.5rem}#beerlist .beer.early.early .name:after,#beerlist .beer.late.early .name:after{content:'14-18';background-color:#68d286}#beerlist .beer.early.late .name:after,#beerlist .beer.late.late .name:after{content:'18-22';background-color:#fbad2f}#beerlist.friday.session .beer.friday .name:before{content:none;background-color:#eb585c}#beerlist.friday.session .beer.friday.saturday .name:before{content:'fri & sat';background-color:#f0f}#beerlist.saturday.session .beer.saturday .name:before{content:none;background-color:#eb585c}#beerlist.saturday.session .beer.friday.saturday .name:before{content:'fri & sat';background-color:#f0f}.style-border.Dark,.style-border.Imperial.Stout{border-left:1rem solid #222245}.style-border.Barley.Wine{border-left:1rem solid #fcd174}.style-border.Traditional,.style-border.Classic{border-left:1rem solid #d3d3d3}.style-border.Hoppy{border-left:1rem solid #68d286}.style-border.Strong{border-left:1rem solid #854848}.style-border.Sake{border-left:1rem solid #77a277}.style-border.Mixed-fermentation{border-left:1rem solid #1da1cd}.style-border.Sour{border-left:1rem solid #d270d2}.style-border.Belgian{border-left:1rem solid #1da1cd}.style-border.Experimental{border-left:1rem solid #399}.style-border.Traditional{border-left:1rem solid #eb585c}.style-border.Cider{border-left:1rem solid #77a277}.style-border.Mead{border-left:1rem solid #fbad2f}.style-border.Pumpkin{border-left:1rem solid #fbad2f}.site-bg-style.avg{background-color:#fbad2f}.site-bg-style.hype{background-color:#ffc0cb;color:#fff}.site-bg-style.untappd,.site-bg-style.ut_rating{background-color:#fc0;color:#111}.site-bg-style.ratebeer{background-color:#2b93cd;color:#fbd500}.site-bg-style.beeradvocate{background-color:#111;color:#e4aa00}.session.yellow{background-color:#fcd174}.session.saturday{background-color:#1da1cd}.session.friday{background-color:#eb585c}.session.green{background-color:#68d286}#beerlist.session{background-color:#fff;}#beerlist.session.yellow h1{background-color:#fcd174}#beerlist.session.saturday h1{background-color:#1da1cd}#beerlist.session.friday h1{background-color:#eb585c}#beerlist.session.green h1{background-color:#68d286}
+@font-face {
+  font-family: 'oswald';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Oswald Regular'), local('Oswald-Regular'), url("/fonts/oswald-v10-latin-regular.woff2") format('woff2'), url("/fonts/oswald-v10-latin-regular.woff") format('woff');
+}
+@font-face {
+  font-family: 'oswald';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Oswald Bold'), local('Oswald-Bold'), url("/fonts/oswald-v10-latin-700.woff2") format('woff2'), url("/fonts/oswald-v10-latin-700.woff") format('woff');
+}
+html,
+body {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+body {
+  font-family: oswald;
+}
+h1 {
+  text-align: center;
+  font-size: 4rem;
+}
+#exportfield {
+  width: 100%;
+  margin-top: 5rem;
+  padding-bottom: 2rem;
+  font-size: 2rem;
+  text-align: center;
+}
+#exportfield input {
+  display: block;
+  border: 0.5rem dashed #fcd174;
+  width: 80%;
+  margin: 1rem auto;
+  padding: 1rem;
+  text-align: center;
+  font-family: inherit;
+}
+.loader {
+  width: 8rem;
+  height: 8rem;
+  margin: 5rem auto;
+  display: block;
+}
+.status-text {
+  font-size: 3rem;
+  text-align: center;
+}
+#main-menu .msg {
+  width: 80%;
+  margin: 4vw auto 0;
+  padding: 3vw 5vw;
+  font-weight: bold;
+  font-size: 3vw;
+  border: 1vw dashed #fcd174;
+  text-align: center;
+}
+#main-menu .sessions {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  justify-content: center;
+  padding: 2.5% 0 2.5%;
+}
+#main-menu .sessions .session {
+  width: 45%;
+  box-sizing: border-box;
+  color: #111;
+  padding: 4rem;
+  text-align: center;
+  display: block;
+  text-decoration: none;
+}
+#main-menu .sessions .session h2 {
+  font-size: 3.5rem;
+  margin: 0;
+}
+#main-menu .sessions .session .sub {
+  font-size: 1.5rem;
+  font-style: italic;
+}
+#main-menu .info {
+  text-align: center;
+  font-size: 2rem;
+}
+#main-menu .untappd {
+  text-align: center;
+  font-size: 2rem;
+  outline: 0.5rem solid #fc0;
+  padding: 2rem;
+  box-sizing: border-box;
+  width: 90vw;
+  margin: 0 auto;
+  margin-bottom: 5%;
+}
+#main-menu .untappd .ut-user {
+  display: inline-block;
+}
+#main-menu .untappd .ut-info {
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+}
+#main-menu .untappd .ut-sync {
+  margin-top: 0.75rem;
+  font-size: 1.4rem;
+}
+#main-menu .untappd .ut-sync .expl {
+  font-size: 1.25rem;
+  margin-top: 0.5rem;
+}
+#main-menu .untappd .ut-sync .load-ratings {
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+#main-menu .untappd .ut-sync a {
+  background-color: #fc0;
+  padding: 0.25rem 1rem;
+  border-radius: 0.2rem;
+  margin: 0 0.5rem;
+}
+#main-menu .untappd img {
+  width: 4rem;
+  height: 4rem;
+  margin-right: 2rem;
+  vertical-align: middle;
+}
+#main-menu .live-ratings {
+  text-align: center;
+  font-size: 2rem;
+  outline: 0.5rem solid #fbad2f;
+  padding: 2rem;
+  box-sizing: border-box;
+  width: 90vw;
+  margin: 0 auto;
+  margin-bottom: 5%;
+}
+#main-menu .live-ratings a {
+  display: block;
+}
+#main-menu .live-ratings .expl {
+  font-size: 1.25rem;
+  margin-top: 0.5rem;
+}
+#main-menu .beer-lists {
+  display: flex;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  flex-direction: vertical;
+  justify-content: center;
+  padding: 0 0 5%;
+}
+#main-menu .beer-lists .all-beers-sel {
+  width: 90%;
+  background-color: #fbad2f;
+  margin-bottom: 1.5rem;
+  font-size: 2.5rem;
+  padding: 1rem 4rem;
+  box-sizing: border-box;
+  color: #111;
+  text-decoration: none;
+}
+#main-menu .beer-lists .all-beers-sel:after {
+  content: '➜';
+  float: right;
+}
+html {
+  font-size: 9px;
+}
+@media (min-width: 2160px) and (max-width: 2700px) {
+  html {
+    font-size: 0.3vw;
+  }
+}
+@media (min-width: 1800px) and (max-width: 2160px) {
+  html {
+    font-size: 0.4vw;
+  }
+}
+@media (min-width: 1440px) and (max-width: 1800px) {
+  html {
+    font-size: 0.5vw;
+  }
+}
+@media (min-width: 1080px) and (max-width: 1350px) {
+  html {
+    font-size: 0.666667vw;
+  }
+}
+@media (min-width: 720px) and (max-width: 900px) {
+  html {
+    font-size: 1vw;
+  }
+}
+@media (max-width: 500px) {
+  html {
+    font-size: 2vw;
+  }
+}
+#beerlist {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+#beerlist h1 {
+  margin: 0;
+  padding: 0.5rem 0;
+  width: 100%;
+  text-transform: capitalize;
+  font-size: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+#beerlist h1 .back {
+  height: 150%;
+  width: 20%;
+  left: 0;
+  top: -25%;
+  text-decoration: none;
+  font-size: 8rem;
+  position: absolute;
+  color: #111;
+  display: block;
+}
+#beerlist h1 .back:hover {
+  background-color: rgba(255,255,255,0.25);
+}
+#beerlist sub {
+  font-size: 1.5rem;
+  display: block;
+}
+#beerlist .container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+}
+@media (min-width: 720px) {
+  #beerlist .container {
+    flex-direction: row;
+    justify-content: space-between;
+    box-sizing: border-box;
+    align-items: flex-start;
+    padding: 0 3vw;
+  }
+  #beerlist .container > div {
+    max-width: 45.5vw;
+  }
+  #beerlist .container > div.bar {
+    max-width: 100vw;
+  }
+}
+@media (min-width: 1080px) {
+  #beerlist .container {
+    padding: 0 2.5vw;
+  }
+  #beerlist .container > div {
+    max-width: 30vw;
+  }
+}
+@media (min-width: 1440px) {
+  #beerlist .container {
+    padding: 0 2vw;
+  }
+  #beerlist .container > div {
+    max-width: 22.5vw;
+  }
+}
+@media (min-width: 1800px) {
+  #beerlist .container {
+    padding: 0 1.666667vw;
+  }
+  #beerlist .container > div {
+    max-width: 18vw;
+  }
+}
+@media (min-width: 2160px) {
+  #beerlist .container {
+    padding: 0 1.428571vw;
+  }
+  #beerlist .container > div {
+    max-width: 15vw;
+  }
+}
+#beerlist .key {
+  text-align: center;
+  margin-top: 1rem;
+  width: 100%;
+}
+#beerlist .key span.info {
+  margin-right: 1rem;
+}
+#beerlist .key span.info:after {
+  content: ':';
+}
+#beerlist .key .style-border {
+  display: inline-block;
+  padding: 1rem;
+  font-size: 1.25rem;
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+  background: #ccc;
+  color: inherit;
+}
+#beerlist.ms-Dark .key .Dark,
+#beerlist.ms-Traditional .key .Traditional,
+#beerlist.ms-Hoppy .key .Hoppy,
+#beerlist.ms-Imperial.Stout .key .Imperial.Stout,
+#beerlist.ms-Barley.Wine .key .Barley.Wine,
+#beerlist.ms-Mixed-fermentation .key .Mixed-fermentation,
+#beerlist.ms-Sour .key .Sour,
+#beerlist.ms-Belgian .key .Belgian,
+#beerlist.ms-Experimental .key .Experimental,
+#beerlist.ms-Cider .key .Cider,
+#beerlist.ms-Mead .key .Mead,
+#beerlist.ms-Wine .key .Wine,
+#beerlist.ms-Sake .key .Sake,
+#beerlist.ms-Pumpkin .key .Pumpkin,
+#beerlist.order-score .order .avg,
+#beerlist.order-hype .order .hype,
+#beerlist.order-ut_rating .order .ut_rating,
+#beerlist.order-ratebeer .order .ratebeer,
+#beerlist.order-beeradvocate .order .beeradvocate,
+#beerlist.order-live_rating .order .live-rating,
+#beerlist.order-location .order .order-location,
+#beerlist.saved .filter .saved,
+#beerlist.not-saved .filter .not-saved,
+#beerlist.today .filter .today,
+#beerlist.tasted .filter .tasted,
+#beerlist.not-tasted .filter .not-tasted,
+#beerlist.mini-true .order .mini,
+#beerlist .order-by-name.selected {
+  outline: 0.5rem solid #d270d2;
+}
+#beerlist .order {
+  padding: 1rem 5%;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+}
+#beerlist .order a {
+  display: block;
+  min-width: 12%;
+  max-width: 60px;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+#beerlist .order a:not(.site-bg-style) {
+  background-color: #d3d3d3;
+}
+#beerlist .order a.ordering:before {
+  content: '⇳ ';
+}
+#beerlist .order a img {
+  width: 2rem;
+  height: 2rem;
+  vertical-align: middle;
+}
+#beerlist .order span.info {
+  margin-right: 1rem;
+  margin-left: 2rem;
+  vertical-align: middle;
+  margin-top: 0.9rem;
+}
+#beerlist .order span.info:after {
+  content: ':';
+}
+#beerlist .filter {
+  width: 100%;
+  padding: 1rem 5%;
+  box-sizing: border-box;
+  text-align: center;
+}
+#beerlist .filter span.info {
+  margin-right: 1rem;
+}
+#beerlist .filter span.info:after {
+  content: ':';
+}
+#beerlist .filter a {
+  display: inline-block;
+  background-color: #d3d3d3;
+  padding: 0.5rem;
+  color: inherit;
+  width: 10%;
+  margin: 0 0.5rem;
+  font-size: 1.5rem;
+  max-width: 60px;
+}
+#beerlist .brewery {
+  width: 90%;
+  background-color: #eee;
+  box-sizing: border-box;
+  margin-top: 1rem;
+}
+#beerlist .brewery h2 {
+  font-size: 2.5rem;
+  margin: 0;
+  padding: 1.5rem 2.5rem;
+  background-color: #333;
+  color: #fff;
+}
+#beerlist .brewery h2 .location {
+  font-size: 1.4rem;
+  display: inline-block;
+  margin-left: 1rem;
+  float: right;
+}
+#beerlist.mini-true .beer .headline .ratings,
+#beerlist.mini-true .beer .headline .expanded {
+  display: none;
+}
+#beerlist.mini-true .beer.expand .headline .ratings,
+#beerlist.mini-true .beer.expand .headline .expanded {
+  display: block;
+}
+#beerlist.mini-false .beer .headline .name-block .ut-avg,
+#beerlist.mini-false .beer .headline .name-block .live-avg {
+  display: none;
+}
+#beerlist .beer {
+  margin-bottom: 0.5rem;
+}
+#beerlist .beer:last-child {
+  margin-bottom: 0;
+}
+#beerlist .beer.saved {
+  outline: 0.5rem solid #d270d2;
+}
+#beerlist .beer.tasted {
+  opacity: 0.5;
+}
+#beerlist .beer.ut-checked-in .headline,
+#beerlist .beer.ut-historic-checked-in .headline {
+  background-image: url("/img/drank_flag.png");
+  background-repeat: no-repeat;
+  background-position: top right;
+}
+#beerlist .beer .star,
+#beerlist .beer .tick {
+  text-shadow: 1px 1px 0px #111;
+  color: #e9e9e9;
+  margin-top: -0.3em;
+  padding: 0.1em;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 1.5em;
+}
+#beerlist .beer.saved .star,
+#beerlist .beer.tasted .tick {
+  color: #fcd174;
+  text-shadow: 0px 0px 5px #111;
+}
+#beerlist .beer .headline {
+  padding: 1rem 2.5rem;
+  font-size: 2rem;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+#beerlist .beer .headline .name-block {
+  width: 81%;
+  display: flex;
+  flex-wrap: wrap;
+}
+#beerlist .beer .headline .name-block .name {
+  font-weight: bold;
+  width: 80%;
+}
+#beerlist .beer .headline .name-block .abv {
+  width: 20%;
+  font-size: 1.75rem;
+}
+#beerlist .beer .headline .name-block .abv:after {
+  content: '%';
+  font-size: 0.6em;
+  display: inline-block;
+  position: relative;
+  top: -0.6em;
+}
+#beerlist .beer .headline .name-block .style {
+  width: 70%;
+  font-size: 1.4rem;
+}
+#beerlist .beer .headline .name-block .ut-avg,
+#beerlist .beer .headline .name-block .live-avg {
+  width: 15%;
+  font-size: 1.4rem;
+}
+#beerlist .beer .headline .name-block .ut-avg img,
+#beerlist .beer .headline .name-block .live-avg img {
+  width: 1.5rem;
+  height: 1.5rem;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  margin-right: 0.3rem;
+}
+#beerlist .beer .headline .marks {
+  width: 19%;
+}
+#beerlist .beer .headline .ratings {
+  width: 100%;
+  margin-top: 0.5rem;
+  font-size: 1.25rem;
+}
+#beerlist .beer .headline .ratings .score {
+  width: 40%;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  float: left;
+}
+#beerlist .beer .headline .ratings .score[href=""] {
+  text-decoration: none;
+}
+#beerlist .beer .headline .ratings .score:empty:after {
+  content: '—';
+}
+#beerlist .beer .headline .ratings .yours {
+  background-color: #d270d2;
+  color: #fff;
+}
+#beerlist .beer .headline .ratings .add-rating {
+  width: 20%;
+  background-color: #d270d2;
+  display: block;
+  box-shadow: inset 0px 0px 0px 3px rgba(255,255,255,0.25), 0px 1px 0px rgba(17,17,17,0.5);
+  border-radius: 5px;
+  float: right;
+  font-size: 1.25rem;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+#beerlist .beer .headline .ratings .add-rating.is-rating {
+  box-shadow: 0px 0px 15px #eb585c;
+}
+#beerlist .beer .headline .expanded {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+#beerlist .beer .headline .expanded div.style {
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+#beerlist .beer .headline .expanded div {
+  width: 80%;
+  font-size: 1.25rem;
+  box-sizing: border-box;
+  padding-right: 2rem;
+}
+#beerlist .beer .headline .rate-box {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  width: 100%;
+  display: none;
+  flex-wrap: wrap;
+}
+#beerlist .beer .headline .rate-box label {
+  font-weight: bold;
+  width: 15%;
+  display: inline-block;
+  display: none;
+}
+#beerlist .beer .headline .rate-box input.rating-slider {
+  width: 70%;
+  display: none;
+}
+#beerlist .beer .headline .rate-box .rating-slider-control {
+  width: 68%;
+  margin-right: 2%;
+  position: relative;
+  height: 2.6rem;
+}
+#beerlist .beer .headline .rate-box .rating-slider-control .track {
+  width: 100%;
+  height: 3px;
+  border-radius: 0.2rem;
+  background-color: #444;
+  margin-top: 1.2rem;
+}
+#beerlist .beer .headline .rate-box .rating-slider-control .handle {
+  position: absolute;
+  width: 4rem;
+  height: 4rem;
+  top: 50%;
+  left: 0px;
+  margin-top: -2rem;
+  margin-left: -2rem;
+}
+#beerlist .beer .headline .rate-box .rating-slider-control .handle:after {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  width: 2rem;
+  height: 2rem;
+  box-sizing: border-box;
+  border: 2px solid #111;
+  background-color: #f0f;
+  box-shadow: 0px 0px 0px 1px #fff, 0px 0px 0px 2px rgba(17,17,17,0.5);
+  border-radius: 1rem;
+}
+#beerlist .beer .headline .rate-box textarea {
+  width: 100%;
+  height: 4em;
+  display: none;
+}
+#beerlist .beer .headline .rate-box .rating-text {
+  width: 10%;
+  text-align: center;
+  font-weight: bold;
+  font-size: 2rem;
+  display: inline-block;
+  display: none;
+}
+#beerlist .beer .headline .rate-box .untappd {
+  margin-top: 0.2rem;
+  width: 100%;
+}
+#beerlist .beer .headline .rate-box .previous-checkin {
+  margin-right: 1rem;
+  display: inline-block;
+}
+#beerlist .beer .headline .rate-box .send-to-untappd {
+  width: 40%;
+  vertical-align: top;
+  background-color: #fc0;
+  display: inline-block;
+  box-shadow: inset 0px 0px 0px 3px rgba(255,255,255,0.25), 0px 1px 0px rgba(17,17,17,0.5);
+  border-radius: 5px;
+  align-self: flex-end;
+  font-size: 1.25rem;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 0.2rem 1rem;
+  cursor: pointer;
+}
+#beerlist .beer .headline .rate-box .send-to-untappd img {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+#beerlist .beer .headline .rate-box .sent-to-untappd {
+  color: #4c3f0c;
+  font-size: 1.25rem;
+  display: none;
+}
+#beerlist .beer .headline .rate-box .sent-to-untappd .beer-check-mark {
+  width: 2rem;
+  height: 2rem;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+  background-color: #fc0;
+  background-image: url("/img/beer_icon_check.png");
+  background-size: 1.4rem;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#beerlist .beer .headline .rate-box .sending-untappd-checkin {
+  display: none;
+}
+#beerlist .beer .headline .rate-box .sending-untappd-checkin img {
+  width: 3rem;
+  height: 3rem;
+  vertical-align: middle;
+}
+#beerlist .beer.has-rating:not(.r-0) .headline .rate-box {
+  display: flex;
+}
+#beerlist .beer.has-rating:not(.r-0) .headline .rate-box label,
+#beerlist .beer.has-rating:not(.r-0) .headline .rate-box .rating-slider-control,
+#beerlist .beer.has-rating:not(.r-0) .headline .rate-box .rating-text {
+  display: inline-block;
+}
+#beerlist .beer.has-rating:not(.r-0) .headline .rate-box .untappd {
+  display: block;
+}
+#beerlist .beer.has-notes .headline .rate-box {
+  display: flex;
+}
+#beerlist .beer.has-notes .headline .rate-box textarea {
+  display: block;
+}
+#beerlist .beer.add-rating .headline .rate-box {
+  display: flex;
+}
+#beerlist .beer.add-rating .headline .rate-box textarea {
+  display: block;
+}
+#beerlist .beer.add-rating .headline .rate-box label,
+#beerlist .beer.add-rating .headline .rate-box .rating-slider-control,
+#beerlist .beer.add-rating .headline .rate-box .rating-text {
+  display: inline-block;
+}
+#beerlist .beer.add-rating .headline .rate-box .untappd {
+  display: block;
+}
+#beerlist .beer.ut-checked-in .headline .rate-box .sent-to-untappd {
+  display: block;
+}
+#beerlist .beer.ut-checked-in .headline .rate-box .send-to-untappd,
+#beerlist .beer.ut-checked-in .headline .rate-box .have-i-drunk-it {
+  display: none;
+}
+#beerlist.beer-list .filter a.today {
+  display: none;
+}
+#beerlist .beer .name:before {
+  font-size: 0.5em;
+  padding: 0.2rem 0.4rem;
+  font-weight: 400;
+  border-radius: 0.2rem;
+  color: #fff;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+#beerlist .beer.friday .name:before {
+  content: 'fri';
+  background-color: #eb585c;
+}
+#beerlist .beer.friday.saturday .name:before {
+  content: 'fri & sat';
+  background-color: #f0f;
+}
+#beerlist .beer.saturday .name:before {
+  content: 'sat';
+  background-color: #1da1cd;
+}
+#beerlist .beer.no-info:after {
+  display: block;
+  content: 'New beer, no Untappd link/info available, no auto checkin';
+  padding: 0.3rem;
+  border: 0.2rem solid #f0f;
+  text-align: center;
+  border-top: none;
+  background-color: rgba(255,0,255,0.1);
+  font-size: 1.25rem;
+}
+#beerlist .beer.early .name:after,
+#beerlist .beer.late .name:after {
+  font-size: 0.5em;
+  padding: 0.2rem 0.4rem;
+  font-weight: 400;
+  border-radius: 0.2rem;
+  color: #111;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+}
+#beerlist .beer.early.early .name:after,
+#beerlist .beer.late.early .name:after {
+  content: '14-18';
+  background-color: #68d286;
+}
+#beerlist .beer.early.late .name:after,
+#beerlist .beer.late.late .name:after {
+  content: '18-22';
+  background-color: #fbad2f;
+}
+#beerlist.friday.session .beer.friday .name:before {
+  content: none;
+  background-color: #eb585c;
+}
+#beerlist.friday.session .beer.friday.saturday .name:before {
+  content: 'fri & sat';
+  background-color: #f0f;
+}
+#beerlist.saturday.session .beer.saturday .name:before {
+  content: none;
+  background-color: #eb585c;
+}
+#beerlist.saturday.session .beer.friday.saturday .name:before {
+  content: 'fri & sat';
+  background-color: #f0f;
+}
+.style-border.Dark,
+.style-border.Imperial.Stout {
+  border-left: 1rem solid #222245;
+}
+.style-border.Barley.Wine {
+  border-left: 1rem solid #fcd174;
+}
+.style-border.Traditional,
+.style-border.Classic {
+  border-left: 1rem solid #d3d3d3;
+}
+.style-border.Hoppy {
+  border-left: 1rem solid #68d286;
+}
+.style-border.Strong {
+  border-left: 1rem solid #854848;
+}
+.style-border.Sake {
+  border-left: 1rem solid #77a277;
+}
+.style-border.Mixed-fermentation {
+  border-left: 1rem solid #1da1cd;
+}
+.style-border.Sour {
+  border-left: 1rem solid #d270d2;
+}
+.style-border.Belgian {
+  border-left: 1rem solid #1da1cd;
+}
+.style-border.Experimental {
+  border-left: 1rem solid #399;
+}
+.style-border.Traditional {
+  border-left: 1rem solid #eb585c;
+}
+.style-border.Cider {
+  border-left: 1rem solid #77a277;
+}
+.style-border.Mead {
+  border-left: 1rem solid #fbad2f;
+}
+.style-border.Pumpkin {
+  border-left: 1rem solid #fbad2f;
+}
+.site-bg-style.avg {
+  background-color: #fbad2f;
+}
+.site-bg-style.hype {
+  background-color: #ffc0cb;
+  color: #fff;
+}
+.site-bg-style.untappd,
+.site-bg-style.ut_rating {
+  background-color: #fc0;
+  color: #111;
+}
+.site-bg-style.ratebeer {
+  background-color: #2b93cd;
+  color: #fbd500;
+}
+.site-bg-style.beeradvocate {
+  background-color: #111;
+  color: #e4aa00;
+}
+.session.yellow {
+  background-color: #fcd174;
+}
+.session.saturday {
+  background-color: #1da1cd;
+}
+.session.friday {
+  background-color: #eb585c;
+}
+.session.green {
+  background-color: #68d286;
+}
+#beerlist.session {
+  background-color: #fff;
+}
+#beerlist.session.yellow h1 {
+  background-color: #fcd174;
+}
+#beerlist.session.saturday h1 {
+  background-color: #1da1cd;
+}
+#beerlist.session.friday h1 {
+  background-color: #eb585c;
+}
+#beerlist.session.green h1 {
+  background-color: #68d286;
+}
