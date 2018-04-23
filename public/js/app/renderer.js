@@ -24,17 +24,14 @@ export default class Renderer extends EventEmitter {
 
   renderer_session(opts) {
     if (!opts.colour) return;
-
-    const {breweries, beer_count} = calcBeerList(this.app.beerset, opts);
-    opts.breweries = breweries;
-    opts.beer_count = beer_count;
+    Object.assign(opts, calcBeerList(this.app.beerset, opts));
     opts.typeclass = opts.title = `${opts.colour} session`;
     opts.rating_as_percent = function() { return this.rating / 5 * 100 };
     return Mustache.render(this.templates.beerlist, opts);
   }
 
   renderer_beerlist(opts) {
-    calcBeerList(opts);
+    Object.assign(opts, calcBeerList(this.app.beerset, opts));
     opts.typeclass = 'beer-list';
     opts.title = 'All Beers';
     opts.rating_as_percent = function() { return this.rating / 5 * 100 };

@@ -1,29 +1,29 @@
+import io from 'socket.io-client'
 export function connectToWebsocket(app) {
   const socket = io();
 
   // todo - these listeners should be in a more appropriate place
   socket.on('rate', function(data) {
-    app.beers.forEach(function(beer) {
-      if (beer.id != data.beer) return;
+    app.beerset.forAllBeersWithId(data.beer, beer => {
       beer.live_rating = data.rating;
       beer.live_rating_count = data.count;
       beer.live_rating_clamped = data.rating.toFixed(2);
-      if (data.flag) return;
-      data.flag = true;
-      app.updateLiveRating(beer.id, data.count, data.rating);
-    });
+      // not sure why this was here.
+      // if (data.flag) return;
+      // data.flag = true;
+    })
+    app.updateLiveRating(data.beer, data.count, data.rating);
   });
 
   socket.on('update', function(data) {
-    app.beers.forEach(function(beer) {
-      if (!data[beer.id]) return;
-      beer.live_rating = data[beer.id].rating;
-      beer.live_rating_clamped = data[beer.id].rating.toFixed(2);
-      beer.live_rating_count = data[beer.id].count;
-      if (data[beer.id].flag) return;
-      data[beer.id].flag = true;
-      app.updateLiveRating(beer.id, data[beer.id].count, data[beer.id].rating);
-    });
+    for (let [beerId, {rating, count}] of Object.entries(data)) {
+      app.beerset.forAllBeersWithId(beerId, beer => {
+        beer.live_rating = rating;
+        beer.live_rating_clamped = rating.toFixed(2);
+        beer.live_rating_count = count;
+      })
+      app.updateLiveRating(beerId, count, rating);
+    }
   });
   
   return socket;

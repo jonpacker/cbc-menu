@@ -1,7 +1,6 @@
 import checkIfDeviceIsMobile from './helpers/isMobile'
 import _ from 'underscore'
 import config from './keys'
-import io from 'socket.io-client'
 import {connectToWebsocket} from './live_ratings'
 import readTemplates from './read_templates'
 import State from './local_persistence'
@@ -178,9 +177,9 @@ export default class App {
     const res = await fetch('/snapshot/' + untappdUser, {
       method: 'POST',
       body: btoa(JSON.stringify({
-        savedBeers: db.savedBeers,
-        tastedBeers: db.tastedBeers,
-        beerData: db.beerData
+        savedBeers: this.db.savedBeers,
+        tastedBeers: this.db.tastedBeers,
+        beerData: this.db.beerData
       }))
     })
     if (res.status != 200) throw new Error(res.statusText);
@@ -206,9 +205,9 @@ export default class App {
     this.db.beerData = data.beerData;
     this.updateBeersMarked();
     this.updateExportLink();
-    let noteCount = _.reduce(db.beerData, (c, d) => c + (d.notes ? 1 : 0), 0);
-    let ratingCount = _.reduce(db.beerData, (c, d) => c + (d.rating ? 1 : 0), 0);
-    db.msg = `
+    let noteCount = _.reduce(this.db.beerData, (c, d) => c + (d.notes ? 1 : 0), 0);
+    let ratingCount = _.reduce(this.db.beerData, (c, d) => c + (d.rating ? 1 : 0), 0);
+    this.db.msg = `
       ${noteCount} notes, 
       ${ratingCount} ratings, 
       ${this.db.savedBeers.length} saved, 
@@ -223,9 +222,9 @@ export default class App {
         + window.location.pathname 
         + '#loadb[{"d":"' 
         + btoa(JSON.stringify({
-            savedBeers:db.savedBeers,
-            tastedBeers:db.tastedBeers,
-            beerData:db.beerData
+            savedBeers:this.db.savedBeers,
+            tastedBeers:this.db.tastedBeers,
+            beerData:this.db.beerData
           })) 
         + '"}]');
     } catch(e) {}
@@ -268,7 +267,7 @@ export default class App {
       e.stopPropagation();
       var beer = $(e.target).parents('.beer');
       var beerId = beer.data().id;
-      var willSave = db.tastedBeers.indexOf(beer.data().id) == -1;
+      var willSave = this.db.tastedBeers.indexOf(beer.data().id) == -1;
       this.toggleBeerTasted(beerId, willSave);
     });
 
@@ -364,7 +363,7 @@ export default class App {
     this.beerset.forAllBeersWithId(beer => { 
       beer.saved = saved ? 'saved' : undefined;
     });
-    db.savedBeers = savedBeers;
+    this.db.savedBeers = savedBeers;
     $(`.beer[data-id=${id}]`).toggleClass('saved', saved);
     this.updateExportLink();
   }
@@ -380,7 +379,7 @@ export default class App {
       beer.tasted = tasted ? 'tasted' : undefined;
     });
     $(`.beer[data-id=${id}]`).toggleClass('tasted', tasted);
-    db.tastedBeers = tastedBeers;
+    this.db.tastedBeers = tastedBeers;
     this.updateExportLink();
   }
 
@@ -398,7 +397,7 @@ export default class App {
     beerEls.toggleClass('ut_checked_in', !!data.ut_checked_in);
     if (data.notes) beerEls.addClass('has-notes');
     if (data.rating != null) beerEls.addClass('has-rating');
-    db.beerData = beerData;
+    this.db.beerData = beerData;
     this.updateExportLink();
   }
 

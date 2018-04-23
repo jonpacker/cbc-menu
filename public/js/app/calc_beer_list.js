@@ -5,6 +5,7 @@ export default function calcBeerList(beerset, opts) {
   //if (opts.order == 'live_rating') rankGroups.live_rating = orderByProp('live_rating');
   //if (opts.order == 'ut_rating') rankGroups.ut_rating = orderByProp('ut_rating');
   
+  console.log(beerset.arr.length);
   let beers = beerset.subsetWithRankings(beer => { 
     let match = true;
     if (opts.metastyle) match = match && beer.metastyle == opts.metastyle;
@@ -15,7 +16,7 @@ export default function calcBeerList(beerset, opts) {
     if (opts.saved) match = match && (opts.saved == 'not-saved' ? !beer.saved : beer.saved === opts.saved);
     return match;
   });
-  
+  console.log(beers.length);
   
   if (!opts.colour) { 
     beers = _.uniq(beers, beer => beer.id);
@@ -24,7 +25,6 @@ export default function calcBeerList(beerset, opts) {
   if (opts.order && opts.order != 'location') {
     beers = _.sortBy(beers, beer => beer[`${opts.order}_rank`]);
   }
-  
   let beersIndexedByBrewery = beers.reduce((breweries, beer, i) => {
     let brewery = beer.brewery;
 
@@ -41,6 +41,7 @@ export default function calcBeerList(beerset, opts) {
     return breweries;
   }, {});
 
+  
   let breweries = Object.keys(beersIndexedByBrewery).map(brewery => ({
     name: brewery,
     location: beersIndexedByBrewery[brewery][0].location,
@@ -50,7 +51,7 @@ export default function calcBeerList(beerset, opts) {
   if (opts.order == 'location') breweries = _.sortBy(breweries, 'location');
   else if (opts.order) breweries = _.sortBy(breweries, b => b.beers[0][`${opts.order}_rank`])
   else breweries = _.sortBy(breweries, 'name');
-  
+
   return {
     beer_count: beers.length,
     breweries
