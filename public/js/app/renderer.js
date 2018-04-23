@@ -1,6 +1,11 @@
 import calcBeerList from './calc_beer_list'
 import _ from 'underscore'
 import EventEmitter from 'events'
+import ReactDOM from 'react-dom'
+import React from 'react'
+import DatabaseContext from './react/components/database_context'
+import FilterableSortableBeerList from './react/components/filterable_sortable_beer_list'
+
 export default class Renderer extends EventEmitter {
   constructor(app, templates, view) {
     super();
@@ -15,6 +20,7 @@ export default class Renderer extends EventEmitter {
   }
 
   render(viewName, opts) {
+    this.emit('willRender');
     Object.assign(opts, this.globals);
     opts.tset = createLinkToSetParam(opts);
     const html = this[`renderer_${viewName}`](opts);
@@ -31,11 +37,20 @@ export default class Renderer extends EventEmitter {
   }
 
   renderer_beerlist(opts) {
-    Object.assign(opts, calcBeerList(this.app.beerset, opts));
-    opts.typeclass = 'beer-list';
-    opts.title = 'All Beers';
-    opts.rating_as_percent = function() { return this.rating / 5 * 100 };
-    return Mustache.render(this.templates.beerlist, opts);
+    //Object.assign(opts, calcBeerList(this.app.beerset, opts));
+    //opts.typeclass = 'beer-list';
+    //opts.title = 'All Beers';
+    //opts.rating_as_percent = function() { return this.rating / 5 * 100 };
+    //return Mustache.render(this.templates.beerlist, opts);
+    ReactDOM.render((
+      <DatabaseContext.Provider value={this.app.db}>
+        <FilterableSortableBeerList beers={this.app.beerset} metastyles={this.app.metastyles} />
+      </DatabaseContext.Provider>
+    ), this.view[0]); 
+    this.once('willRender', () => {
+      ReactDOM.unmountComponentAtNode(this.view[0]);
+    });
+    return null;
   }
 
   renderer_index(opts) {

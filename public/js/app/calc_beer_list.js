@@ -5,20 +5,19 @@ export default function calcBeerList(beerset, opts) {
   //if (opts.order == 'live_rating') rankGroups.live_rating = orderByProp('live_rating');
   //if (opts.order == 'ut_rating') rankGroups.ut_rating = orderByProp('ut_rating');
   
-  console.log(beerset.arr.length);
+  const session = opts.colour || opts.session;
   let beers = beerset.subsetWithRankings(beer => { 
     let match = true;
     if (opts.metastyle) match = match && beer.metastyle == opts.metastyle;
-    if (opts.colour) match = match && ((beer.sessions && beer.sessions.indexOf(opts.colour) != -1) || beer.session == opts.colour);
+    if (session) match = match && ((beer.sessions && beer.sessions.indexOf(session) != -1) || beer.session == session);
     // FIXME
-    if (opts.today == 'true') match = match && (beer.sessionSet && beer.sessionSet == opts.colour);
+    if (opts.today == 'true' || opts.today === true) match = match && (beer.sessionSet && beer.sessionSet == session);
     if (opts.tasted) match = match && (opts.tasted == 'not-tasted' ? !beer.tasted : beer.tasted === opts.tasted);
     if (opts.saved) match = match && (opts.saved == 'not-saved' ? !beer.saved : beer.saved === opts.saved);
     return match;
   });
-  console.log(beers.length);
   
-  if (!opts.colour) { 
+  if (!session) { 
     beers = _.uniq(beers, beer => beer.id);
   }
   
