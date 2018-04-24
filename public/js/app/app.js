@@ -40,6 +40,7 @@ export default class App {
 
     // some kind of init function?
     if (!this.db.disableLiveRating) this.socket = connectToWebsocket(this);
+    this.liveRatingUploadTimeouts = [];
 
     if (location.hash) this.route(location.hash);
     else this.route('#index');
@@ -121,6 +122,8 @@ export default class App {
   }
 
   addSliderListeners(view) {
+    //todo react
+    return;
     view.find('.rating-slider-control').each(function() {
       var container = $(this);
       var label;
@@ -232,8 +235,8 @@ export default class App {
 
   updateBeersMarked() {
     this.beerset.arr.forEach(beer => {
-      if (this.db.savedBeers.indexOf(beer.id) != -1) beer.saved = 'saved';
-      if (this.db.tastedBeers.indexOf(beer.id) != -1) beer.tasted = 'tasted';
+      if (this.db.savedBeers.indexOf(beer.id) != -1) beer.saved = true;
+      if (this.db.tastedBeers.indexOf(beer.id) != -1) beer.tasted = true;
       if (this.db.beerData[beer.id]) {
         beer.notes = this.db.beerData[beer.id].notes;
         beer.rating = this.db.beerData[beer.id].rating;
@@ -248,6 +251,7 @@ export default class App {
 
   addGlobalListeners() {
     // expand/contract beer info in mini mode
+    return;
     $('#window').on('click', '.mini-true .beer', e => {
       // don't accept clicks from clickable elements.
       if ($(e.target).is('.star, .tick, textarea, input, a, .rating-slider-control, .rating-slider-control > *')) return;
@@ -353,6 +357,23 @@ export default class App {
 
   }
 
+  setBeerRating(beerId, rating) {
+    const timeouts = this.liveRatingUploadTimeouts;
+    const hasTastedBefore = this.db.tastedBeers.indexOf(beerId) != -1;
+    this.updateBeerData(beerId, { rating })
+    if (timeouts[beerId]) {
+      clearTimeout(timeouts[beerId]);
+      delete timeouts[beerId];
+    }
+    timeouts[beerId] = setTimeout(() => {
+      delete timeouts[beerId];
+      fetch(`/rate/${beerId}`, {
+        method: hasTastedBefore ? 'PUT' : 'POST',
+        body: rating.toString()
+      }).catch(() => {})
+    }, 5000);
+  }
+
   toggleBeerSaved(id, saved) {
     let {savedBeers} = this.db;
     if (!saved) {
@@ -360,11 +381,9 @@ export default class App {
     } else {
       savedBeers.push(id);
     }
-    this.beerset.forAllBeersWithId(beer => { 
-      beer.saved = saved ? 'saved' : undefined;
-    });
+    this.beerset.forAllBeersWithId(beer => beer.saved = saved);
     this.db.savedBeers = savedBeers;
-    $(`.beer[data-id=${id}]`).toggleClass('saved', saved);
+    //$(`.beer[data-id=${id}]`).toggleClass('saved', saved);
     this.updateExportLink();
   }
 
@@ -375,10 +394,8 @@ export default class App {
     } else {
       tastedBeers.push(id);
     }
-    this.beerset.forAllBeersWithId(id, beer => { 
-      beer.tasted = tasted ? 'tasted' : undefined;
-    });
-    $(`.beer[data-id=${id}]`).toggleClass('tasted', tasted);
+    this.beerset.forAllBeersWithId(id, beer => beer.tasted = tasted);
+   // $(`.beer[data-id=${id}]`).toggleClass('tasted', tasted);
     this.db.tastedBeers = tastedBeers;
     this.updateExportLink();
   }

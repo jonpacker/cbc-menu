@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import BeerSet from '../../beer_set'
-import DatabaseContext from './database_context'
+import BeerList from './beer_list'
 import calcBeerList from '../../calc_beer_list'
 const {Component} = React
 
+console.log(require('../../app'))
 export default class FilterableSortableBeerList extends Component {
   constructor(props) {
     super(props);
@@ -30,6 +30,7 @@ export default class FilterableSortableBeerList extends Component {
   render() {
     const classes = this.getClassList();
     const {breweries, beer_count} = calcBeerList(this.props.beers, this.state);
+    const {app} = this.props;
     return (
       <div id="beerlist" className={classes.join(' ')}>
         <h1>
@@ -45,12 +46,9 @@ export default class FilterableSortableBeerList extends Component {
             <a className="site-bg-style ut_rating" onClick={() => this.setState({order: 'ut_rating'})}> 
               <img src="/img/ut_icon_144.png"/> Rating
             </a>
-            <DatabaseContext.Consumer>
-              {({disableLiveRating}) => (disableLiveRating &&
+              {!app.db.disableLiveRating &&
                 <a className="site-bg-style avg live-rating" 
-                   onClick={() => this.setState({order: 'live_rating'})}>👥 Rating</a> 
-              )}
-            </DatabaseContext.Consumer>
+                   onClick={() => this.setState({order: 'live_rating'})}>👥 Rating</a> }
             <a className="ordering order-location" onClick={() => this.setState({order:'location'})}>Location</a>
             <a className={`ordering ${this.state.order == null ? "order-by-name selected" : ""}`} 
               onClick={() => this.setState({order:null})}>Brewery</a>
@@ -78,6 +76,7 @@ export default class FilterableSortableBeerList extends Component {
             { this.state.metastyle && 
               <a onClick={() => this.setState({metastyle: null})}>✘ Reset</a> }
           </div>
+          <BeerList beersGroupedByBrewery={breweries} app={app} />
         </div>
       </div>
     );
@@ -87,5 +86,6 @@ export default class FilterableSortableBeerList extends Component {
 FilterableSortableBeerList.propTypes = {
   session: PropTypes.string,
   metastyles: PropTypes.arrayOf(PropTypes.string).isRequired,
-  beers: PropTypes.instanceOf(BeerSet).isRequired
+  beers: PropTypes.object.isRequired,
+  app: PropTypes.object.isRequired
 };

@@ -3,7 +3,6 @@ import _ from 'underscore'
 import EventEmitter from 'events'
 import ReactDOM from 'react-dom'
 import React from 'react'
-import DatabaseContext from './react/components/database_context'
 import FilterableSortableBeerList from './react/components/filterable_sortable_beer_list'
 
 export default class Renderer extends EventEmitter {
@@ -43,9 +42,7 @@ export default class Renderer extends EventEmitter {
     //opts.rating_as_percent = function() { return this.rating / 5 * 100 };
     //return Mustache.render(this.templates.beerlist, opts);
     ReactDOM.render((
-      <DatabaseContext.Provider value={this.app.db}>
-        <FilterableSortableBeerList beers={this.app.beerset} metastyles={this.app.metastyles} />
-      </DatabaseContext.Provider>
+      <FilterableSortableBeerList app={this.app} beers={this.app.beerset} metastyles={this.app.metastyles} />
     ), this.view[0]); 
     this.once('willRender', () => {
       ReactDOM.unmountComponentAtNode(this.view[0]);

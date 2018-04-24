@@ -10,7 +10,6 @@ export default function calcBeerList(beerset, opts) {
     let match = true;
     if (opts.metastyle) match = match && beer.metastyle == opts.metastyle;
     if (session) match = match && ((beer.sessions && beer.sessions.indexOf(session) != -1) || beer.session == session);
-    // FIXME
     if (opts.today == 'true' || opts.today === true) match = match && (beer.sessionSet && beer.sessionSet == session);
     if (opts.tasted) match = match && (opts.tasted == 'not-tasted' ? !beer.tasted : beer.tasted === opts.tasted);
     if (opts.saved) match = match && (opts.saved == 'not-saved' ? !beer.saved : beer.saved === opts.saved);
