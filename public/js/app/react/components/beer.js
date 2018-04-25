@@ -1,13 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import RatingSlider from './rating_slider'
+import {RatingSlider, StaticRatingSlider} from './rating_slider'
 export default class Beer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       saved: props.beer.saved == 'saved' || props.beer.saved === true,
       tasted: props.beer.tasted == 'tasted' || props.beer.tasted === true,
-      rating: props.beer.rating
+      rating: props.beer.rating,
+      notes: props.beer.notes,
+      isSentToUntappd: props.beer.ut_checked_in
     };
   }
   getClassList() {
@@ -18,12 +20,12 @@ export default class Beer extends React.Component {
       this.state.saved ? 'saved' : '',
       this.state.tasted ? 'tasted' : '',
       this.state.isRating ? 'add-rating' : '',
+      this.state.notes ? "has-notes" : "",
+      this.state.isSentToUntappd ? "ut-checked-in" : "",
       beer.tag, 
       beer.session,
       beer.sessionSet,
       beer.no_available_info ? "no-info" : "",
-      beer.notes ? "has-notes" : "",
-      beer.ut_checked_in ? "ut-checked-in" : "",
       beer.ut_h_ch ? "ut-historic-checked-in" : ""
     ];
     if (beer.rating) classes.push('has-rating', `r-${beer.rating}`);
@@ -45,6 +47,24 @@ export default class Beer extends React.Component {
     app.toggleBeerTasted(beer.id, true);
     this.setState({tasted: true, rating});
   }
+  setNotes(notes) {
+    const {app, beer} = this.props;
+    app.updateBeerData(beer.id, {notes});
+    this.setState({notes});
+  }
+  async sendToUntappd() {
+    const {app, beer} = this.props;
+    try {
+      clearTimeout(this.untappdErrorTimeout);
+      this.setState({isSendingToUntappd: true, untappdError: ''});
+      const res = await app.untappd.createCheckin(beer.ut_bid, this.state.rating, this.state.notes);
+      this.setState({isSendingToUntappd: false, isSentToUntappd: true});
+      app.updateBeerData(beer.id, {ut_checked_in:true});
+    } catch (e) {
+      this.setState({untappdError: `Error! 😰 Try again?! 🔂 (${e.message})`});
+      this.untappdErrorTimeout = setTimeout(() => this.setState({untappdError: ''}));
+    }
+  }
   render() {
     const {beer, app} = this.props;
     return (
@@ -53,13 +73,13 @@ export default class Beer extends React.Component {
           <div className="name-block">
             <div className="name">{beer.name}</div>
             <div className="abv">{ beer.percent ? beer.percent : '?' }</div>
-            { beer.ut_rating &&
+            { (beer.ut_rating &&
               <div className="ut-avg">
                 <img src="/img/ut_icon_144.png"/> 
                 { beer.ut_rating_clamped }
-              </div> }
-            { !app.db.disableLiveRating && beer.live_rating &&
-              <div className="live-avg">👥 {beer.live_rating_clamped}</div>}
+              </div>) || null }
+            { (!app.db.disableLiveRating && beer.live_rating &&
+                <div className="live-avg">👥 {beer.live_rating_clamped}</div>)|| null}
             <div className="style">{beer.superstyle}</div>
           </div>
           <div className="marks">
@@ -87,11 +107,30 @@ export default class Beer extends React.Component {
           <div className="expanded">
             <div className="desc">{beer.trunc_desc}</div>
           </div>
-          { this.state.isRating && 
-            <div className="rate-box">
-              <label htmlFor="rslider">Rating</label>
-              <RatingSlider rating={this.state.rating} onRate={rating => this.setRating(rating)} />
-            </div> }
+          <div className="rate-box">
+            <label>Rating</label>
+            { this.state.isRating 
+                ? <RatingSlider rating={this.state.rating} onRate={rating => this.setRating(rating)} />
+                : <StaticRatingSlider rating={this.state.rating} onInteract={() => this.setState({isRating:true})} /> }
+            
+            <textarea name="rnotes" placeholder="Notes" className="notes" value={this.state.notes}
+                      onChange={e => this.setNotes(e.target.value)}>
+            </textarea>
+            { app.db.untappdToken && beer.ut_bid &&
+              <div className="untappd">
+                { !this.state.isSentToUntappd &&
+                  <a className="send-to-untappd" onClick={() => this.sendToUntappd()}>
+                    <img src="/img/ut_icon_144.png" /> Send to Untappd
+                  </a> }
+                { this.state.isSendingToUntappd && <img src="/img/spin.svg" className="load" /> }
+                { this.state.untappdError && <span className="untappd-error-text">{this.state.untappdError}</span> }
+                { this.state.isSentToUntappd &&
+                  <div className="sent-to-untappd">
+                    <div className="beer-check-mark"/> you have sent this checkin to untappd
+                  </div> }
+              </div>
+            }
+          </div> 
         </div>
       </div>
     );

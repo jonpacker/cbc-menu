@@ -2,8 +2,40 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import DragListener from '../../helpers/drag_listener'
 
-export default class RatingSlider extends React.Component {
+export class StaticRatingSlider extends React.Component {
   constructor(props) {
+    super(props);
+  }
+
+  interact() {
+    this.props.onInteract && this.props.onInteract();
+  }
+
+  render() {
+    return [
+      <div key="slider" onClick={() => this.interact()} 
+           className="rating-slider-control" 
+           ref={el => this.sliderContainer = el}>
+        <div className="track"/>
+        <div className="handle" 
+              style={{left: `${this.props.rating / 5 * 100}%`}}
+              ref={elem => this.sliderHandle = elem}/>
+      </div>,
+      <div key="slider-text" className="rating-text" ref={el => this.ratingText = el}>
+        {this.props.rating}
+      </div>
+    ];
+  }
+}
+
+StaticRatingSlider.propTypes = {
+  rating: PropTypes.number,
+  onInteract: PropTypes.func
+};
+
+export class RatingSlider extends StaticRatingSlider {
+  constructor(props) {
+    delete props.onInteract;
     super(props);
   }
 
@@ -30,19 +62,6 @@ export default class RatingSlider extends React.Component {
     delete this.dragListener;
   }
 
-  render() {
-    return [
-      <div key="slider" className="rating-slider-control" ref={el => this.sliderContainer = el}>
-        <div className="track"/>
-        <div className="handle" 
-              style={{left: `${this.props.rating / 5 * 100}%`}}
-              ref={elem => this.sliderHandle = elem}/>
-      </div>,
-      <div key="slider-text" className="rating-text" ref={el => this.ratingText = el}>
-        {this.props.rating}
-      </div>
-    ];
-  }
 
 }
 

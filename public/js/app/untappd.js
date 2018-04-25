@@ -52,4 +52,32 @@ export default class Untappd {
     return count;
   }
 
+  async createCheckin(untappdBeerId, rating, text) {
+    const res = await this.fetchUntappd('/checkin/add', {
+      method: 'POST',
+      body: {
+        timezone: 'CET',
+        gmt_offset: 2,
+        bid: untappdBeerId,
+        shout: text,
+        foursquare_id: config.LOCATION_FOURSQUARE_ID,
+        geolat: config.UNTAPPD_LOCATION_LAT,
+        geolng: config.UNTAPPD_LOCATION_LON,
+        rating: rating > 0 ? rating : undefined
+      }
+    })
+      /*
+    } catch (e) {
+      loader.hide();
+      const errorText = beer.find('.untappd-error-text');
+      errorText.text('Error! 😰 Try again?! 🔂');
+      setTimeout(function() {
+        errorText.text('');
+      }, 5000);
+    }*/
+    if (res.meta.code >= 300) {
+      throw new Error(res.meta.error_type);
+    }
+    
+  }
 }
