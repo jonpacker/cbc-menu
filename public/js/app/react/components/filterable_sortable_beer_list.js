@@ -16,10 +16,26 @@ export default class FilterableSortableBeerList extends Component {
       today: null,
       metastyle: null
     };
+    this.recalculateBeerList();
+  }
+  recalculateBeerList(state = this.state) {
+    const {breweries, beer_count} = calcBeerList(this.props.beers, state);
+    this.breweries = breweries;
+    this.beer_count = beer_count;
   }
   toggleMini() {
     this.props.app.db.mini = !this.state.mini;
     this.setState({mini: !this.state.mini});
+  }
+  setOrder(order) {
+    if (order == this.state.order) return;
+    this.recalculateBeerList(Object.assign({}, this.state, {order}));
+    this.setState({order});
+  }
+  setFilter(filter) {
+    //todo - filtering with css
+    this.recalculateBeerList(Object.assign({}, this.state, filter));
+    this.setState(filter);
   }
   getClassList() {
     const classes = [this.props.session ? `${this.props.session} session` : 'beer-list'];
@@ -33,7 +49,7 @@ export default class FilterableSortableBeerList extends Component {
   }
   render() {
     const classes = this.getClassList();
-    const {breweries, beer_count} = calcBeerList(this.props.beers, this.state);
+    const {breweries, beer_count} = this;
     const {app} = this.props;
     return (
       <div id="beerlist" className={classes.join(' ')}>
@@ -47,24 +63,24 @@ export default class FilterableSortableBeerList extends Component {
             <span className="info">Display Options</span>
             <a className="mini" onClick={() => this.toggleMini()}>Small UI</a>
             <span className="info">Sort by</span>
-            <a className="site-bg-style ut_rating" onClick={() => this.setState({order: 'ut_rating'})}> 
+            <a className="site-bg-style ut_rating" onClick={() => this.setOrder('ut_rating')}> 
               <img src="/img/ut_icon_144.png"/> Rating
             </a>
               {!app.db.disableLiveRating &&
                 <a className="site-bg-style avg live-rating" 
-                   onClick={() => this.setState({order: 'live_rating'})}>👥 Rating</a> }
-            <a className="ordering order-location" onClick={() => this.setState({order:'location'})}>Location</a>
+                   onClick={() => this.setOrder('live_rating')}>👥 Rating</a> }
+            <a className="ordering order-location" onClick={() => this.setOrder('location')}>Location</a>
             <a className={`ordering ${this.state.order == null ? "order-by-name selected" : ""}`} 
-              onClick={() => this.setState({order:null})}>Brewery</a>
+              onClick={() => this.setOrder(null)}>Brewery</a>
           </div>
           <div className="filter bar">
             <span className="info">Filter by</span>
-            <a className="tasted" onClick={() => this.setState({tasted: 'tasted'})}>✓</a>
-            <a className="not-tasted" onClick={() => this.setState({tasted: 'not-tasted'})}>NOT ✓</a>
-            <a className="saved" onClick={() => this.setState({saved: 'saved'})}>★</a>
-            <a className="not-saved" onClick={() => this.setState({saved: 'not-saved'})}>NOT ★</a>
-            <a className="today" onClick={() => this.setState({today: true})}>Only Today</a>
-            <a onClick={() => this.setState({
+            <a className="tasted" onClick={() => this.setFilter({tasted: 'tasted'})}>✓</a>
+            <a className="not-tasted" onClick={() => this.setFilter({tasted: 'not-tasted'})}>NOT ✓</a>
+            <a className="saved" onClick={() => this.setFilter({saved: 'saved'})}>★</a>
+            <a className="not-saved" onClick={() => this.setFilter({saved: 'not-saved'})}>NOT ★</a>
+            <a className="today" onClick={() => this.setFilter({today: true})}>Only Today</a>
+            <a onClick={() => this.setFilter({
               today: null,
               saved: null,
               tasted: null
@@ -75,10 +91,10 @@ export default class FilterableSortableBeerList extends Component {
             { this.props.metastyles.map(metastyle => (
               <a key={metastyle}
                  className={`style-border ${metastyle}`} 
-                 onClick={() => this.setState({metastyle})}>{metastyle}</a>
+                 onClick={() => this.setFilter({metastyle})}>{metastyle}</a>
             )) }
             { this.state.metastyle && 
-              <a onClick={() => this.setState({metastyle: null})}>✘ Reset</a> }
+              <a onClick={() => this.setFilter({metastyle: null})}>✘ Reset</a> }
           </div>
           <BeerList beersGroupedByBrewery={breweries} app={app} />
         </div>
