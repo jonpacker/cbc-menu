@@ -9,8 +9,24 @@ export default class Beer extends React.Component {
       tasted: props.beer.tasted == 'tasted' || props.beer.tasted === true,
       rating: props.beer.rating,
       notes: props.beer.notes,
-      isSentToUntappd: props.beer.ut_checked_in
+      liveRating: props.beer.live_rating,
+      liveRatingCount: props.beer.live_rating_count,
+      isSentToUntappd: props.beer.ut_checked_in,
+      expanded: false
     };
+    this.liveRatingDidChange = this.liveRatingDidChange.bind(this);
+  }
+  componentDidMount() {
+    this.props.app.on(`update-live-rating-${this.props.beer.id}`, this.liveRatingDidChange);
+  }
+  componentWillUnmount() {
+    this.props.app.removeListener(`update-live-rating-${this.props.beer.id}`, this.liveRatingDidChange);
+  }
+  toggleExpand(e) {
+    if (e.target.matches('.star, .tick, textarea, input, a, .rating-slider-control, .rating-slider-control *')) {
+      return;
+    }
+    this.setState({expanded: !this.state.expanded});
   }
   getClassList() {
     const {beer} = this.props;
@@ -22,6 +38,7 @@ export default class Beer extends React.Component {
       this.state.isRating ? 'add-rating' : '',
       this.state.notes ? "has-notes" : "",
       this.state.isSentToUntappd ? "ut-checked-in" : "",
+      this.state.expanded ? 'expand' : '',
       beer.tag, 
       beer.session,
       beer.sessionSet,
@@ -30,6 +47,9 @@ export default class Beer extends React.Component {
     ];
     if (beer.rating) classes.push('has-rating', `r-${beer.rating}`);
     return classes;
+  }
+  liveRatingDidChange(liveRating, liveRatingCount) {
+    this.setState({liveRating, liveRatingCount});
   }
   toggleSaved() {
     const {app, beer} = this.props;
@@ -68,7 +88,7 @@ export default class Beer extends React.Component {
   render() {
     const {beer, app} = this.props;
     return (
-      <div className={this.getClassList().join(' ')}>
+      <div className={this.getClassList().join(' ')} onClick={e => this.checkMiniToggle(e)}>
         <div className="headline">
           <div className="name-block">
             <div className="name">{beer.name}</div>
@@ -78,8 +98,8 @@ export default class Beer extends React.Component {
                 <img src="/img/ut_icon_144.png"/> 
                 { beer.ut_rating_clamped }
               </div>) || null }
-            { (!app.db.disableLiveRating && beer.live_rating &&
-                <div className="live-avg">👥 {beer.live_rating_clamped}</div>)|| null}
+            { (!app.db.disableLiveRating && this.state.liveRating &&
+                <div className="live-avg">👥 {this.state.liveRating.toFixed(2)}</div>)|| null}
             <div className="style">{beer.superstyle}</div>
           </div>
           <div className="marks">
@@ -97,9 +117,9 @@ export default class Beer extends React.Component {
                 target="_blank">
                 You (UT): {beer.ut_h_ra}
               </a> } 
-            { !app.db.disableLiveRating && beer.live_rating && 
+            { !app.db.disableLiveRating && this.state.liveRating && 
                 <a className="site-bg-style score avg live-rating">
-                    Users ({beer.live_rating_count}): {beer.live_rating_clamped}
+                    Users ({this.state.liveRatingCount}): {this.state.liveRating.toFixed(2)}
                 </a> }
             <a className={`add-rating ${this.state.isRating ? 'is-rating' : ''}`} 
                onClick={() => this.setState({isRating: !this.state.isRating})}>Rate</a>

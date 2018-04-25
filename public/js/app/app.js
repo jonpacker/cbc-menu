@@ -7,14 +7,16 @@ import State from './local_persistence'
 import Renderer from './renderer'
 import BeerSet from './beer_set' 
 import Untappd from './untappd'
+import EventEmitter from 'events'
 
 _.templateSettings = {
   interpolate: /\{\{=(.+?)\}\}/g,
   evaluate: /\{\{(.+?)\}\}/g,
 };
 
-export default class App {
+export default class App extends EventEmitter {
   constructor({beers, breweries, metastyles, superstyles}) {
+    super()
     this.config = config;
 
    // this.beers = beers;
@@ -38,8 +40,7 @@ export default class App {
 
     this.addGlobalListeners();
 
-    // some kind of init function?
-    if (!this.db.disableLiveRating) this.socket = connectToWebsocket(this);
+    if (!this.db.disableLiveRating) this.connectToLiveRatings();
     this.liveRatingUploadTimeouts = [];
 
     if (location.hash) this.route(location.hash);
@@ -106,10 +107,33 @@ export default class App {
     calc('live_ratings', () => !this.db.disableLiveRating);
   }
 
+  connectToLiveRatings() {
+    this.socket = connectToWebsocket(this);
+    this.socket.on('rate', data => {
+      this.beerset.forAllBeersWithId(data.beer, beer => {
+        beer.live_rating = data.rating;
+        beer.live_rating_count = data.count;
+        beer.live_rating_clamped = data.rating.toFixed(2);
+      })
+      this.emit(`update-live-rating-${data.beer}`, data.rating, data.count);
+    });
+
+    this.socket.on('update', data => {
+      for (let [beerId, {rating, count}] of Object.entries(data)) {
+        this.beerset.forAllBeersWithId(beerId, beer => {
+          beer.live_rating = rating;
+          beer.live_rating_clamped = rating.toFixed(2);
+          beer.live_rating_count = count;
+        })
+        this.emit(`update-live-rating-${beerId}`, rating, count);
+      }
+    });
+  }
+
   toggleLiveRatings() {
     if (this.db.disableLiveRating) {
       this.db.disableLiveRating = null;
-      this.socket = connectToWebsocket();
+      this.connectToLiveRatings();
     } else {
       this.db.disableLiveRating = true;
       this.socket.close();
@@ -416,14 +440,6 @@ export default class App {
     if (data.rating != null) beerEls.addClass('has-rating');
     this.db.beerData = beerData;
     this.updateExportLink();
-  }
-
-  updateLiveRating(id, count, rating) {
-    var beer = $(`.beer[data-id=${id}]`);
-    var lrBig = beer.find('.live-rating');
-    var lrSmall = beer.find('.live-avg');
-    lrSmall.text(`👥 ${rating.toFixed(2)}`)
-    lrBig.text(`Users (${count}): ${rating.toFixed(2)}`).show()
   }
 }
 

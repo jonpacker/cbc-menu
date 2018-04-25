@@ -9,13 +9,17 @@ export default class FilterableSortableBeerList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      mini: false,
+      mini: props.app.db.mini,
       order: null,
       saved: null,
       tasted: null,
       today: null,
       metastyle: null
     };
+  }
+  toggleMini() {
+    this.props.app.db.mini = !this.state.mini;
+    this.setState({mini: !this.state.mini});
   }
   getClassList() {
     const classes = [this.props.session ? `${this.props.session} session` : 'beer-list'];
@@ -41,7 +45,7 @@ export default class FilterableSortableBeerList extends Component {
         <div className="container">
           <div className="order bar">
             <span className="info">Display Options</span>
-            <a className="mini" onClick={() => this.setState({mini: !this.state.mini})}>Small UI</a>
+            <a className="mini" onClick={() => this.toggleMini()}>Small UI</a>
             <span className="info">Sort by</span>
             <a className="site-bg-style ut_rating" onClick={() => this.setState({order: 'ut_rating'})}> 
               <img src="/img/ut_icon_144.png"/> Rating
