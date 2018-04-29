@@ -21,6 +21,7 @@
     "browserify-middleware": "^8.1.0",
     "csv-write-stream": "^2.0.0",
     "express": "^4.13.4",
+    "full-text-search-light": "^0.0.17",
     "jade": "^1.11.0",
     "nib": "^1.1.0",
     "optimist": "^0.6.1",
@@ -29,6 +30,7 @@
     "react-dom": "^16.3.2",
     "redis": "^2.7.1",
     "seraph": "^0.14.2",
+    "set-value": "^3.0.0",
     "socket.io": "^1.7.3",
     "stylus": "^0.54.5",
     "underscore": "^1.8.3"

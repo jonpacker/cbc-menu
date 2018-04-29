@@ -10,6 +10,13 @@
   font-weight: 700;
   src: local('Oswald Bold'), local('Oswald-Bold'), url("/fonts/oswald-v10-latin-700.woff2") format('woff2'), url("/fonts/oswald-v10-latin-700.woff") format('woff');
 }
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  select,
+  textarea,
+  input {
+    font-size: 16px !important;
+  }
+}
 html,
 body {
   width: 100%;
@@ -209,33 +216,113 @@ html {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  padding-top: 5rem;
 }
-#beerlist h1 {
-  margin: 0;
-  padding: 0.5rem 0;
+#beerlist .topBar {
   width: 100%;
-  text-transform: capitalize;
-  font-size: 4rem;
-  position: relative;
-  overflow: hidden;
-}
-#beerlist h1 .back {
-  height: 150%;
-  width: 20%;
+  display: grid;
+  height: 5rem;
+  grid-template-rows: 5rem;
+  grid-template-columns: minmax(4rem, 8rem) auto auto minmax(4rem, 8rem);
+  grid-template-areas: "back-button title beer-stats search-button";
+  position: fixed;
+  transform: translate3d(0, 0, 0);
+  top: 0;
   left: 0;
-  top: -25%;
-  text-decoration: none;
-  font-size: 8rem;
-  position: absolute;
-  color: #111;
-  display: block;
+  z-index: 200;
 }
-#beerlist h1 .back:hover {
+#beerlist .topBar h1 {
+  margin: 0;
+  padding: 0;
+  justify-self: end;
+  text-transform: capitalize;
+  font-size: 3rem;
+  line-height: 5rem;
+  grid-area: title;
+  margin-right: 1rem;
+}
+#beerlist .topBar .back {
+  grid-area: back-button;
+  background-image: url("/img/chevron-left.svg");
+  background-size: 3.4rem 3.4rem;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+#beerlist .topBar .back:hover {
   background-color: rgba(255,255,255,0.25);
 }
-#beerlist sub {
-  font-size: 1.5rem;
+#beerlist .topBar .search {
+  grid-area: search-button;
+  position: relative;
+  cursor: default;
+}
+#beerlist .topBar .search:after,
+#beerlist .topBar .search:before {
+  background-size: 3.4rem 3.4rem;
+  background-position: center;
+  background-repeat: no-repeat;
+  content: '';
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
   display: block;
+  position: absolute;
+}
+#beerlist .topBar .search:before {
+  background-image: url("/img/search.svg");
+  opacity: 0.2;
+}
+#beerlist .topBar .search:after {
+  background-image: url("/img/spin.svg");
+}
+#beerlist .topBar .search.ready {
+  cursor: pointer;
+}
+#beerlist .topBar .search.ready:before {
+  opacity: 1;
+}
+#beerlist .topBar .search.ready:after {
+  opacity: 0;
+}
+#beerlist .topBar .search.ready:hover {
+  background-color: rgba(255,255,255,0.25);
+}
+#beerlist .topBar.searching .search {
+  background-color: rgba(204,204,204,0.5);
+}
+#beerlist .topBar.searching .search:before {
+  background-image: url("/img/close.svg");
+}
+#beerlist .topBar.searching .back {
+  display: none;
+}
+#beerlist .topBar .searchQuery {
+  grid-column: 1/4;
+  grid-row: 1/2;
+  margin: 0.5rem;
+  font-size: 2rem;
+  background-color: rgba(255,255,255,0.25);
+  border: 0;
+  background-image: url("/img/search.svg");
+  background-size: 3rem 3rem;
+  background-repeat: no-repeat;
+  background-position: 1rem center;
+  padding-left: 4.3rem;
+  box-sizing: border-box;
+  z-index: 10;
+}
+#beerlist .topBar sub {
+  font-size: 1.5rem;
+  grid-area: beer-stats;
+  align-self: end;
+  justify-self: start;
+  margin-bottom: 0.8rem;
+}
+#beerlist .topBar.searching sub {
+  justify-self: end;
+  margin-right: 1rem;
 }
 #beerlist .container {
   display: flex;
@@ -318,6 +405,7 @@ html {
 #beerlist.ms-Barley.Wine .key .Barley.Wine,
 #beerlist.ms-Mixed-fermentation .key .Mixed-fermentation,
 #beerlist.ms-Sour .key .Sour,
+#beerlist.ms-Strong .key .Strong,
 #beerlist.ms-Belgian .key .Belgian,
 #beerlist.ms-Experimental .key .Experimental,
 #beerlist.ms-Cider .key .Cider,
@@ -340,6 +428,7 @@ html {
 #beerlist.mini-true .order .mini,
 #beerlist .order-by-name.selected {
   outline: 0.5rem solid #d270d2;
+  z-index: 5;
 }
 #beerlist .order {
   padding: 1rem 5%;
@@ -393,7 +482,7 @@ html {
   background-color: #d3d3d3;
   padding: 0.5rem;
   color: inherit;
-  width: 10%;
+  width: 12.5%;
   margin: 0 0.5rem;
   font-size: 1.5rem;
   max-width: 60px;
@@ -403,6 +492,9 @@ html {
   background-color: #eee;
   box-sizing: border-box;
   margin-top: 1rem;
+}
+#beerlist .brewery.hidden {
+  display: none;
 }
 #beerlist .brewery h2 {
   font-size: 2.5rem;
@@ -437,6 +529,9 @@ html {
 }
 #beerlist .beer.saved {
   outline: 0.5rem solid #d270d2;
+}
+#beerlist .beer.hidden {
+  display: none;
 }
 #beerlist .beer.tasted {
   opacity: 0.5;
@@ -488,6 +583,7 @@ html {
   font-size: 0.6em;
   display: inline-block;
   position: relative;
+  z-index: 1;
   top: -0.6em;
 }
 #beerlist .beer .headline .name-block .style {
@@ -731,6 +827,28 @@ html {
   vertical-align: middle;
   margin-right: 0.5rem;
 }
+#beerlist .beer .name .yellow-indicator {
+  background-color: #fcd174;
+}
+#beerlist .beer .name .blue-indicator {
+  background-color: #1da1cd;
+}
+#beerlist .beer .name .red-indicator {
+  background-color: #eb585c;
+}
+#beerlist .beer .name .green-indicator {
+  background-color: #68d286;
+}
+#beerlist .beer .name .sess {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border-radius: 0.5em;
+  margin-right: 0.3em;
+}
+#beerlist.session .beer .name .sess {
+  display: none;
+}
 #beerlist .beer.friday .name:before {
   content: 'fri';
   background-color: #eb585c;
@@ -857,10 +975,12 @@ html {
 .session.yellow {
   background-color: #fcd174;
 }
-.session.saturday {
+.session.saturday,
+.session.blue {
   background-color: #1da1cd;
 }
-.session.friday {
+.session.friday,
+.session.red {
   background-color: #eb585c;
 }
 .session.green {
@@ -869,15 +989,20 @@ html {
 #beerlist.session {
   background-color: #fff;
 }
-#beerlist.session.yellow h1 {
+#beerlist.session.yellow .topBar {
   background-color: #fcd174;
 }
-#beerlist.session.saturday h1 {
+#beerlist.session.saturday .topBar,
+#beerlist.session.blue .topBar {
   background-color: #1da1cd;
 }
-#beerlist.session.friday h1 {
+#beerlist.session.friday .topBar,
+#beerlist.session.red .topBar {
   background-color: #eb585c;
 }
-#beerlist.session.green h1 {
+#beerlist.session.green .topBar {
   background-color: #68d286;
+}
+#beerlist.beer-list .topBar {
+  background-color: #fbad2f;
 }

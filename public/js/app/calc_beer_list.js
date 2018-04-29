@@ -43,7 +43,7 @@ export default function calcBeerList(beerset, opts) {
   let breweries = Object.keys(beersIndexedByBrewery).map(brewery => ({
     name: brewery,
     location: beersIndexedByBrewery[brewery][0].location,
-    beers: _.sortBy(beersIndexedByBrewery[brewery], b => `${b.session}${b.tag}`)
+    beers: _.sortBy(_.uniq(beersIndexedByBrewery[brewery], 'id'), b => `${b.session}${b.tag}`)
   }));
   
   if (opts.order == 'location') breweries = _.sortBy(breweries, 'location');

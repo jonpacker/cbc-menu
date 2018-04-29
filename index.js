@@ -11,6 +11,7 @@ var app = express();
 var server = require('http').createServer(app);
 var csvWriter = require('csv-write-stream');
 var redisClient = require('redis');
+var FullText = require('full-text-search-light');
 var redis = redisClient.createClient();
 var io = require('socket.io')(server);
 const browserify = require('browserify-middleware');
@@ -57,6 +58,7 @@ express.static.mime.define({
 var beerQuery = fs.readFileSync(__dirname + '/beer.cypher', 'utf8');
 
 var beers;
+var beersIndex;
 if (argv.disk) {
   beers = JSON.parse(fs.readFileSync(__dirname + '/beers.json', 'utf8'));
 } else {
@@ -116,7 +118,14 @@ function getBeerData(cb) {
           cb(null, metastyle.map(function(m) { return m.name }));
         });
       }
-    }, cb);
+    }, (err, data) => {
+      if (err) return cb(err);
+      console.log('INDEXING...');
+      var fts = new FullText();
+      data.beers.forEach(beer => fts.add(beer));
+      beersIndex = "window.LoadIndex("+JSON.stringify(fts)+");";
+      cb(null, data);
+    });
   });
 };
 
@@ -171,7 +180,7 @@ app.get('/', function(req, res) {
 
 var dataCache = {};
 
-app.get('/mbcc-2017-dump-jonpacker.csv', function(req, res) {
+app.get('/mbcc-2018-dump-jonpacker.csv', function(req, res) {
   if (!dataCache.csvTime || Date.now() - dataCache.csvTime > 120000) {
     getBeerData(function(err, data) {
       if (err) return res.sendStatus(500);
@@ -226,6 +235,11 @@ app.get('/latest.json', function(req, res) {
   }
 });
 
+app.get('/index.js', function(req, res) {
+  res.set('Content-Type', 'text/javascript');
+  res.end(beersIndex);
+});
+
 app.post('/snapshot/:ut', function(req, res) {
   if (!req.params.ut) return res.send(400);
   var data = '';
@@ -255,8 +269,7 @@ var cf = cache.newCache([
     'js/mustache.min.js',
     'js/underscore-min.js',
     'js/drag-listener.min.js',
-    'js/rate.js',
-    'js/cbc.js',
+    'js/app/cbc.js',
     'css/cbc.css',
     'fonts/oswald-v10-latin-700.woff',
     'fonts/oswald-v10-latin-700.woff2',
@@ -266,7 +279,11 @@ var cf = cache.newCache([
     'img/drank_flag.png',
     'img/puff.svg',
     'img/spin.svg',
-    'img/ut_icon_144.png'
+    'img/ut_icon_144.png',
+    'img/chevron-left.svg',
+    'img/search.svg',
+    'img/close.svg',
+    'index.js'
 ]);
 if (!argv.noappcache) {
   app.get('/app.cache', function(req, res) {

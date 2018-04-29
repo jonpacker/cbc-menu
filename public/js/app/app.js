@@ -49,6 +49,8 @@ export default class App extends EventEmitter {
     $(window).on('hashchange', () => {
       this.route(location.hash || '#index');
     });
+
+    this.loadIndex();
   }
 
   route(path) {
@@ -84,6 +86,12 @@ export default class App extends EventEmitter {
     this.beerset.setBeers(data.beers);
     this.updateBeersMarked();
     this.route(location.hash || '#index');
+  }
+  
+
+  async loadIndex(url) {
+    BeerIndex.then(() => console.log('beer index loaded'));
+    this.beerset.loadIndex(await BeerIndex);
   }
 
   savePersistentOptions(opts) {

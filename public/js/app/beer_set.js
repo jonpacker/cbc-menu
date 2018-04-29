@@ -1,4 +1,6 @@
 import _ from 'underscore'
+import FullTextSearch from 'full-text-search-light'
+import EventEmitter from 'events'
 
 const SESSION_GROUPS = {
   friday: 1, 
@@ -7,8 +9,9 @@ const SESSION_GROUPS = {
   saturday: 2
 };
 
-export default class BeerSet {
-  constructor(beers) { 
+export default class BeerSet extends EventEmitter {
+  constructor(beers, index) { 
+    super();
     this.indexes = ['ut_bid'];
     this.setBeers(beers);
   }
@@ -74,10 +77,19 @@ export default class BeerSet {
     return this.specialIndexes[index][key];
   }
 
+  loadIndex(index) {
+    let fullText = new FullTextSearch(index.config);
+    delete index.config;
+    Object.assign(fullText, index);
+    this.fullText = fullText;
+    this.emit('fullTextIndexReady');
+  }
+
   _indexBeers(beers) {
     let indexedBeers = {};
     let beersIndexedByUntappdId = {};
     let specialIndexes = this.indexes.reduce((o, i) => (o[i] = [], o), {});
+    let indexingQueue = [];
 
     let indexedBeerSet = beers.map(beer => {
       beer = _.clone(beer);

@@ -33,6 +33,7 @@ export default class Beer extends React.Component {
     const classes = [
       'beer', 
       'style-border',
+      this.props.hidden ? 'hidden' : '',
       this.state.saved ? 'saved' : '',
       this.state.tasted ? 'tasted' : '',
       this.state.isRating ? 'add-rating' : '',
@@ -42,6 +43,7 @@ export default class Beer extends React.Component {
       beer.tag, 
       beer.session,
       beer.sessionSet,
+      beer.metastyle,
       beer.no_available_info ? "no-info" : "",
       beer.ut_h_ch ? "ut-historic-checked-in" : ""
     ];
@@ -88,15 +90,20 @@ export default class Beer extends React.Component {
   render() {
     const {beer, app} = this.props;
     return (
-      <div className={this.getClassList().join(' ')} onClick={e => this.checkMiniToggle(e)}>
+      <div className={this.getClassList().join(' ')} onClick={e => this.toggleExpand(e)}>
         <div className="headline">
           <div className="name-block">
-            <div className="name">{beer.name}</div>
+            <div className="name">
+              { beer.sessions.map((sess, i) => ( 
+                <span key={`${beer.id}_${sess}_${i}`} className={`${sess}-indicator sess`}/>
+              ))}
+              {beer.name}
+            </div>
             <div className="abv">{ beer.percent ? beer.percent : '?' }</div>
-            { (beer.ut_rating &&
+            { (beer.ut_bid &&
               <div className="ut-avg">
                 <img src="/img/ut_icon_144.png"/> 
-                { beer.ut_rating_clamped }
+                { beer.ut_rating_clamped || '--' }
               </div>) || null }
             { (!app.db.disableLiveRating && this.state.liveRating &&
                 <div className="live-avg">👥 {this.state.liveRating.toFixed(2)}</div>)|| null}

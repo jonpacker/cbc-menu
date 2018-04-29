@@ -18,14 +18,20 @@ html(manifest="app.cache")
       | {{#msg}}
       .msg {{.}}
       | {{/msg}}
-      h1= "What's Brewing 2017"
+      h1= "MBCC 2018"
       .sessions
-        a(href='#session[{"colour":"friday"}]', class="session friday") 
-          h2 Friday
-          .sub Friday 14-22
-        a(href='#session[{"colour":"saturday"}]', class="session saturday") 
-          h2 Saturday
-          .sub Saturday 14-22
+        a(href='#session[{"colour":"yellow"}]', class="session yellow") 
+          h2 Yellow
+          .sub Friday 10-14
+        a(href='#session[{"colour":"blue"}]', class="session blue") 
+          h2 Blue
+          .sub Friday 16-20
+        a(href='#session[{"colour":"red"}]', class="session red") 
+          h2 Red
+          .sub Saturday 10-14
+        a(href='#session[{"colour":"green"}]', class="session green") 
+          h2 Green
+          .sub Saturday 16-20
       .beer-lists
         a(href="#beerlist", class="all-beers-sel") All Beers
       .untappd
@@ -158,9 +164,7 @@ html(manifest="app.cache")
 
 
   script(type="text/javascript", src="/js/jquery-2.2.3.min.js")
-  script(type="text/javascript", src="/js/underscore-min.js")
   script(type="text/javascript", src="/js/mustache.min.js")
-  script(type="text/javascript", src="/js/drag-listener.min.js")
   script(type="text/javascript", src="/js/app/cbc.js")
   script(type="text/javascript").
     var initData = {
@@ -169,6 +173,8 @@ html(manifest="app.cache")
       superstyles: !{JSON.stringify(superstyles)},
       metastyles: !{JSON.stringify(metastyles)}
     };
+    window.LoadIndex = null;
+    window.BeerIndex = new Promise(function(res) { window.LoadIndex = res });
     window.BeerApp = initBeerApp(initData);
     fetch('/latest.json').then(function(res) {
       return res.json();

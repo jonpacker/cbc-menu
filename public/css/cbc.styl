@@ -17,6 +17,14 @@
        url('/fonts/oswald-v10-latin-700.woff') format('woff'); 
 }
 
+@media screen and (-webkit-min-device-pixel-ratio:0) { 
+  select,
+  textarea,
+  input {
+    font-size: 16px !important;
+  }
+}
+
 html
 body
   width: 100%
@@ -194,32 +202,108 @@ html
   justify-content: center
   align-items: center
   flex-direction: column
+  padding-top: 5rem
 
-  h1 
-    margin: 0
-    padding: 0.5rem 0
+  .topBar 
     width: 100%
-    text-transform: capitalize
-    font-size: 4rem
-    position: relative
-    overflow: hidden
+    display: grid
+    height: 5rem
+    grid-template-rows: 5rem
+    grid-template-columns: minmax(4rem, 8rem) auto auto minmax(4rem, 8rem)
+    grid-template-areas: "back-button title beer-stats search-button"
+    position: fixed
+    transform: translate3d(0,0,0)
+    top: 0
+    left: 0
+    z-index: 200
+    h1
+      margin: 0
+      padding: 0
+      justify-self: end
+      text-transform: capitalize
+      font-size: 3rem
+      line-height: 5rem
+      grid-area: title
+      margin-right: 1rem
 
     .back
-      height: 150%
-      width: 20%
-      left: 0
-      top: -25%
-      text-decoration: none
-      font-size: 8rem
-      position: absolute
-      color:black
-      display: block
+      grid-area: back-button
+      background-image: url(/img/chevron-left.svg)
+      background-size: 3.4rem 3.4rem
+      background-position: center
+      background-repeat: no-repeat
+      cursor: pointer
       &:hover
         background-color: rgba(white, 25%)
 
-   sub
-     font-size: 1.5rem
-     display: block
+    .search
+      grid-area: search-button
+      position: relative
+      cursor: default
+
+      &:after
+      &:before
+        background-size: 3.4rem 3.4rem
+        background-position: center
+        background-repeat: no-repeat
+        content: ''
+        width: 100%
+        height: 100%
+        top: 0
+        left: 0
+        display: block
+        position: absolute
+
+      &:before
+        background-image: url(/img/search.svg)
+        opacity: 0.2
+      
+      &:after
+        background-image: url(/img/spin.svg)
+
+      &.ready
+        cursor: pointer
+        &:before
+          opacity: 1
+        &:after
+          opacity: 0
+        &:hover
+          background-color: rgba(white, 25%)
+    
+    &.searching
+      .search
+        background-color: rgba(#ccc, 50%)
+        &:before
+          background-image: url(/img/close.svg)
+      .back
+        display: none
+
+    .searchQuery
+      grid-column: 1/4
+      grid-row: 1/2
+      margin: 0.5rem
+      font-size: 2rem
+      background-color: rgba(white, 25%)
+      border: 0
+      background-image: url(/img/search.svg)
+      background-size: 3rem 3rem
+      background-repeat: no-repeat
+      background-position: 1rem center
+      padding-left: 4.3rem
+      box-sizing: border-box
+      z-index: 10
+
+
+    sub
+      font-size: 1.5rem
+      grid-area: beer-stats
+      align-self: end
+      justify-self: start
+      margin-bottom: 0.8rem
+    &.searching sub
+      justify-self: end
+      margin-right: 1rem
+
 
   .container
     display: flex
@@ -285,6 +369,7 @@ html
   &.ms-Barley.Wine .key .Barley.Wine
   &.ms-Mixed-fermentation .key .Mixed-fermentation
   &.ms-Sour .key .Sour
+  &.ms-Strong .key .Strong
   &.ms-Belgian .key .Belgian
   &.ms-Experimental .key .Experimental
   &.ms-Cider .key .Cider
@@ -307,6 +392,7 @@ html
   &.mini-true .order .mini
   .order-by-name.selected
     outline: 0.5rem solid fuchsia
+    z-index: 5
 
   .order
     padding: 1rem 5%
@@ -356,7 +442,7 @@ html
       background-color: silver
       padding: 0.5rem
       color: inherit
-      width: 10%
+      width: 12.5%
       margin: 0 0.5rem
       font-size: 1.5rem
       max-width: 60px
@@ -367,6 +453,9 @@ html
     background-color: #EEE
     box-sizing: border-box
     margin-top: 1rem
+
+    &.hidden
+      display: none
 
     h2
       font-size: 2.5rem
@@ -405,6 +494,9 @@ html
 
     &.saved
       outline: 0.5rem solid fuchsia
+
+    &.hidden
+      display: none
 
     &.tasted
       opacity: 0.5
@@ -456,6 +548,7 @@ html
             font-size: 0.6em
             display: inline-block
             position: relative
+            z-index: 1
             top: -0.6em
 
         .style
@@ -689,6 +782,24 @@ html
     display: inline-block
     vertical-align: middle
     margin-right: 0.5rem
+
+  .beer .name .yellow-indicator
+    background-color: yellow
+  .beer .name .blue-indicator
+    background-color: blue
+  .beer .name .red-indicator
+    background-color: red
+  .beer .name .green-indicator
+    background-color: green
+  .beer .name .sess
+    display: inline-block
+    width: 1em
+    height: 1em
+    border-radius: 0.5em
+    margin-right: 0.3em
+  
+  &.session .beer .name .sess
+    display: none
   
   .beer.friday .name:before
     content: 'fri'
@@ -813,19 +924,25 @@ html
 .session.yellow
   background-color: yellow
 .session.saturday
+.session.blue
   background-color: blue
 .session.friday
+.session.red
   background-color: red
 .session.green
   background-color: green
 
 #beerlist.session
   background-color: white
-  &.yellow h1
+  &.yellow .topBar
     background-color: yellow
-  &.saturday h1
+  &.saturday .topBar
+  &.blue .topBar
     background-color: blue
-  &.friday h1
+  &.friday .topBar
+  &.red .topBar
     background-color: red
-  &.green h1
+  &.green .topBar
     background-color: green
+#beerlist.beer-list .topBar
+  background-color: orange

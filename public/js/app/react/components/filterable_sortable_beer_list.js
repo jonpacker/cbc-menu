@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import BeerList from './beer_list'
 import calcBeerList from '../../calc_beer_list'
+import {debounce} from 'underscore'
 const {Component} = React
 
-console.log(require('../../app'))
 export default class FilterableSortableBeerList extends Component {
   constructor(props) {
     super(props);
@@ -14,9 +14,19 @@ export default class FilterableSortableBeerList extends Component {
       saved: null,
       tasted: null,
       today: null,
-      metastyle: null
+      metastyle: null,
+      session: props.session,
+      searchIndexReady: !!props.beers.fullText
     };
+    if (!props.beers.fullText) {
+      this.fullTextReadyListener = () => this.setState({searchIndexReady: true});
+      props.beers.once('fullTextIndexReady', this.fullTextReadyListener);
+    }
+    this.executeSearch = debounce(this.executeSearch.bind(this), 300)
     this.recalculateBeerList();
+  }
+  componentWillUnmount() {
+    this.props.beers.removeListener('fullTextIndexReady', this.fullTextReadyListener);
   }
   recalculateBeerList(state = this.state) {
     const {breweries, beer_count} = calcBeerList(this.props.beers, state);
@@ -45,19 +55,60 @@ export default class FilterableSortableBeerList extends Component {
     if (this.state.tasted != null) classes.push(this.state.tasted);
     if (this.state.saved != null) classes.push(this.state.saved);
     if (this.state.today != null) classes.push('today');
+    if (this.state.isSearching) classes.push('searching');
     return classes;
+  }
+  changeSearchTerm(e) {
+    // executeSearch is debounced, and react doesn't like keeping the `e` around.
+    this.executeSearch(e.target.value);
+  }
+  executeSearch(query) {
+    if (!query) return this.setState({idMask: null, breweryCount: null, beerCount: null});
+    const beers = this.props.beers.fullText.search(query);
+    let beerCount = 0;
+    let breweryCount = 0;
+    let breweries = {};
+    const idMask = beers.reduce((mask, beer) => {
+      beerCount++;
+      if (!breweries[beer.brewery]) breweryCount++;
+      breweries[beer.brewery] = true;
+      mask[beer.id] = true;
+      return mask;
+    }, {});
+    this.setState({idMask, breweryCount, beerCount});
+  }
+  toggleSearching() {
+    const searching = !this.state.isSearching;
+    if (!searching) {
+      this.setState({
+        beerCount: null,
+        breweryCount: null,
+        idMask: null,
+        isSearching: searching
+      });
+    } else {
+      this.setState({
+        isSearching: searching
+      });
+    }
   }
   render() {
     const classes = this.getClassList();
-    const {breweries, beer_count} = this;
+    let {breweries, beer_count} = this;
+    let breweryCount = this.state.breweryCount == null ? breweries.length : this.state.breweryCount;
+    let beerCount = this.state.beerCount == null ? beer_count : this.state.beerCount;
     const {app} = this.props;
     return (
       <div id="beerlist" className={classes.join(' ')}>
-        <h1>
-          {this.props.session ? `${this.props.session} session` : `all beers`}
-          <sub>{beer_count} beers, {breweries.length} brewers listed</sub>
-          <a className="back" href="#index">↫</a>
-        </h1>
+        <div className={`topBar ${this.state.isSearching ? 'searching' : ''}`}>
+          { this.state.isSearching 
+            ? (<input className="searchQuery" onChange={e => this.changeSearchTerm(e)} />)
+            : (<h1>{this.props.session ? `${this.props.session} session` : `all beers`}</h1> )}
+          <sub>{beerCount} beers, {breweryCount} brewers</sub>
+          <a className="back" href="#index"></a>
+          <a className={`search ${this.state.searchIndexReady ? 'ready' : ''}`} 
+             onClick={() => this.toggleSearching()}></a>
+        </div>
         <div className="container">
           <div className="order bar">
             <span className="info">Display Options</span>
@@ -69,7 +120,7 @@ export default class FilterableSortableBeerList extends Component {
               {!app.db.disableLiveRating &&
                 <a className="site-bg-style avg live-rating" 
                    onClick={() => this.setOrder('live_rating')}>👥 Rating</a> }
-            <a className="ordering order-location" onClick={() => this.setOrder('location')}>Location</a>
+            { false && <a className="ordering order-location" onClick={() => this.setOrder('location')}>Location</a> }
             <a className={`ordering ${this.state.order == null ? "order-by-name selected" : ""}`} 
               onClick={() => this.setOrder(null)}>Brewery</a>
           </div>
@@ -96,7 +147,7 @@ export default class FilterableSortableBeerList extends Component {
             { this.state.metastyle && 
               <a onClick={() => this.setFilter({metastyle: null})}>✘ Reset</a> }
           </div>
-          <BeerList beersGroupedByBrewery={breweries} app={app} />
+          <BeerList beersGroupedByBrewery={breweries} idMask={this.state.idMask} app={app} />
         </div>
       </div>
     );
