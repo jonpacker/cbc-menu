@@ -24,7 +24,7 @@
     "express": "^4.13.4",
     "full-text-search-light": "^0.0.17",
     "jade": "^1.11.0",
-    "leaderbeer-core": "git+ssh://git@github.com/jonpacker/lb-core.git",
+    "leaderbeer-core": "git+https://github.com/jonpacker/lb-core.git",
     "nib": "^1.1.0",
     "optimist": "^0.6.1",
     "prop-types": "^15.6.1",
