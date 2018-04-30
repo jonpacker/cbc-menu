@@ -1,5 +1,6 @@
 var express = require('express');
-var db = require('seraph')();
+var config = require('./config.json');
+var db = require('seraph')(config.neo4j);
 var nib = require('nib');
 var stylus = require('stylus');
 var fs = require('fs');
@@ -14,17 +15,16 @@ var redisClient = require('redis');
 var redis = redisClient.createClient();
 var io = require('socket.io')(server);
 const browserify = require('browserify-middleware');
-const config = require('./config.json');
 
 function compile(str, path) {
   return stylus(str)
     .set('filename', path)
-  //.set('compress', true) 
+    .set('compress', true) 
     .use(nib());
 }
 
 app.use('/css', stylus.middleware({ src: __dirname + '/public/css' , compile: compile }));
-app.use('/js/app/', browserify(`${__dirname}/public/js/app`, { 
+app.use('/js/app/', browserify(`${__dirname}/public/js/app`, {
   transform: [
     ['babelify', {
       presets: [
@@ -53,7 +53,7 @@ express.static.mime.define({
    'application/x-font-woff': ['woff'],
    'application/font-woff': ['woff'],
    'font/woff2': ['woff2']
-}); 
+});
 
 var beerQuery = fs.readFileSync(__dirname + '/beer.cypher', 'utf8');
 
@@ -74,7 +74,7 @@ if (argv.disk) {
       console.log('wrote ' + data.beers.length + ' to disk');
     }
   });
-} 
+}
 
 
 function getBeerData(cb) {
@@ -98,7 +98,7 @@ function getBeerData(cb) {
             }
             return beer;
           }));
-        }); 
+        });
       },
       breweries: function(cb) {
         db.query("MATCH (brewery:brewery) RETURN brewery", function(err, breweries) {
@@ -147,7 +147,7 @@ io.on('connection', (socket) => {
 
 require('./leaderbeer')(
   require('then-redis').createClient(),
-  config, 
+  config,
   require('./credentials.json'),
   io
 );
@@ -172,7 +172,7 @@ var handleRate = (req, res) => {
     redis.incr(`_br${id}_count`);
     res.sendStatus(200);
     io.emit('rate', {beer:id,rating:newRating,count:memoryRatingCache[id].count});
-  }); 
+  });
 };
 app.post('/rate/:id', handleRate);
 app.put('/rate/:id', handleRate);
@@ -191,28 +191,28 @@ app.get('/mbcc-2018-dump-jonpacker.csv', function(req, res) {
         headers: ['brewery', 'session', 'beer', 'abv', 'style', 'metastyle',
                   'untappd rating', 'description', 'untappd link']
       });
-      
+
       var csvData = '';
-      
+
       res.set('Content-Type', 'text/csv');
       csv.pipe(res);
-      
+
       csv.on('data', function(chunk) {
         var part = chunk.toString();
         csvData += part;
       });
-      
+
       csv.on('end', function() {
         dataCache.csvData = csvData;
         dataCache.csvTime = Date.now();
       });
-      
+
       var sessions = ['yellow', 'blue', 'red', 'green']
       data.breweries.sort().forEach(function(brewery) {
         var beers = data.beers.filter((beer) => { return beer.brewery == brewery });
         beers = _.sortBy(beers, (beer) => { return sessions.indexOf(beer.session) });
         beers.forEach((beer) => {
-          csv.write([beer.brewery, beer.session, beer.name, beer.percent, 
+          csv.write([beer.brewery, beer.session, beer.name, beer.percent,
             beer.superstyle, beer.metastyle, beer.ut_rating, beer.desc, `https://untappd.com/b/_/${beer.ut_bid}`]);
         });
       });
