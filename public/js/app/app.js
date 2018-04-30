@@ -1,6 +1,6 @@
 import checkIfDeviceIsMobile from './helpers/isMobile'
 import _ from 'underscore'
-import config from './keys'
+import config from '../../../config.json'
 import {connectToWebsocket} from './live_ratings'
 import readTemplates from './read_templates'
 import State from './local_persistence'
@@ -90,8 +90,8 @@ export default class App extends EventEmitter {
   
 
   async loadIndex(url) {
-    BeerIndex.then(() => console.log('beer index loaded'));
-    this.beerset.loadIndex(await BeerIndex);
+    await this.beerset.loadIndex();
+    console.log('index loaded');
   }
 
   savePersistentOptions(opts) {
@@ -117,6 +117,10 @@ export default class App extends EventEmitter {
 
   connectToLiveRatings() {
     this.socket = connectToWebsocket(this);
+
+    this.socket.on('leaderbeer-init', data => {
+      console.log('leaderbeer!', data);
+    });
     this.socket.on('rate', data => {
       this.beerset.forAllBeersWithId(data.beer, beer => {
         beer.live_rating = data.rating;

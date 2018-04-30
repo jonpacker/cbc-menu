@@ -11,10 +11,10 @@ var app = express();
 var server = require('http').createServer(app);
 var csvWriter = require('csv-write-stream');
 var redisClient = require('redis');
-var FullText = require('full-text-search-light');
 var redis = redisClient.createClient();
 var io = require('socket.io')(server);
 const browserify = require('browserify-middleware');
+const config = require('./config.json');
 
 function compile(str, path) {
   return stylus(str)
@@ -120,10 +120,6 @@ function getBeerData(cb) {
       }
     }, (err, data) => {
       if (err) return cb(err);
-      console.log('INDEXING...');
-      var fts = new FullText();
-      data.beers.forEach(beer => fts.add(beer));
-      beersIndex = "window.LoadIndex("+JSON.stringify(fts)+");";
       cb(null, data);
     });
   });
@@ -148,6 +144,13 @@ function updateRatingCache(cb) {
 io.on('connection', (socket) => {
   socket.emit('update', memoryRatingCache);
 });
+
+require('./leaderbeer')(
+  require('then-redis').createClient(),
+  config, 
+  require('./credentials.json'),
+  io
+);
 
 var handleRate = (req, res) => {
   var id = parseInt(req.params.id);
@@ -175,7 +178,7 @@ app.post('/rate/:id', handleRate);
 app.put('/rate/:id', handleRate);
 
 app.get('/', function(req, res) {
-  res.render('index', beers);
+  res.render('index', {beers, config});
 });
 
 var dataCache = {};

@@ -1,4 +1,4 @@
-import config from './keys'
+import config from '../../../config.json'
 
 export default class Untappd {
   constructor(app) {
@@ -60,9 +60,9 @@ export default class Untappd {
         gmt_offset: 2,
         bid: untappdBeerId,
         shout: text,
-        foursquare_id: config.LOCATION_FOURSQUARE_ID,
-        geolat: config.UNTAPPD_LOCATION_LAT,
-        geolng: config.UNTAPPD_LOCATION_LON,
+        foursquare_id: config.foursquareLocationId,
+        geolat: config.locationLat,
+        geolng: config.locationLon,
         rating: rating > 0 ? rating : undefined
       }
     })

@@ -16,7 +16,7 @@ export default class FilterableSortableBeerList extends Component {
       today: null,
       metastyle: null,
       session: props.session,
-      searchIndexReady: !!props.beers.fullText
+      searchIndexReady: !!props.beers.fullTextSearchReady
     };
     if (!props.beers.fullText) {
       this.fullTextReadyListener = () => this.setState({searchIndexReady: true});
@@ -62,9 +62,9 @@ export default class FilterableSortableBeerList extends Component {
     // executeSearch is debounced, and react doesn't like keeping the `e` around.
     this.executeSearch(e.target.value);
   }
-  executeSearch(query) {
+  async executeSearch(query) {
     if (!query) return this.setState({idMask: null, breweryCount: null, beerCount: null});
-    const beers = this.props.beers.fullText.search(query);
+    const beers = await this.props.beers.search(query);
     let beerCount = 0;
     let breweryCount = 0;
     let breweries = {};

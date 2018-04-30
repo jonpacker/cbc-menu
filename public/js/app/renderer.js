@@ -62,8 +62,8 @@ export default class Renderer extends EventEmitter {
       opts.msg = this.app.db.msg;
       this.app.db.msg = null;
     }
-    opts.untappd_redir_url = this.app.config.UT_REDIR_URL;
-    opts.untappd_cid = this.app.config.UT_CLIENT;
+    opts.untappd_redir_url = this.app.config.untappdRedirectUrl;
+    opts.untappd_cid = this.app.config.untappdClientId;
     return Mustache.render(this.templates.index, opts);
   }
 

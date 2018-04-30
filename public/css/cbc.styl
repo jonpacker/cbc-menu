@@ -98,6 +98,10 @@ a
       .sub
         font-size: 1.5rem
         font-style: italic
+      
+  .sessions.sessions-3
+    .session:first-child
+      width: 90%
 
 
   .info
@@ -785,6 +789,8 @@ html
 
   .beer .name .yellow-indicator
     background-color: yellow
+  .beer .name .magenta-indicator
+    background-color: magenta
   .beer .name .blue-indicator
     background-color: blue
   .beer .name .red-indicator
@@ -931,6 +937,8 @@ html
   background-color: red
 .session.green
   background-color: green
+.session.magenta
+  background-color: magenta
 
 #beerlist.session
   background-color: white
@@ -944,5 +952,7 @@ html
     background-color: red
   &.green .topBar
     background-color: green
+  &.magenta .topBar
+    background-color: magenta
 #beerlist.beer-list .topBar
   background-color: orange

@@ -14,6 +14,7 @@ export default class BeerSet extends EventEmitter {
     super();
     this.indexes = ['ut_bid'];
     this.setBeers(beers);
+    this.fullTextSearchReady = false;
   }
 
   get obj() { return this.indexedBeers }
@@ -77,12 +78,38 @@ export default class BeerSet extends EventEmitter {
     return this.specialIndexes[index][key];
   }
 
-  loadIndex(index) {
-    let fullText = new FullTextSearch(index.config);
-    delete index.config;
-    Object.assign(fullText, index);
-    this.fullText = fullText;
-    this.emit('fullTextIndexReady');
+  loadIndex() {
+    if (this._searchWorker) this._searchWorker.terminate();
+    this.fullTextSearchReady = false;
+    this._searchCallbacks = {};
+    this._readySearchWorker = new Promise(res => {
+      this._searchWorker = new Worker('/js/app/search_worker.js');
+      this._searchWorker.onmessage = ({data}) => {
+        if (data.id && this._searchCallbacks[data.id]) {
+          this._searchCallbacks[data.id](data.result);
+          delete this._searchCallbacks[data.id];
+          return;
+        }
+        console.log('BeerSet got', data);
+        if (data == 'ready') {
+          return this._searchWorker.postMessage({type: 'init', args: Object.values(this.obj)})
+        }
+        if (data == 'finished_indexing') {
+          res(this._searchWorker);
+          this.fullTextSearchReady = true;
+          this.emit('fullTextIndexReady');
+        }
+      };
+    });
+  }
+
+  async search(query) {
+    const worker = await this._readySearchWorker;
+    const id = Date.now();
+    return await new Promise(res => {
+      this._searchCallbacks[id] = res;
+      worker.postMessage({type:'search', args:{id, query}});
+    });
   }
 
   _indexBeers(beers) {

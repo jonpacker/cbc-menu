@@ -93,6 +93,9 @@ a {
   font-size: 1.5rem;
   font-style: italic;
 }
+#main-menu .sessions.sessions-3 .session:first-child {
+  width: 90%;
+}
 #main-menu .info {
   text-align: center;
   font-size: 2rem;
@@ -830,6 +833,9 @@ html {
 #beerlist .beer .name .yellow-indicator {
   background-color: #fcd174;
 }
+#beerlist .beer .name .magenta-indicator {
+  background-color: #f0f;
+}
 #beerlist .beer .name .blue-indicator {
   background-color: #1da1cd;
 }
@@ -986,6 +992,9 @@ html {
 .session.green {
   background-color: #68d286;
 }
+.session.magenta {
+  background-color: #f0f;
+}
 #beerlist.session {
   background-color: #fff;
 }
@@ -1002,6 +1011,9 @@ html {
 }
 #beerlist.session.green .topBar {
   background-color: #68d286;
+}
+#beerlist.session.magenta .topBar {
+  background-color: #f0f;
 }
 #beerlist.beer-list .topBar {
   background-color: #fbad2f;

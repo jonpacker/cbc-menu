@@ -1,0 +1,30 @@
+{
+  "festivalName": "BCBF 2018",
+  "sessions": {
+    "green": {
+      "key": "green",
+      "title": "Green",
+      "subtitle": "Friday 17-21"
+    },
+    "blue": {
+      "key": "blue",
+      "title": "Blue",
+      "subtitle": "Saturday 12-16"
+    },
+    "magenta": {
+      "key": "magenta",
+      "title": "Magenta",
+      "subtitle": "Saturday 18-22"
+    }
+  },
+  "sessionOrder": ["green", "blue", "magenta"],
+  "untappdClientId": "7E07FC9AC3B3866F4F620819996F262F087EAC92",
+  "untappdRedirectUrl": "http://wb.jonpacker.com",
+  "foursquareLocationId": "59e5d6846fa81f4ea5407189",
+  "locationLat": 58.969173,
+  "locationLon": 5.758406,
+  "leaderbeer": {
+    "venueId": 209821,
+    "count": 15
+  }
+}
