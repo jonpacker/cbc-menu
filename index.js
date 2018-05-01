@@ -12,7 +12,7 @@ var app = express();
 var server = require('http').createServer(app);
 var csvWriter = require('csv-write-stream');
 var redisClient = require('redis');
-var redis = redisClient.createClient();
+var redis = redisClient.createClient(config.redis);
 var io = require('socket.io')(server);
 const browserify = require('browserify-middleware');
 

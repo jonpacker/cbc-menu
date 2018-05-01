@@ -1,6 +1,7 @@
 const LeaderBeer = require('leaderbeer-core');
 const {CronJob} = require('cron');
-const subscriber = require('then-redis').createClient();
+const  config = require('./config.json');
+const subscriber = require('then-redis').createClient(config.redis);
 
 module.exports = async (db, config, credentials, io) => {
   // update every minute
