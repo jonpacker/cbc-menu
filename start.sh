@@ -1,2 +1,1 @@
-redis-server /etc/redis/redis.conf
-node index --noappcache
+./node_modules/.bin/forever start index.js
