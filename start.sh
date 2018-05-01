@@ -1,1 +1,1 @@
-./node_modules/.bin/forever start index.js
+./node_modules/.bin/forever index.js
