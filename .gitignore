@@ -2,3 +2,4 @@ node_modules
 credentials.json
 yarn-error.log
 config.json
+config*
