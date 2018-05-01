@@ -146,7 +146,7 @@ io.on('connection', (socket) => {
 });
 
 require('./leaderbeer')(
-  require('then-redis').createClient(),
+  require('then-redis').createClient(config.redis),
   config,
   require('./credentials.json'),
   io
