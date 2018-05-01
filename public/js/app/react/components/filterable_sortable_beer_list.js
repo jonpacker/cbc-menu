@@ -36,7 +36,8 @@ export default class FilterableSortableBeerList extends Component {
     if (this.state.searchIndexReady) this.setState({searchIndexReady: false});
   }
   componentWillUnmount() {
-    this.props.beers.removeListener('fullTextIndexReady', this.fullTextReadyListener);
+    if (this.fullTextReadyListener)
+      this.props.beers.removeListener('fullTextIndexReady', this.fullTextReadyListener);
     this.props.app.removeListener('dataUpdate', this.sourceDataDidUpdate);
   }
   sourceDataDidUpdate() {
