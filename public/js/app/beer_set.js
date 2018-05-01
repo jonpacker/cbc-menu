@@ -3,14 +3,14 @@ import FullTextSearch from 'full-text-search-light'
 import EventEmitter from 'events'
 
 const SESSION_GROUPS = {
-  friday: 1, 
-  'friday saturday': 3, 
-  'saturday friday': 3, 
+  friday: 1,
+  'friday saturday': 3,
+  'saturday friday': 3,
   saturday: 2
 };
 
 export default class BeerSet extends EventEmitter {
-  constructor(beers, index) { 
+  constructor(beers, index) {
     super();
     this.indexes = ['ut_bid'];
     this.setBeers(beers);
@@ -20,7 +20,7 @@ export default class BeerSet extends EventEmitter {
   get obj() { return this.indexedBeers }
   get arr() { return this.indexedBeerSet }
 
-  get rankGroups() { 
+  get rankGroups() {
     return {
       ut_rating: this.orderByProp('ut_rating'),
       live_rating: this.orderByProp('live_rating')
@@ -29,6 +29,7 @@ export default class BeerSet extends EventEmitter {
 
   setBeers(beers) {
     Object.assign(this, this._indexBeers(beers));
+    this.loadIndex();
   }
 
   orderByProp(prop) {
@@ -40,7 +41,7 @@ export default class BeerSet extends EventEmitter {
 
   /**
    * generates a subset of beers that match the given filter, and the calculates rankings
-   * for each of the ranked groups (for example live and untappd). 
+   * for each of the ranked groups (for example live and untappd).
    */
   subsetWithRankings(filter) {
     const {rankGroups} = this;
@@ -80,6 +81,7 @@ export default class BeerSet extends EventEmitter {
 
   loadIndex() {
     if (this._searchWorker) this._searchWorker.terminate();
+    this.emit('fullTextIndexNotReady');
     this.fullTextSearchReady = false;
     this._searchCallbacks = {};
     this._readySearchWorker = new Promise(res => {
@@ -135,9 +137,10 @@ export default class BeerSet extends EventEmitter {
       });
       return beer;
     });
-    
-    beers.forEach(beer => {
-      beer.sessionSet = indexedBeers[beer.id].sessions.join(' ');
+
+    indexedBeerSet.forEach(beer => {
+      beer.sessions = indexedBeers[beer.id].sessions;
+      beer.sessionSet = beer.sessions.join(' ');
       return beer;
     });
 

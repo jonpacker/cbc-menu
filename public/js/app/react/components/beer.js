@@ -31,7 +31,7 @@ export default class Beer extends React.Component {
   getClassList() {
     const {beer} = this.props;
     const classes = [
-      'beer', 
+      'beer',
       'style-border',
       this.props.hidden ? 'hidden' : '',
       this.state.saved ? 'saved' : '',
@@ -40,7 +40,7 @@ export default class Beer extends React.Component {
       this.state.notes ? "has-notes" : "",
       this.state.isSentToUntappd ? "ut-checked-in" : "",
       this.state.expanded ? 'expand' : '',
-      beer.tag, 
+      beer.tag,
       beer.session,
       beer.sessionSet,
       beer.metastyle,
@@ -94,7 +94,7 @@ export default class Beer extends React.Component {
         <div className="headline">
           <div className="name-block">
             <div className="name">
-              { beer.sessions.map((sess, i) => ( 
+              { beer.sessions.map((sess, i) => (
                 <span key={`${beer.id}_${sess}_${i}`} className={`${sess}-indicator sess`}/>
               ))}
               {beer.name}
@@ -102,11 +102,14 @@ export default class Beer extends React.Component {
             <div className="abv">{ beer.percent ? beer.percent : '?' }</div>
             { (beer.ut_bid &&
               <div className="ut-avg">
-                <img src="/img/ut_icon_144.png"/> 
+                <img src="/img/ut_icon_144.png"/>
                 { beer.ut_rating_clamped || '--' }
               </div>) || null }
-            { (!app.db.disableLiveRating && this.state.liveRating &&
-                <div className="live-avg">👥 {this.state.liveRating.toFixed(2)}</div>)|| null}
+            { !app.db.disableLiveRating && this.state.liveRating ?
+                (<div className="live-avg">
+                  <img src="/img/users.svg"/>
+                  {this.state.liveRating.toFixed(2)}
+                  </div>) : ''}
             <div className="style">{beer.superstyle}</div>
           </div>
           <div className="marks">
@@ -118,17 +121,17 @@ export default class Beer extends React.Component {
               href={`https://untappd.com/beer/${beer.ut_bid}`} target="_blank">
               { beer.ut_rating ? `${beer.ut_rating_clamped}${beer.ut_rating_rank_br}` : 'no rating' }
             </a>
-            { beer.ut_h_id &&
-              <a className="site-bg-style score untappd"
+            { beer.ut_h_id ?
+              (<a className="site-bg-style score untappd"
                 href={`https://untappd.com/user/${app.db.untappdUser}/checkin/${beer.ut_h_id}`}
                 target="_blank">
                 You (UT): {beer.ut_h_ra}
-              </a> } 
-            { !app.db.disableLiveRating && this.state.liveRating && 
+              </a>)  : ''}
+            { !app.db.disableLiveRating && this.state.liveRating &&
                 <a className="site-bg-style score avg live-rating">
                     Users ({this.state.liveRatingCount}): {this.state.liveRating.toFixed(2)}
                 </a> }
-            <a className={`add-rating ${this.state.isRating ? 'is-rating' : ''}`} 
+            <a className={`add-rating ${this.state.isRating ? 'is-rating' : ''}`}
                onClick={() => this.setState({isRating: !this.state.isRating})}>Rate</a>
           </div>
           <div className="expanded">
@@ -136,10 +139,10 @@ export default class Beer extends React.Component {
           </div>
           <div className="rate-box">
             <label>Rating</label>
-            { this.state.isRating 
+            { this.state.isRating
                 ? <RatingSlider rating={this.state.rating} onRate={rating => this.setRating(rating)} />
                 : <StaticRatingSlider rating={this.state.rating} onInteract={() => this.setState({isRating:true})} /> }
-            
+
             <textarea name="rnotes" placeholder="Notes" className="notes" value={this.state.notes}
                       onChange={e => this.setNotes(e.target.value)}>
             </textarea>
@@ -157,7 +160,7 @@ export default class Beer extends React.Component {
                   </div> }
               </div>
             }
-          </div> 
+          </div>
         </div>
       </div>
     );

@@ -18,15 +18,30 @@ export default class FilterableSortableBeerList extends Component {
       session: props.session,
       searchIndexReady: !!props.beers.fullTextSearchReady
     };
-    if (!props.beers.fullText) {
-      this.fullTextReadyListener = () => this.setState({searchIndexReady: true});
-      props.beers.once('fullTextIndexReady', this.fullTextReadyListener);
-    }
+    this.fullTextIndexNotReady = this.fullTextIndexNotReady.bind(this);
+    if (!props.beers.fullTextSearchReady) this.fullTextIndexNotReady();
+    props.beers.on('fullTextIndexNotReady', this.fullTextIndexNotReady);
+
+    this.searchInput = React.createRef();
     this.executeSearch = debounce(this.executeSearch.bind(this), 300)
     this.recalculateBeerList();
+
+    this.sourceDataDidUpdate = this.sourceDataDidUpdate.bind(this);
+    props.app.on('dataUpdate', this.sourceDataDidUpdate);
+  }
+  fullTextIndexNotReady() {
+    console.log('got not ready');
+    this.fullTextReadyListener = () => this.setState({searchIndexReady: true});
+    this.props.beers.once('fullTextIndexReady', this.fullTextReadyListener);
+    if (this.state.searchIndexReady) this.setState({searchIndexReady: false});
   }
   componentWillUnmount() {
     this.props.beers.removeListener('fullTextIndexReady', this.fullTextReadyListener);
+    this.props.app.removeListener('dataUpdate', this.sourceDataDidUpdate);
+  }
+  sourceDataDidUpdate() {
+    this.recalculateBeerList();
+    this.forceUpdate();
   }
   recalculateBeerList(state = this.state) {
     const {breweries, beer_count} = calcBeerList(this.props.beers, state);
@@ -52,8 +67,8 @@ export default class FilterableSortableBeerList extends Component {
     classes.push(`mini-${!!this.state.mini}`);
     if (this.state.order != null) classes.push(`order-${this.state.order}`);
     if (this.state.metastyle != null) classes.push(`ms-${this.state.metastyle}`);
-    if (this.state.tasted != null) classes.push(this.state.tasted);
-    if (this.state.saved != null) classes.push(this.state.saved);
+    if (this.state.tasted != null) classes.push(this.state.tasted ? 'tasted' : 'not-tasted');
+    if (this.state.saved != null) classes.push(this.state.saved ? 'saved' : 'not-saved');
     if (this.state.today != null) classes.push('today');
     if (this.state.isSearching) classes.push('searching');
     return classes;
@@ -92,6 +107,11 @@ export default class FilterableSortableBeerList extends Component {
       });
     }
   }
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState.isSearching && this.state.isSearching == true) {
+      this.searchInput.current.focus();
+    }
+  }
   render() {
     const classes = this.getClassList();
     let {breweries, beer_count} = this;
@@ -101,12 +121,12 @@ export default class FilterableSortableBeerList extends Component {
     return (
       <div id="beerlist" className={classes.join(' ')}>
         <div className={`topBar ${this.state.isSearching ? 'searching' : ''}`}>
-          { this.state.isSearching 
-            ? (<input className="searchQuery" onChange={e => this.changeSearchTerm(e)} />)
+          { this.state.isSearching
+            ? (<input className="searchQuery" onChange={e => this.changeSearchTerm(e)} ref={this.searchInput} />)
             : (<h1>{this.props.session ? `${this.props.session} session` : `all beers`}</h1> )}
           <sub>{beerCount} beers, {breweryCount} brewers</sub>
           <a className="back" href="#index"></a>
-          <a className={`search ${this.state.searchIndexReady ? 'ready' : ''}`} 
+          <a className={`search ${this.state.searchIndexReady ? 'ready' : ''}`}
              onClick={() => this.toggleSearching()}></a>
         </div>
         <div className="container">
@@ -114,23 +134,24 @@ export default class FilterableSortableBeerList extends Component {
             <span className="info">Display Options</span>
             <a className="mini" onClick={() => this.toggleMini()}>Small UI</a>
             <span className="info">Sort by</span>
-            <a className="site-bg-style ut_rating" onClick={() => this.setOrder('ut_rating')}> 
+            <a className="site-bg-style ut_rating" onClick={() => this.setOrder('ut_rating')}>
               <img src="/img/ut_icon_144.png"/> Rating
             </a>
               {!app.db.disableLiveRating &&
-                <a className="site-bg-style avg live-rating" 
+                <a className="site-bg-style avg live-rating"
                    onClick={() => this.setOrder('live_rating')}>👥 Rating</a> }
             { false && <a className="ordering order-location" onClick={() => this.setOrder('location')}>Location</a> }
-            <a className={`ordering ${this.state.order == null ? "order-by-name selected" : ""}`} 
+            <a className={`ordering ${this.state.order == null ? "order-by-name selected" : ""}`}
               onClick={() => this.setOrder(null)}>Brewery</a>
           </div>
           <div className="filter bar">
             <span className="info">Filter by</span>
-            <a className="tasted" onClick={() => this.setFilter({tasted: 'tasted'})}>✓</a>
-            <a className="not-tasted" onClick={() => this.setFilter({tasted: 'not-tasted'})}>NOT ✓</a>
-            <a className="saved" onClick={() => this.setFilter({saved: 'saved'})}>★</a>
-            <a className="not-saved" onClick={() => this.setFilter({saved: 'not-saved'})}>NOT ★</a>
-            <a className="today" onClick={() => this.setFilter({today: true})}>Only Today</a>
+            <a className="tasted" onClick={() => this.setFilter({tasted: true})}>✓</a>
+            <a className="not-tasted" onClick={() => this.setFilter({tasted: false})}>NOT ✓</a>
+            <a className="saved" onClick={() => this.setFilter({saved: true})}>★</a>
+            <a className="not-saved" onClick={() => this.setFilter({saved: false})}>NOT ★</a>
+            { app.config.allowFilterByToday && (
+              <a className="today" onClick={() => this.setFilter({today: true})}>Only Today</a> )}
             <a onClick={() => this.setFilter({
               today: null,
               saved: null,
@@ -141,10 +162,10 @@ export default class FilterableSortableBeerList extends Component {
             <span className="info">Filter by</span>
             { this.props.metastyles.map(metastyle => (
               <a key={metastyle}
-                 className={`style-border ${metastyle}`} 
+                 className={`style-border ${metastyle}`}
                  onClick={() => this.setFilter({metastyle})}>{metastyle}</a>
             )) }
-            { this.state.metastyle && 
+            { this.state.metastyle &&
               <a onClick={() => this.setFilter({metastyle: null})}>✘ Reset</a> }
           </div>
           <BeerList beersGroupedByBrewery={breweries} idMask={this.state.idMask} app={app} />

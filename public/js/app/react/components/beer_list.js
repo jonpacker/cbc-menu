@@ -14,7 +14,7 @@ export default class BeerList extends React.Component {
         </h2>
         <div className="beers">
           {brewery.beers.map(beer => (
-            <Beer app={this.props.app} key={beer.mbcc_id} beer={beer} hidden={!!idMask && !idMask[beer.id]} />
+            <Beer app={this.props.app} key={beer.id} beer={beer} hidden={!!idMask && !idMask[beer.id]} />
           ))}
         </div>
       </div>

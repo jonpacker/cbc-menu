@@ -19,7 +19,7 @@ const browserify = require('browserify-middleware');
 function compile(str, path) {
   return stylus(str)
     .set('filename', path)
-    .set('compress', true) 
+    .set('compress', true)
     .use(nib());
 }
 
@@ -188,7 +188,7 @@ app.get('/mbcc-2018-dump-jonpacker.csv', function(req, res) {
     getBeerData(function(err, data) {
       if (err) return res.sendStatus(500);
       var csv = csvWriter({
-        headers: ['brewery', 'session', 'beer', 'abv', 'style', 'metastyle',
+        headers: ['brewery', 'session', 'beer', 'abv', 'supplied style', 'untappd style', 'metastyle',
                   'untappd rating', 'description', 'untappd link']
       });
 
@@ -212,8 +212,16 @@ app.get('/mbcc-2018-dump-jonpacker.csv', function(req, res) {
         var beers = data.beers.filter((beer) => { return beer.brewery == brewery });
         beers = _.sortBy(beers, (beer) => { return sessions.indexOf(beer.session) });
         beers.forEach((beer) => {
-          csv.write([beer.brewery, beer.session, beer.name, beer.percent,
-            beer.superstyle, beer.metastyle, beer.ut_rating, beer.desc, `https://untappd.com/b/_/${beer.ut_bid}`]);
+          csv.write([beer.brewery,
+            beer.session,
+            beer.name,
+            beer.percent,
+            beer.mbcc_desc,
+            beer.superstyle,
+            beer.metastyle,
+            beer.ut_rating,
+            beer.desc,
+            `https://untappd.com/b/_/${beer.ut_bid}`]);
         });
       });
       csv.end();
@@ -282,6 +290,7 @@ var cf = cache.newCache([
     'img/drank_flag.png',
     'img/puff.svg',
     'img/spin.svg',
+    'img/users.svg',
     'img/ut_icon_144.png',
     'img/chevron-left.svg',
     'img/search.svg',

@@ -1,4 +1,9 @@
 import EventEmitter from 'events'
+let userIsTouching = false;
+window.addEventListener('touchstart', function onFirstTouch() {
+  userIsTouching = true;
+  window.removeEventListener('touchstart', onFirstTouch, false);
+}, false);
 export default function DragListener (parent, handle, offsetMin, offsetMax, opts) {
   if (typeof handle != 'object') {
     opts = offsetMax;
@@ -15,7 +20,8 @@ export default function DragListener (parent, handle, offsetMin, offsetMax, opts
     requireBothThresholds: false
   }, opts || {});
 
-  const canTouch = !!window.ontouchstart;
+  const canTouch = userIsTouching;
+  console.log('canTouch', canTouch)
   const eventName = action => {
     if (canTouch) {
       switch (action) {
@@ -38,8 +44,8 @@ export default function DragListener (parent, handle, offsetMin, offsetMax, opts
     if (e instanceof MouseEvent) {
       return { x: e.pageX, y: e.pageY }
     } else if (e instanceof TouchEvent) {
-      if (e.touches.length == 0) return undefined;
-      return { x: e.touches[0].pageX, y: e.touches[0].pageY }
+      const touches = e.touches.length == 0 ? e.changedTouches : e.touches;
+      return { x: touches[0].pageX, y: touches[0].pageY }
     } else {
       return undefined
     }
@@ -51,7 +57,7 @@ export default function DragListener (parent, handle, offsetMin, offsetMax, opts
   const emitter = new EventEmitter();
   let isDragging = false;
 
-  
+
   const currentPosition = () => {
     let pos = getElementOffsetPosition(parent).left
     if (opts.includeParentWidth) pos += parseFloat(window.getComputedStyle(parent).width);
@@ -66,7 +72,7 @@ export default function DragListener (parent, handle, offsetMin, offsetMax, opts
     if (isDragging || !opts.shouldDrag()) return;
     downEvent.preventDefault();
     if (opts.stopPropagation) downEvent.stopPropagation();
-    
+
     const min = typeof offsetMin == 'function' ? offsetMin() : offsetMin;
     const max = typeof offsetMax == 'function' ? offsetMax() : offsetMax;
 
@@ -82,13 +88,13 @@ export default function DragListener (parent, handle, offsetMin, offsetMax, opts
       const dragCoords = coordinates(dragEvent);
       const offsetX = dragCoords.x - downCoords.x;
       let position, relativePosition;
-      
+
       if (!hasDragged) {
         position = percentOfXVal(currentPosition());
         relativePosition = currentPositionRelativeToElement(dragEvent);
         const isUnderPositionThreshold = Math.abs(offsetX) < opts.movementThreshold;
         const isUnderTimeThreshold = Date.now() - startTime < opts.timeThreshold;
-        if ( (opts.requireBothThresholds && (isUnderTimeThreshold || isUnderPositionThreshold)) 
+        if ( (opts.requireBothThresholds && (isUnderTimeThreshold || isUnderPositionThreshold))
              || (!opts.requireBothThresholds && isUnderTimeThreshold && isUnderPositionThreshold))
            return
         emitter.emit('dragStart', position, relativePosition);
@@ -138,7 +144,7 @@ export default function DragListener (parent, handle, offsetMin, offsetMax, opts
     eventName('start').forEach(event => page.removeEventListener(event, listener, false));
     removeListeners && removeListeners();
   }
-    
+
   return emitter
 }
 

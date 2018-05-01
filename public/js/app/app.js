@@ -5,7 +5,7 @@ import {connectToWebsocket} from './live_ratings'
 import readTemplates from './read_templates'
 import State from './local_persistence'
 import Renderer from './renderer'
-import BeerSet from './beer_set' 
+import BeerSet from './beer_set'
 import Untappd from './untappd'
 import EventEmitter from 'events'
 
@@ -37,8 +37,6 @@ export default class App extends EventEmitter {
 
     this.updateExportLink();
     this.updateBeersMarked();
-
-    this.addGlobalListeners();
 
     if (!this.db.disableLiveRating) this.connectToLiveRatings();
     this.liveRatingUploadTimeouts = [];
@@ -85,9 +83,9 @@ export default class App extends EventEmitter {
     this.superstyles = data.superstyles;
     this.beerset.setBeers(data.beers);
     this.updateBeersMarked();
-    this.route(location.hash || '#index');
+    this.emit('dataUpdate');
   }
-  
+
 
   async loadIndex(url) {
     await this.beerset.loadIndex();
@@ -101,7 +99,7 @@ export default class App extends EventEmitter {
   setTemplateGlobals(renderer) {
     this.renderer.globals.metastyles = this.metastyles;
     this.renderer.globals.is_mobile = this.isMobile;
-    
+
     const calc = (prop, getProp) => {
       Object.defineProperty(this.renderer.globals, prop, {
         enumerable: true,
@@ -196,7 +194,7 @@ export default class App extends EventEmitter {
   }
 
   async saveUntappdToken({arg}) {
-    const {response} = await fetchUntappd('/user/info', {token: arg});
+    const {response} = await this.untappd.fetchUntappd('/user/info', {token: arg});
     this.db.untappdUser = response.user.user_name;
     this.db.untappdToken = arg;
   }
@@ -228,7 +226,7 @@ export default class App extends EventEmitter {
     let {untappdUser} = this.db;
     if (!untappdUser) throw new Error('You are not logged in to untappd! 😨');
     const res = await fetch(`/snapshot/${untappdUser}`);
-    
+
     if (res.status != 200) {
       throw new Error(res.statusText);
     } else {
@@ -247,24 +245,24 @@ export default class App extends EventEmitter {
     let noteCount = _.reduce(this.db.beerData, (c, d) => c + (d.notes ? 1 : 0), 0);
     let ratingCount = _.reduce(this.db.beerData, (c, d) => c + (d.rating ? 1 : 0), 0);
     this.db.msg = `
-      ${noteCount} notes, 
-      ${ratingCount} ratings, 
-      ${this.db.savedBeers.length} saved, 
+      ${noteCount} notes,
+      ${ratingCount} ratings,
+      ${this.db.savedBeers.length} saved,
       ${this.db.tastedBeers.length} tasted beers loaded
     `;
   }
-   
+
   updateExportLink() {
     try {
-      $('#export').val('http://' 
-        + window.location.hostname 
-        + window.location.pathname 
-        + '#loadb[{"d":"' 
+      $('#export').val('http://'
+        + window.location.hostname
+        + window.location.pathname
+        + '#loadb[{"d":"'
         + btoa(JSON.stringify({
             savedBeers:this.db.savedBeers,
             tastedBeers:this.db.tastedBeers,
             beerData:this.db.beerData
-          })) 
+          }))
         + '"}]');
     } catch(e) {}
   }
@@ -285,113 +283,6 @@ export default class App extends EventEmitter {
     });
   }
 
-  addGlobalListeners() {
-    // expand/contract beer info in mini mode
-    return;
-    $('#window').on('click', '.mini-true .beer', e => {
-      // don't accept clicks from clickable elements.
-      if ($(e.target).is('.star, .tick, textarea, input, a, .rating-slider-control, .rating-slider-control > *')) return;
-      const beerElement = $(e.target).parents('.beer');
-      beerElement.toggleClass('expand');
-    });
-
-    $('body').on('click', '.beer .star', e => {
-      e.stopPropagation();
-      const beer = $(e.target).parents('.beer');
-      const beerId = beer.data().id;
-      const willSave = this.db.savedBeers.indexOf(beer.data().id) == -1;
-      this.toggleBeerSaved(beerId, willSave);
-    });
-
-    $('body').on('click', '.beer .tick', e => {
-      e.stopPropagation();
-      var beer = $(e.target).parents('.beer');
-      var beerId = beer.data().id;
-      var willSave = this.db.tastedBeers.indexOf(beer.data().id) == -1;
-      this.toggleBeerTasted(beerId, willSave);
-    });
-
-    $('body').on('click', '.beer .send-to-untappd', e => {
-      e.stopPropagation();
-      const target = $(e.target);
-      const beer = target.parents('.beer');
-      const beerId = beer.data().id;
-      const untappdId = target.closest('.send-to-untappd').data().bid;
-      const rating = parseFloat(beer.find('.rating-slider').val());
-      const comments = beer.find('.notes').val();
-      const loader = beer.find('.sending-untappd-checkin').show()
-      
-      // todo... export to untappd module
-      var handleError = function() {
-        loader.hide();
-        const errorText = beer.find('.untappd-error-text');
-        errorText.text('Error! 😰 Try again?! 🔂');
-        setTimeout(function() {
-          errorText.text('');
-        }, 5000);
-      }
-      
-      fetchUntappd('/checkin/add', {
-        method: 'POST',
-        body: {
-          timezone: 'CET',
-          gmt_offset: 2,
-          bid: untappdId,
-          shout: comments,
-          foursquare_id: config.FOURSQUARE_LOCATION_ID,
-          geolat: 58.969173,
-          geolng: 5.758406,
-          rating: rating > 0 ? rating : undefined
-        }
-      }).then(res => {
-        loader.hide();
-        if (res.meta.code >= 300) {
-          return handleError();
-        }
-        beer.addClass('ut-checked-in');
-        this.updateBeerData(beerId, {ut_checked_in:true})
-      }).catch(handleError);
-    })
-
-    let timeouts = {};
-    $('body').on('rating-slider:rate', (e, slider, num) => {
-      const textarea = slider.siblings('textarea');
-      const beer = slider.parents('.beer');
-      const beerId = beer.data().id;
-      const hasTastedBefore = this.db.tastedBeers.indexOf(beerId) != -1;
-      this.toggleBeerTasted(beerId, true);
-      this.updateBeerData(beerId, { rating: num, notes: textarea.val() });
-      if (timeouts[beerId]) {
-        clearTimeout(timeouts[beerId]);
-        delete timeouts[beerId];
-      }
-      timeouts[beerId] = setTimeout(() => {
-        delete timeouts[beerId];
-        fetch(`/rate/${beerId}`, {
-          method: hasTastedBefore ? 'PUT' : 'POST',
-          body: num.toString()
-        })
-      }, 5000);
-    });
-
-    $('body').on('change', '.beer textarea', function(e) {
-      const textarea = $(e.target);
-      const notes = textarea.val();
-      const beer = textarea.parents('.beer');
-      const beerId = beer.data().id;
-      this.toggleBeerTasted(beerId, true);
-      this.updateBeerData(beerId, { notes });
-    });
-
-    $('body').on('click', 'a.add-rating', e => {
-      e.stopPropagation();
-      const button = $(e.target);
-      const parent = button.parents('.beer');
-      parent.toggleClass('add-rating');
-      button.toggleClass('is-rating');
-    });
-
-  }
 
   setBeerRating(beerId, rating) {
     const timeouts = this.liveRatingUploadTimeouts;
@@ -454,4 +345,3 @@ export default class App extends EventEmitter {
     this.updateExportLink();
   }
 }
-

@@ -5,19 +5,19 @@
   font-style: normal;
   font-weight: 400;
   src: local('Oswald Regular'), local('Oswald-Regular'),
-       url('/fonts/oswald-v10-latin-regular.woff2') format('woff2'), 
-       url('/fonts/oswald-v10-latin-regular.woff') format('woff'); 
+       url('/fonts/oswald-v10-latin-regular.woff2') format('woff2'),
+       url('/fonts/oswald-v10-latin-regular.woff') format('woff');
 }
 @font-face {
   font-family: 'oswald';
   font-style: normal;
   font-weight: 700;
   src: local('Oswald Bold'), local('Oswald-Bold'),
-       url('/fonts/oswald-v10-latin-700.woff2') format('woff2'), 
-       url('/fonts/oswald-v10-latin-700.woff') format('woff'); 
+       url('/fonts/oswald-v10-latin-700.woff2') format('woff2'),
+       url('/fonts/oswald-v10-latin-700.woff') format('woff');
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) { 
+@media screen and (-webkit-min-device-pixel-ratio:0) {
   select,
   textarea,
   input {
@@ -56,7 +56,7 @@ a
     padding: 1rem
     text-align: center
     font-family: inherit
-    
+
 .loader
   width: 8rem
   height: 8rem
@@ -75,7 +75,7 @@ a
     font-size: 3vw
     border: 1vw dashed yellow
     text-align: center
-    
+
   .sessions
     width: 100%
     display: flex
@@ -98,7 +98,7 @@ a
       .sub
         font-size: 1.5rem
         font-style: italic
-      
+
   .sessions.sessions-3
     .session:first-child
       width: 90%
@@ -107,7 +107,7 @@ a
   .info
     text-align: center
     font-size: 2rem
-    
+
   .untappd
     text-align: center
     font-size: 2rem
@@ -141,7 +141,7 @@ a
       height: 4rem
       margin-right: 2rem
       vertical-align: middle
-      
+
   .live-ratings
     text-align: center
     font-size: 2rem
@@ -193,7 +193,7 @@ html
 
   @media (min-width: 1080px) and (max-width: 1350px)
     font-size: 0.666667vw
-  
+
   @media (min-width: 720px) and (max-width: 900px)
     font-size: 1vw
 
@@ -208,7 +208,7 @@ html
   flex-direction: column
   padding-top: 5rem
 
-  .topBar 
+  .topBar
     width: 100%
     display: grid
     height: 5rem
@@ -261,7 +261,7 @@ html
       &:before
         background-image: url(/img/search.svg)
         opacity: 0.2
-      
+
       &:after
         background-image: url(/img/spin.svg)
 
@@ -273,7 +273,7 @@ html
           opacity: 0
         &:hover
           background-color: rgba(white, 25%)
-    
+
     &.searching
       .search
         background-color: rgba(#ccc, 50%)
@@ -419,7 +419,7 @@ html
         width: 2rem
         height: 2rem
         vertical-align: middle
-      
+
     span.info
       margin-right: 1rem
       margin-left: 2rem
@@ -427,7 +427,7 @@ html
       margin-top: 0.9rem
       &:after
         content: ':'
-      
+
 
 
   .filter
@@ -435,7 +435,7 @@ html
     padding: 1rem 5%
     box-sizing: border-box
     text-align: center
-    
+
     span.info
       margin-right: 1rem
       &:after
@@ -450,7 +450,7 @@ html
       margin: 0 0.5rem
       font-size: 1.5rem
       max-width: 60px
-    
+
 
   .brewery
     width: 90%
@@ -467,7 +467,7 @@ html
       padding: 1.5rem 2.5rem
       background-color: #333
       color: white
-      
+
       .location
         font-size: 1.4rem
         display: inline-block
@@ -488,8 +488,8 @@ html
       .name-block .ut-avg
       .name-block .live-avg
         display: none
-      
-    
+
+
 
   .beer
     margin-bottom: 0.5rem
@@ -504,7 +504,7 @@ html
 
     &.tasted
       opacity: 0.5
-      
+
     &.ut-checked-in .headline
     &.ut-historic-checked-in .headline
       background-image: url(/img/drank_flag.png)
@@ -558,11 +558,11 @@ html
         .style
           width: 70%
           font-size: 1.4rem
-          
+
         .ut-avg
         .live-avg
           width: 15%
-          font-size: 1.4rem
+          font-size: 1.325rem
           img
             width: 1.5rem
             height: 1.5rem
@@ -627,7 +627,7 @@ html
           box-sizing: border-box
           padding-right: 2rem
 
-        
+
       .rate-box
         font-size: 1.5rem
         margin-top: 1rem
@@ -642,11 +642,11 @@ html
         input.rating-slider
           width: 70%
           display: none
-          
+
         .rating-slider-control
           width: 68%
           margin-right: 2%
-          
+
           position: relative
           height: 2.6rem
           .track
@@ -663,7 +663,7 @@ html
             left: 0px
             margin-top: -2rem
             margin-left: -2rem
-            
+
             &:after
               content: ''
               position: absolute
@@ -676,7 +676,7 @@ html
               background-color: magenta
               box-shadow: 0px 0px 0px 1px white, 0px 0px 0px 2px rgba(black, 50%)
               border-radius: 1rem
-            
+
 
         textarea
           width: 100%
@@ -690,15 +690,15 @@ html
           font-size: 2rem
           display: inline-block
           display: none
-          
+
         .untappd
           margin-top: 0.2rem
           width: 100%
-          
+
         .previous-checkin
           margin-right: 1rem
           display: inline-block
-        
+
         .send-to-untappd
           width: 40%
           vertical-align: top
@@ -717,7 +717,7 @@ html
             height: 2.5rem
             margin-right: 0.5rem
             vertical-align: middle
-            
+
         .sent-to-untappd
           color: mix(black, #ffcc00, 75%)
           font-size: 1.25rem
@@ -733,10 +733,10 @@ html
             background-size: 1.4rem
             background-repeat: no-repeat
             background-position: center
-            
+
         .sending-untappd-checkin
           display: none
-          
+
           img
             width: 3rem
             height: 3rem
@@ -765,7 +765,7 @@ html
           display: inline-block
         .untappd
           display: block
-    
+
     &.ut-checked-in
       .headline .rate-box
         .sent-to-untappd
@@ -773,12 +773,12 @@ html
         .send-to-untappd
         .have-i-drunk-it
           display: none
-  
+
   &.beer-list .filter a.today
     display: none
 
   .beer .name:before
-    font-size: 0.5em 
+    font-size: 0.5em
     padding: 0.2rem 0.4rem
     font-weight: 400
     border-radius: 0.2rem
@@ -803,10 +803,10 @@ html
     height: 1em
     border-radius: 0.5em
     margin-right: 0.3em
-  
+
   &.session .beer .name .sess
     display: none
-  
+
   .beer.friday .name:before
     content: 'fri'
     background-color: red
@@ -816,7 +816,7 @@ html
   .beer.saturday .name:before
     content: 'sat'
     background-color: blue
-    
+
   .beer.no-info:after
     display: block
     content: 'New beer, no Untappd link/info available, no auto checkin'
@@ -826,11 +826,11 @@ html
     border-top: none
     background-color: rgba(magenta, 0.1)
     font-size: 1.25rem
-    
+
   .beer.early
-  .beer.late 
+  .beer.late
     .name:after
-      font-size: 0.5em 
+      font-size: 0.5em
       padding: 0.2rem 0.4rem
       font-weight: 400
       border-radius: 0.2rem
@@ -838,14 +838,14 @@ html
       display: inline-block
       vertical-align: middle
       margin-left: 0.5rem
-      
+
     &.early .name:after
       content: '14-18'
       background-color: green
     &.late .name:after
       content: '18-22'
       background-color: orange
-      
+
   &.friday.session
     .beer.friday .name:before
       content: none
@@ -860,15 +860,15 @@ html
     .beer.friday.saturday .name:before
       content: 'fri & sat'
       background-color: magenta
-  
-    
+
+
 
 
 .style-border
   &.Dark
   &.Imperial.Stout
    border-left: 1rem solid navy
-   
+
   &.Barley.Wine
    border-left: 1rem solid yellow
 
@@ -901,10 +901,10 @@ html
   &.Cider
    border-left: 1rem solid olive
   &.Mead
-   border-left: 1rem solid orange  
+   border-left: 1rem solid orange
 
   &.Pumpkin
-   border-left: 1rem solid orange 
+   border-left: 1rem solid orange
 
 .site-bg-style
   &.avg
