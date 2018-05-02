@@ -86,9 +86,9 @@ export default class Renderer extends EventEmitter {
     this.showLoading();
     try {
       const count = await this.app.downloadUserUntappdCheckins();
-      db.msg = `Marked ${count} beers as checked-in on untappd`;
+      this.app.db.msg = `Marked ${count} beers as checked-in on untappd`;
     } catch (e) {
-      db.msg = e.message;
+      this.app.db.msg = e.message;
     } finally {
       window.location = '/#index';
     }
@@ -98,9 +98,9 @@ export default class Renderer extends EventEmitter {
     this.showLoading();
     try {
       await this.app.takeSnapshot();
-      db.msg = 'Snapshot saved!';
+      this.db.msg = 'Snapshot saved!';
     } catch (e) {
-      db.msg = 'Snapshot failed 😱 - ' + err.message;
+      this.db.msg = 'Snapshot failed 😱 - ' + err.message;
     } finally {
       window.location = '/#index';
     }
@@ -115,7 +115,7 @@ export default class Renderer extends EventEmitter {
     try {
       await this.app.loadSnapshot();
     } catch (e) {
-      db.msg =  `Couldn't load snapshot 😱 - ${err.message}`;
+      this.app.db.msg =  `Couldn't load snapshot 😱 - ${err.message}`;
       window.location = '/#index';
     }
   }
