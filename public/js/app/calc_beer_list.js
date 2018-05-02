@@ -9,16 +9,14 @@ export default function calcBeerList(beerset, opts) {
   let beers = beerset.subsetWithRankings(beer => {
     let match = true;
     if (opts.metastyle) match = match && beer.metastyle == opts.metastyle;
-    if (session) match = match && beer.session == session;
+    if (session) match = match && ((beer.sessions && beer.sessions.indexOf(session) != -1) || beer.session == session);
     if (opts.today == 'true' || opts.today === true) match = match && (beer.sessionSet && beer.sessionSet == session);
     if (opts.tasted != null) match = match && (opts.tasted === false ? !beer.tasted : beer.tasted === opts.tasted);
     if (opts.saved != null) match = match && (opts.saved === false ? !beer.saved : beer.saved === opts.saved);
     return match;
   });
 
-  if (!session) {
-    beers = _.uniq(beers, beer => beer.id);
-  }
+  beers = _.uniq(beers, beer => beer.id);
 
   if (opts.order && opts.order != 'location') {
     beers = _.sortBy(beers, beer => beer[`${opts.order}_rank`]);
