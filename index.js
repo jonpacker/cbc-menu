@@ -281,6 +281,7 @@ var cf = cache.newCache([
     'js/underscore-min.js',
     'js/drag-listener.min.js',
     'js/app/cbc.js',
+    'js/app/search_worker.js',
     'css/cbc.css',
     'fonts/oswald-v10-latin-700.woff',
     'fonts/oswald-v10-latin-700.woff2',

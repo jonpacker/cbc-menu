@@ -11,7 +11,7 @@ export default class Renderer extends EventEmitter {
     this.app = app;
     this.templates = templates;
     this.view = view;
-    this.globals = {}; 
+    this.globals = {};
   }
 
   canRender(viewName) {
@@ -35,7 +35,7 @@ export default class Renderer extends EventEmitter {
     //return Mustache.render(this.templates.beerlist, opts);
     ReactDOM.render((
       <FilterableSortableBeerList session={opts.colour} app={this.app} beers={this.app.beerset} metastyles={this.app.metastyles} />
-    ), this.view[0]); 
+    ), this.view[0]);
     this.once('willRender', () => {
       ReactDOM.unmountComponentAtNode(this.view[0]);
     });
@@ -50,7 +50,7 @@ export default class Renderer extends EventEmitter {
     //return Mustache.render(this.templates.beerlist, opts);
     ReactDOM.render((
       <FilterableSortableBeerList app={this.app} beers={this.app.beerset} metastyles={this.app.metastyles} />
-    ), this.view[0]); 
+    ), this.view[0]);
     this.once('willRender', () => {
       ReactDOM.unmountComponentAtNode(this.view[0]);
     });
@@ -84,7 +84,7 @@ export default class Renderer extends EventEmitter {
 
   async renderer_unicorn() {
     this.showLoading();
-    try { 
+    try {
       const count = await this.app.downloadUserUntappdCheckins();
       db.msg = `Marked ${count} beers as checked-in on untappd`;
     } catch (e) {
@@ -117,7 +117,7 @@ export default class Renderer extends EventEmitter {
     } catch (e) {
       db.msg =  `Couldn't load snapshot 😱 - ${err.message}`;
       window.location = '/#index';
-    } 
+    }
   }
 
   renderer_ut_logout() {
@@ -144,7 +144,7 @@ export default class Renderer extends EventEmitter {
 
   showLoading() {
     if (!this._loadingTemplate) this._loadingTemplate = Mustache.render(this.templates.loading);
-    this.view.empty().html(_loadingTemplate);
+    this.view.empty().html(this._loadingTemplate);
   }
 }
 
