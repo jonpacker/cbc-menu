@@ -308,7 +308,7 @@ export default class App extends EventEmitter {
     } else {
       savedBeers.push(id);
     }
-    this.beerset.forAllBeersWithId(beer => beer.saved = saved);
+    this.beerset.forAllBeersWithId(id, beer => beer.saved = saved);
     this.db.savedBeers = savedBeers;
     //$(`.beer[data-id=${id}]`).toggleClass('saved', saved);
     this.updateExportLink();
