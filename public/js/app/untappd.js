@@ -1,4 +1,5 @@
 import config from '../../../config.json'
+import _ from 'underscore'
 
 export default class Untappd {
   constructor(app) {
@@ -8,7 +9,7 @@ export default class Untappd {
   async fetchUntappd(path, opts = {}) {
     const token = opts.token || this.app.db.untappdToken;
     delete opts.token;
-      
+
     if (opts.body) {
       opts.body.access_token = token;
       opts.body = $.param(opts.body)
@@ -29,18 +30,18 @@ export default class Untappd {
       count = parseInt(localStorage.getItem('ut_uniques_count')) || 0;
     }
     let result;
-    while ((result = await fetchUntappd('/user/beers', {query: `offset=${start}&limit=50`})) &&
+    while ((result = await this.fetchUntappd('/user/beers', {query: `offset=${start}&limit=50`})) &&
            result.meta.code == 200 && result.response.beers.count > 0) {
       start += result.response.beers.count;
       localStorage.setItem('ut_uniques_start', start);
       if (result.response.beers.count == 0) break;
       var checkins = result.response.beers.items;
       checkins.forEach(checkin => {
-        const matchingBeers = this.app.db.getBeersIndexedBy('ut_bid', checkin.beer.bid);
+        const matchingBeers = this.app.beerset.getBeersIndexedBy('ut_bid', checkin.beer.bid);
         if (!matchingBeers) return;
         count++;
-        this.app.updateBeerData(beers[i].id, {
-          ut_h_ch: true, 
+        this.app.updateBeerData(matchingBeers[0].id, {
+          ut_h_ch: true,
           ut_h_ra: checkin.rating_score,
           ut_h_id: checkin.first_checkin_id
         });
@@ -78,6 +79,6 @@ export default class Untappd {
     if (res.meta.code >= 300) {
       throw new Error(res.meta.error_type);
     }
-    
+
   }
 }

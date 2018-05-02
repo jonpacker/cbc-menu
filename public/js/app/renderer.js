@@ -23,7 +23,7 @@ export default class Renderer extends EventEmitter {
     Object.assign(opts, this.globals);
     opts.tset = createLinkToSetParam(opts);
     const html = this[`renderer_${viewName}`](opts);
-    if (html) this.view.empty().html(html);
+    if (html && typeof html == 'string') this.view.empty().html(html);
     this.emit('didRender');
   }
 
@@ -98,9 +98,9 @@ export default class Renderer extends EventEmitter {
     this.showLoading();
     try {
       await this.app.takeSnapshot();
-      this.db.msg = 'Snapshot saved!';
+      this.app.db.msg = 'Snapshot saved!';
     } catch (e) {
-      this.db.msg = 'Snapshot failed 😱 - ' + err.message;
+      this.app.db.msg = 'Snapshot failed 😱 - ' + e.message;
     } finally {
       window.location = '/#index';
     }

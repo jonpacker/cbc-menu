@@ -256,7 +256,7 @@ app.post('/snapshot/:ut', function(req, res) {
   var data = '';
   req.on('data', (d) => { data += d.toString() });
   req.on('end', () => {
-    redis.set(req.params.ut, data, function(err) {
+    redis.set(`_snapshot_${req.params.ut}`, data, function(err) {
       if (err) res.sendStatus(500);
       else res.sendStatus(200);
     });
@@ -265,7 +265,7 @@ app.post('/snapshot/:ut', function(req, res) {
 
 app.get('/snapshot/:ut', function(req, res) {
   if (!req.params.ut) return res.sendStatus(400);
-  redis.get(req.params.ut, function(err, snap) {
+  redis.get(`_snapshot_${req.params.ut}`, function(err, snap) {
     if (err) return res.sendStatus(500);
     else if (!snap) return res.sendStatus(404);
     else {

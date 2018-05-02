@@ -72,9 +72,7 @@ export default class State {
     } catch (e) {
       this[`_${key}`] = KEYS[key].default;
     }
-    console.log(key, this[`_${key}`])
   }
 
-  
-}
 
+}
