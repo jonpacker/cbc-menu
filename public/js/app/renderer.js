@@ -64,6 +64,7 @@ export default class Renderer extends EventEmitter {
     }
     opts.untappd_redir_url = this.app.config.untappdRedirectUrl;
     opts.untappd_cid = this.app.config.untappdClientId;
+    opts.hasLeaderbeer = !!this.app.leaderbeer && this.app.leaderbeer.beers.length > 0;
     return Mustache.render(this.templates.index, opts);
   }
 
@@ -148,7 +149,6 @@ export default class Renderer extends EventEmitter {
     }
     const setSession = (e) => {
       e.preventDefault();
-      console.log('creating sess');
       const pass = $(this.view).find('#password').val();
       const sess = $(this.view).find("#sessionName").val();
       this.app.setSession(pass, sess);

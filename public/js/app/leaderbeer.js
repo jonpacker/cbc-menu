@@ -5,6 +5,9 @@ import {tween} from 'shifty'
 const ANIMATION_SPEED = 1500;
 
 export default class LeaderBeer {
+  constructor() {
+    this.beers = [];
+  }
   attachToView(view) {
     this.view = view.find('ul');
     this.initUi();

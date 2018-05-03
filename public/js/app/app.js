@@ -141,11 +141,13 @@ export default class App extends EventEmitter {
 
     this.socket.on('leaderbeer-init', data => {
       this.leaderbeer.updateBeers(data.all);
+      if (data.all.length > 0) $('#leaderbeer-button').show();
       for (let [session, beers] of Object.entries(data.sessions)) {
         this.getLeaderbeerSession(session).updateBeers(beers);
       }
     });
     this.socket.on('leaderbeer-update', data => {
+      $('#leaderbeer-button').show();
       this.leaderbeer.updateBeers(data);
     });
     this.socket.on('leaderbeer-update-session', ({session, beers}) => {
