@@ -12,7 +12,7 @@ const SESSION_GROUPS = {
 export default class BeerSet extends EventEmitter {
   constructor(beers, index) {
     super();
-    this.indexes = ['ut_bid'];
+    this.indexes = ['ut_bid', 'brewery'];
     this.setBeers(beers);
     this.fullTextSearchReady = false;
   }
@@ -77,6 +77,10 @@ export default class BeerSet extends EventEmitter {
 
   getBeersIndexedBy(index, key) {
     return this.specialIndexes[index][key];
+  }
+
+  getIndexKeys(index) {
+    return Object.keys(this.specialIndexes[index]);
   }
 
   loadIndex() {

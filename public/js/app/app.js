@@ -8,6 +8,7 @@ import Renderer from './renderer'
 import BeerSet from './beer_set'
 import Untappd from './untappd'
 import EventEmitter from 'events'
+import LeaderBeer from './leaderbeer'
 
 _.templateSettings = {
   interpolate: /\{\{=(.+?)\}\}/g,
@@ -30,10 +31,11 @@ export default class App extends EventEmitter {
     this.view = $('#window');
     this.renderer = new Renderer(this, this.templates, this.view);
     this.setTemplateGlobals();
-    this.renderer.on('didRender', () => this.afterRender());
 
     this.beerset = new BeerSet(beers);
     this.untappd = new Untappd(this);
+    this.leaderbeer = new LeaderBeer();
+    this.leaderbeerSessions = {};
 
     this.updateExportLink();
     this.updateBeersMarked();
@@ -113,11 +115,44 @@ export default class App extends EventEmitter {
     calc('live_ratings', () => !this.db.disableLiveRating);
   }
 
+  getLeaderbeerSession(sess) {
+    if (!this.leaderbeerSessions[sess]) this.leaderbeerSessions[sess] = new LeaderBeer();
+    return this.leaderbeerSessions[sess];
+  }
+
+  setSession(pass, name) {
+    this.socket.emit('leaderbeer-start-session', {pass, name});
+    this.socket.once('leaderbeer-return', ({err}) => {
+      if (!err) alert(`session ${name} started`);
+      else alert('bad pass');
+    });
+  }
+
+  clearSession(pass) {
+    this.socket.emit('leaderbeer-clear-session', {pass});
+    this.socket.once('leaderbeer-return', ({err}) => {
+      if (!err) alert(`session cleared`);
+      else alert('bad pass');
+    });
+  }
+
   connectToLiveRatings() {
     this.socket = connectToWebsocket(this);
 
     this.socket.on('leaderbeer-init', data => {
-      console.log('leaderbeer!', data);
+      this.leaderbeer.updateBeers(data.all);
+      for (let [session, beers] of Object.entries(data.sessions)) {
+        this.getLeaderbeerSession(session).updateBeers(beers);
+      }
+    });
+    this.socket.on('leaderbeer-update', data => {
+      this.leaderbeer.updateBeers(data);
+    });
+    this.socket.on('leaderbeer-update-session', ({session, beers}) => {
+      this.getLeaderbeerSession(session).updateBeers(beers);
+    });
+    this.socket.on('leaderbeer-new-session', session => {
+      this.getLeaderbeerSession(session);
     });
     this.socket.on('rate', data => {
       this.beerset.forAllBeersWithId(data.beer, beer => {
@@ -149,48 +184,6 @@ export default class App extends EventEmitter {
       this.socket.close();
       this.socket = undefined;
     }
-  }
-
-  afterRender() {
-    this.addSliderListeners(this.view);
-  }
-
-  addSliderListeners(view) {
-    //todo react
-    return;
-    view.find('.rating-slider-control').each(function() {
-      var container = $(this);
-      var label;
-      var handle = $(this.children[1]);
-      var hasPrepped = false;
-      //TODO bundle dependency
-      var listener = DragListener(handle, 0, function() { return container.width() }, {
-        stopPropagation: true
-      });
-      var prep = function() {
-        label = container.next('.rating-text');
-        hasPrepped = true;
-      };
-      var moveTo = function(pct) {
-        handle.css({left: (Math.round(pct * 20) * 5) + '%'});
-        label.text(Math.round(pct * 20) / 4);
-      };
-      var moveToAndSave = function(pct) {
-        moveTo(pct)
-        $('body').trigger('rating-slider:rate', [container, Math.round(pct * 20) / 4]);
-      }
-      listener.on('dragStart', prep);
-      listener.on('drag', moveTo);
-      listener.on('dragFinish', moveToAndSave);
-      container.on('click', function(event) {
-        if (!hasPrepped) prep();
-        moveToAndSave(event.offsetX / container.width());
-      });
-      handle.on('click', function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-      });
-    });
   }
 
   async saveUntappdToken({arg}) {

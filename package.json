@@ -34,6 +34,8 @@
     "redis": "^2.7.1",
     "seraph": "^0.14.2",
     "set-value": "^3.0.0",
+    "shifty": "^2.3.1",
+    "shufflejs": "^5.1.2",
     "socket.io": "^1.7.3",
     "stylus": "^0.54.5",
     "then-redis": "^2.0.1",

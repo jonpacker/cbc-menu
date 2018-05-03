@@ -120,6 +120,50 @@ export default class Renderer extends EventEmitter {
     }
   }
 
+  renderer_leaderbeer(opts) {
+    let lb;
+    if (opts.session) {
+      lb = this.app.getLeaderbeerSession(opts.session);
+    } else {
+      lb = this.app.leaderbeer;
+    }
+    opts.beerList = lb.beers;
+    opts.sessions = Object.keys(this.app.leaderbeerSessions);
+    opts.hasSessions = opts.sessions.length > 0;
+    this.once('didRender', () => {
+      lb.attachToView(this.view);
+    });
+    this.once('willRender', () => {
+      lb.detachFromView(this.view);
+    })
+    return Mustache.render(this.templates.leaderbeer, opts);
+  }
+
+  renderer_admin(opts) {
+    opts.breweries = this.app.beerset.getIndexKeys('brewery');
+    const clearSession = (e) => {
+      e.preventDefault();
+      const pass = $(this.view).find('#password').val();
+      this.app.clearSession(pass);
+    }
+    const setSession = (e) => {
+      e.preventDefault();
+      console.log('creating sess');
+      const pass = $(this.view).find('#password').val();
+      const sess = $(this.view).find("#sessionName").val();
+      this.app.setSession(pass, sess);
+    }
+    this.once('didRender', () => {
+      this.view.find("#createSession").on('click', setSession);
+      this.view.find("#clearSession").on('click', clearSession);
+    });
+    this.once('willRender', () => {
+      this.view.find("#createSession").off('click', setSession);
+      this.view.find("#clearSession").off('click', clearSession);
+    });
+    return Mustache.render(this.templates.admin, opts);
+  }
+
   renderer_ut_logout() {
     this.app.db.untappdUser = null;
     this.app.db.untappdToken = null;

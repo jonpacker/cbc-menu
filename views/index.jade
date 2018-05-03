@@ -26,6 +26,7 @@ html(manifest="app.cache")
             .sub= config.sessions[session].subtitle
       .beer-lists
         a(href="#beerlist", class="all-beers-sel") All Beers
+        a(href="#leaderbeer", class="leaderbeer-sel") Untappd Leaderboard
       .untappd
         img(src='/img/ut_icon_144.png')
         | {{#untappd_token}}
@@ -47,7 +48,51 @@ html(manifest="app.cache")
         .expl When live ratings are turned on, an average based on ratings from users of this app is generated and updated in real time, as people drink beer and rate. This feature requires internet.
       .info
         p Made by <a href="http://github.com/jonpacker">Jon Packer</a>.
+        
+  script(type="text/html", class="template", data-template-id="leaderbeer")
+    .leaderbeer(class="sess-{{session}}")
+      .top-bar
+        a(href="#index")
+          img(src="/img/chevron-left.svg" width="32")
+        h1 Untappd Leaderboard {{#session}}- {{.}} session{{/session}}{{^session}}- Overall{{/session}}
+      .leaderbeer-inner
+        | {{#hasSessions}}
+        strong Available sessions:
+          | {{#sessions}}
+          a(href='#leaderbeer[{"session":"{{.}}"}]' class="sess-link {{.}}") {{.}}
+          | {{/sessions}}
+          a(href='#leaderbeer' class='sess-link overall') Overall (all sessions)
+        | {{/hasSessions}} 
+        .expl This is a leaderboard of all untappd checkins. It tracks all checkins marked at the #{config.festivalName} venue. The ratings are weighted averages, so a beer with 5 ratings of 4.5 will be rated higher than one with 3 ratings of 4.5.
 
+        ul.beer-ranking
+          | {{#beerList}}
+          li.beer-item(data-bid="{{beer.bid}}", data-rating="{{bayesianRating}}", data-index="{{index}}")
+            .ranking {{humanIndex}}
+            .beer
+              span.beer-name {{beer.beer_name}}
+              span.brewery-name {{brewery.brewery_name}}
+            .rating {{bayesianRatingFixed}}
+            .count {{validCheckinCount}}
+            .unweighted {{rollingAverageRatingFixed}}
+          | {{/beerList}}
+          
+  script(type="text/html", class="template", data-template-id="admin")
+    #admin
+      input(type="password", id="password", name="password")
+      div  
+        label(for="sessionName") Create Session
+        input(type="text", name="session", id="sessionName")
+        button(id="createSession") Create
+      div
+        button(id="clearSession") Clear Session
+      div
+        label(for="breweries") Add Location to Brewery
+        select(name="brewery", id="breweries")
+          | {{#breweries}}
+          option(value="{{.}}") {{.}}
+          | {{/breweries}}
+        input(type="text", name="breweryLocation", id="breweryLocation")
 
   script(type="text/javascript", src="/js/jquery-2.2.3.min.js")
   script(type="text/javascript", src="/js/mustache.min.js")
