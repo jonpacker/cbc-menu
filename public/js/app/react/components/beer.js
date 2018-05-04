@@ -94,10 +94,10 @@ export default class Beer extends React.Component {
         <div className="headline">
           <div className="name-block">
             <div className="name">
-              { beer.sessions.map((sess, i) => (
-                <span key={`${beer.id}_${sess}_${i}`} className={`${sess}-indicator sess`}/>
-              ))}
               {beer.name}
+              { beer.sessions.map((sess, i) => (
+                <span key={`${beer.id}_${sess}_${i}`} className={`${sess}-indicator sess`}>{sess[0]}</span>
+              ))}
             </div>
             <div className="abv">{ beer.percent ? beer.percent : '?' }</div>
             { (beer.ut_bid &&
@@ -110,7 +110,7 @@ export default class Beer extends React.Component {
                   <img src="/img/users.svg"/>
                   {this.state.liveRating.toFixed(2)}
                   </div>) : ''}
-            <div className="style">{beer.superstyle}</div>
+            <div className="style">{beer.mbcc_desc || beer.superstyle}</div>
           </div>
           <div className="marks">
             <a className="star" onClick={() => this.toggleSaved()}>★</a>
