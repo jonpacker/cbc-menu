@@ -1020,18 +1020,31 @@ html
     .beer
       color: #ccc
       display: grid
-      grid-template-rows: 1fr 1fr
+      grid-template-rows: 2fr 1fr
       grid-gap: 0.15rem
       font-size: 0.9em
+      padding: 0.25rem
 
       .beer-name
         align-self: end
+        font-size: 1.6em
+        max-height: .66*7.5rem
+        line-height: @max-height
+        overflow: hidden
 
       .brewery-name
         align-self: start
+        max-height: .33*7.5rem
+        line-height: .33*7.5rem
+        overflow: hidden
 
+    .rating
+      font-size: 1.5em
     .rating:after
       background-color: black
+
+    .count
+      font-size: 1em
 
 
   .top-bar
