@@ -37,6 +37,7 @@ export default class App extends EventEmitter {
     this.leaderbeer = new LeaderBeer();
     this.leaderbeerCheckins = new LeaderBeer();
     this.leaderbeerSessions = {};
+    this.leaderbeerSessionsCheckins = {};
 
     this.updateExportLink();
     this.updateBeersMarked();
@@ -148,7 +149,6 @@ export default class App extends EventEmitter {
     this.socket.on('leaderbeer-init', data => {
       this.leaderbeer.updateBeers(data.all);
       this.leaderbeerCheckins.updateBeers(data.topChecked);
-      console.log(data.topChecked);
       if (data.all.length > 0) $('#leaderbeer-button').show();
       for (let [session, beers] of Object.entries(data.sessions)) {
         this.getLeaderbeerSession(session).updateBeers(beers);
