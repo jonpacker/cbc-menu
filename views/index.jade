@@ -87,6 +87,34 @@ html(manifest="app.cache")
             .unweighted {{rollingAverageRatingFixed}}
           | {{/beerList}}
           
+  script(type="text/html", class="template", data-template-id="lbheadless")
+    .leaderbeer.headless
+      img(src="/img/bcbf.png")
+      h1.beers Highest Rated
+      ul.beer-ranking
+        | {{#beerList}}
+        li.beer-item(data-bid="{{beer.bid}}", data-rating="{{bayesianRating}}", data-index="{{index}}")
+          .ranking {{humanIndex}}
+          .beer
+            span.beer-name {{beer.beer_name}}
+            span.brewery-name {{brewery.brewery_name}}
+          .rating {{bayesianRatingFixed}}
+          .count {{validCheckinCount}}
+          .unweighted {{rollingAverageRatingFixed}}
+        | {{/beerList}}
+      h1.checks Most Checked In
+      ul.checkin-ranking
+        | {{#checkinTopList}}
+        li.beer-item(data-bid="{{beer.bid}}", data-rating="{{bayesianRating}}", data-index="{{index}}")
+          .ranking {{humanIndex}}
+          .beer
+            span.beer-name {{beer.beer_name}}
+            span.brewery-name {{brewery.brewery_name}}
+          .rating {{bayesianRatingFixed}}
+          .count {{validCheckinCount}}
+          .unweighted {{rollingAverageRatingFixed}}
+        | {{/checkinTopList}}
+          
   script(type="text/html", class="template", data-template-id="admin")
     #admin
       input(type="password", id="password", name="password")

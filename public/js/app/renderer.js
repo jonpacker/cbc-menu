@@ -121,8 +121,14 @@ export default class Renderer extends EventEmitter {
     }
   }
 
+  renderer_leaderbeerheadless(opts) {
+    opts.headless = true;
+    opts.checks = true;
+    return this.renderer_leaderbeer(opts);
+  }
+
   renderer_leaderbeer(opts) {
-    let lb;
+    let lb, lbChecked;
     if (opts.session) {
       lb = this.app.getLeaderbeerSession(opts.session);
     } else {
@@ -131,13 +137,25 @@ export default class Renderer extends EventEmitter {
     opts.beerList = lb.beers;
     opts.sessions = Object.keys(this.app.leaderbeerSessions);
     opts.hasSessions = opts.sessions.length > 0;
+
+    if (opts.checks) {
+      if (opts.session) {
+        lbChecked = this.app.getLeaderbeerSession(opts.session, true);
+      } else {
+        lbChecked = this.app.leaderbeerCheckins;
+      }
+      opts.checkinTopList = lbChecked.beers;
+    }
     this.once('didRender', () => {
-      lb.attachToView(this.view);
+      lb.attachToView(this.view.find('.beer-ranking'));
+      if (lbChecked) lbChecked.attachToView(this.view.find('.checkin-ranking'));
     });
     this.once('willRender', () => {
-      lb.detachFromView(this.view);
+      lb.detachFromView(this.view.find('.beer-ranking'));
+      if (lbChecked) lbChecked.detachFromView(this.view.find('.checkin-ranking'));
     })
-    return Mustache.render(this.templates.leaderbeer, opts);
+    const template = opts.headless ? this.templates.lbheadless : this.templates.leaderbeer;
+    return Mustache.render(template, opts);
   }
 
   renderer_admin(opts) {

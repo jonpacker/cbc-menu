@@ -2417,8 +2417,8 @@ lazy@~1.0.11:
   resolved "https://registry.yarnpkg.com/lazy/-/lazy-1.0.11.tgz#daa068206282542c088288e975c297c1ae77b690"
 
 "leaderbeer-core@git+https://github.com/jonpacker/lb-core.git":
-  version "1.2.5"
-  resolved "git+https://github.com/jonpacker/lb-core.git#1078fa7a951ec48dcd5608c13b15f074115ee65c"
+  version "1.3.2"
+  resolved "git+https://github.com/jonpacker/lb-core.git#a14539cbcb7cf9c6b9bb6ba479564db815c5f10f"
   dependencies:
     fetch-check-http-status "^2.0.0"
     node-fetch "^2.1.2"

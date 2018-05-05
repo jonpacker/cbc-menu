@@ -970,6 +970,69 @@ html
 .leaderbeer
   font-size: 2rem
 
+  &.headless
+    display: grid
+    width: 100%
+    height: 100%
+    grid-template-columns: 10vw 40vw 50vw
+    grid-template-rows: 9vh 91vh
+    grid-gap: 1rem
+    padding: 1rem
+
+    background-color: #111
+    background-image: url(/img/bcbfnologo.png)
+    background-repeat: no-repeat
+    background-size: cover
+    overflow: hidden
+    img
+      grid-column:1/2
+      grid-row: 1/2
+      width: 7.5rem
+      height: 7.5rem
+      margin-bottom: 1rem
+      display: block
+      align-self: center
+      justify-self: center
+    ul.beer-ranking
+      grid-column:1/3
+      grid-row:2/3
+    ul.checkin-ranking
+      grid-column:3/4
+      grid-row:2/3
+    h1.beers
+      grid-column: 2/3
+      grid-row: 1/2
+    h1.checks
+      grid-column: 3/4
+      grid-row: 1/2
+
+    h1
+      color #ccc
+      text-align: left
+      margin-top: 0
+      margin-bottom: 0
+      align-self: center
+    li
+      background-color: #333
+      grid-template-columns: 7.5rem auto 12rem 12rem
+
+    .beer
+      color: #ccc
+      display: grid
+      grid-template-rows: 1fr 1fr
+      grid-gap: 0.15rem
+      font-size: 0.9em
+
+      .beer-name
+        align-self: end
+
+      .brewery-name
+        align-self: start
+
+    .rating:after
+      background-color: black
+
+
   .top-bar
     display: grid
     grid-template-columns: 1fr 7fr

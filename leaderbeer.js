@@ -25,16 +25,19 @@ module.exports = async (db, config, credentials, io) => {
 
   const getAllTopLists = async () => {
     const all = await LeaderBeer.stats.getTopRated(db, config.leaderbeer.venueId, config.leaderbeer.count);
+    const allTopChecked = await LeaderBeer.stats.getTopCheckedIn(db, config.leaderbeer.venueId, config.leaderbeer.count);
     const sessions = await LeaderBeer.getSessions(db, config.leaderbeer.venueId);
-    const lists = {all, sessions:{}};
+    const lists = {all, topChecked: allTopChecked, sessions:{}, sessionCheckins: {}};
     for (let session of sessions) {
       lists.sessions[session] = await LeaderBeer.stats.getTopRated(db,
+        config.leaderbeer.venueId, config.leaderbeer.count, session);
+      lists.sessionCheckins[session] = await LeaderBeer.stats.getTopCheckedIn(db,
         config.leaderbeer.venueId, config.leaderbeer.count, session);
     }
     return lists;
   }
 
-  let initRatings = {all: [], sessions: {}};
+  let initRatings = {all: [], topChecked: [],sessions: {}, sessionCheckins: {}};
   try { initRatings = await getAllTopLists() } catch (e) {}
   io.on('connection', async socket => {
     socket.emit('leaderbeer-init', initRatings);
@@ -58,14 +61,22 @@ module.exports = async (db, config, credentials, io) => {
     console.log('got message about updated ratings, sending out with websockets...');
     const updatedAllRatings = await LeaderBeer.stats.getTopRated(db,
       config.leaderbeer.venueId, config.leaderbeer.count);
+    const updatedAllCheckins = await LeaderBeer.stats.getTopCheckedIn(db,
+      config.leaderbeer.venueId, config.leaderbeer.count);
     initRatings.all = updatedAllRatings;
+    initRatings.topChecked = updatedAllCheckins;
     if (sess) {
       const sessRatings = await LeaderBeer.stats.getTopRated(db,
         config.leaderbeer.venueId, config.leaderbeer.count, sess);
+      const sessTopChecked = await LeaderBeer.stats.getTopCheckedIn(db,
+        config.leaderbeer.venueId, config.leaderbeer.count, sess);
       initRatings.sessions[sess] = sessRatings;
+      initRatings.sessionCheckins[sess] = sessTopChecked;
       io.emit('leaderbeer-update-session', {session: sess, beers: sessRatings})
+      io.emit('leaderbeer-update-session-checked', {session: sess, beers: sessTopChecked})
     }
     io.emit('leaderbeer-update', updatedAllRatings);
+    io.emit('leaderbeer-update-checked', updatedAllCheckins);
   });
   subscriber.subscribe('updated-ratings');
 }

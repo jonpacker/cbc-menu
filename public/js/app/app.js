@@ -35,6 +35,7 @@ export default class App extends EventEmitter {
     this.beerset = new BeerSet(beers);
     this.untappd = new Untappd(this);
     this.leaderbeer = new LeaderBeer();
+    this.leaderbeerCheckins = new LeaderBeer();
     this.leaderbeerSessions = {};
 
     this.updateExportLink();
@@ -115,9 +116,14 @@ export default class App extends EventEmitter {
     calc('live_ratings', () => !this.db.disableLiveRating);
   }
 
-  getLeaderbeerSession(sess) {
-    if (!this.leaderbeerSessions[sess]) this.leaderbeerSessions[sess] = new LeaderBeer();
-    return this.leaderbeerSessions[sess];
+  getLeaderbeerSession(sess, topChecked) {
+    if (topChecked) {
+      if (!this.leaderbeerSessionsCheckins[sess]) this.leaderbeerSessionsCheckins[sess] = new LeaderBeer();
+      return this.leaderbeerSessionsCheckins[sess];
+    } else {
+      if (!this.leaderbeerSessions[sess]) this.leaderbeerSessions[sess] = new LeaderBeer();
+      return this.leaderbeerSessions[sess];
+    }
   }
 
   setSession(pass, name) {
@@ -141,6 +147,8 @@ export default class App extends EventEmitter {
 
     this.socket.on('leaderbeer-init', data => {
       this.leaderbeer.updateBeers(data.all);
+      this.leaderbeerCheckins.updateBeers(data.topChecked);
+      console.log(data.topChecked);
       if (data.all.length > 0) $('#leaderbeer-button').show();
       for (let [session, beers] of Object.entries(data.sessions)) {
         this.getLeaderbeerSession(session).updateBeers(beers);
@@ -150,11 +158,19 @@ export default class App extends EventEmitter {
       $('#leaderbeer-button').show();
       this.leaderbeer.updateBeers(data);
     });
+    this.socket.on('leaderbeer-update-checked', data => {
+      $('#leaderbeer-button').show();
+      this.leaderbeerCheckins.updateBeers(data);
+    });
     this.socket.on('leaderbeer-update-session', ({session, beers}) => {
       this.getLeaderbeerSession(session).updateBeers(beers);
     });
+    this.socket.on('leaderbeer-update-session-checked', ({session, beers}) => {
+      this.getLeaderbeerSession(session, true).updateBeers(beers);
+    });
     this.socket.on('leaderbeer-new-session', session => {
       this.getLeaderbeerSession(session);
+      this.getLeaderbeerSession(session, true);
     });
     this.socket.on('rate', data => {
       this.beerset.forAllBeersWithId(data.beer, beer => {
