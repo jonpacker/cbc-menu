@@ -25,7 +25,8 @@ export default class Untappd {
 
   async readUntappdCheckins() {
     let start = 0, count = 0;
-    if (localStorage.getItem('ut_uniques_start')) {
+    if (localStorage.getItem('ut_uniques_start')
+        && localStorage.getItem('unicorn_not_finished_flag') == '1') {
       start = parseInt(localStorage.getItem('ut_uniques_start'));
       count = parseInt(localStorage.getItem('ut_uniques_count')) || 0;
     }
@@ -48,6 +49,13 @@ export default class Untappd {
       });
       localStorage.setItem('ut_uniques_count', count);
       $('.status-text').text(start + " beers read, " + count + " beers matched");
+    }
+    if (result.meta && result.meta.error_type) {
+      localStorage.setItem('unicorn_not_finished_flag', '1');
+    } else {
+      localStorage.setItem('unicorn_not_finished_flag', '0');
+      localStorage.removeItem('ut_uniques_count');
+      localStorage.removeItem('ut_uniques_start');
     }
 
     return count;
