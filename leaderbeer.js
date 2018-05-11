@@ -3,6 +3,15 @@ const {CronJob} = require('cron');
 const config = require('./config.json');
 const privateConfig = require('./config-private.json');
 const subscriber = require('then-redis').createClient(config.redis);
+const fs = require('fs');
+const _config = require('./config.json');
+
+let credNum = 0;
+const getCredentials = async () => {
+  const creds = fs.readFileSync(`./credentials-${credNum}.json`, 'utf8')
+  credNum = (credNum + 1) % (_config.leaderbeer.credentialsCount || 1);
+  return JSON.parse(creds);
+}
 
 module.exports = async (db, config, credentials, io) => {
   // update every minute
@@ -12,7 +21,7 @@ module.exports = async (db, config, credentials, io) => {
       const count = await LeaderBeer.updateBeerScores(
         db,
         config.leaderbeer.venueId,
-        credentials,
+        await getCredentials(),
         config.leaderbeer.forcedFirstCheckin
       );
       const session = await LeaderBeer.getCurrentSession(db, config.leaderbeer.venueId);
