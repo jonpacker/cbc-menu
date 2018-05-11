@@ -141,7 +141,7 @@ export default class FilterableSortableBeerList extends Component {
               {!app.db.disableLiveRating &&
                 <a className="site-bg-style avg live-rating"
                    onClick={() => this.setOrder('live_rating')}>👥 Rating</a> }
-            { false && <a className="ordering order-location" onClick={() => this.setOrder('location')}>Location</a> }
+            {  <a className="ordering order-location" onClick={() => this.setOrder('location')}>Location</a> }
             <a className={`ordering ${this.state.order == null ? "order-by-name selected" : ""}`}
               onClick={() => this.setOrder(null)}>Brewery</a>
           </div>
