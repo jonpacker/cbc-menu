@@ -15,7 +15,7 @@ const getCredentials = async () => {
 
 module.exports = async (db, config, credentials, io) => {
   // update every minute
-  const update = new CronJob('0 * * * * *', async () => {
+  const update = new CronJob('*/20 * * * * *', async () => {
     console.log('updating ratings from untappd');
     try {
       const count = await LeaderBeer.updateBeerScores(
